@@ -40,6 +40,7 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
       };
 
     case 'ADD_TASK':
+      const now = new Date();
       const newTask: Task = {
         id: Date.now(),
         titulo: action.payload.titulo,
@@ -48,7 +49,8 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         prioridade: action.payload.prioridade,
         impedimento: false,
         impedimentoMotivo: '',
-        dataInicio: new Date(),
+        dataCadastro: now, // Data de cadastro da tarefa
+        dataInicio: null, // Será preenchida quando mudar para "fazendo"
         dataFim: null,
         ordem: 0 // Nova tarefa vai para o topo
       };
@@ -74,12 +76,19 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
               novoHistorico.push(action.payload.status);
             }
             
+            // Define dataInicio quando muda para "fazendo" (se ainda não foi definida)
+            const dataInicio = action.payload.status === 'fazendo' && !task.dataInicio 
+              ? new Date() 
+              : task.dataInicio;
+            
+            // Define dataFim quando muda para "concluido"
             const dataFim = action.payload.status === 'concluido' ? new Date() : task.dataFim;
             
             return {
               ...task,
               statusAtual: action.payload.status,
               statusHistorico: novoHistorico,
+              dataInicio,
               dataFim
             };
           }

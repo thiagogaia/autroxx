@@ -10,7 +10,8 @@ export const STORAGE_KEYS = {
 export const serializeTasks = (tasks: Task[]): string => {
   const serializedTasks = tasks.map(task => ({
     ...task,
-    dataInicio: task.dataInicio.toISOString(),
+    dataCadastro: task.dataCadastro.toISOString(),
+    dataInicio: task.dataInicio ? task.dataInicio.toISOString() : null,
     dataFim: task.dataFim ? task.dataFim.toISOString() : null
   }));
   
@@ -24,7 +25,8 @@ export const deserializeTasks = (tasksJson: string): Task[] => {
     
     return parsed.map((task: any) => ({
       ...task,
-      dataInicio: new Date(task.dataInicio),
+      dataCadastro: new Date(task.dataCadastro),
+      dataInicio: task.dataInicio ? new Date(task.dataInicio) : null,
       dataFim: task.dataFim ? new Date(task.dataFim) : null
     }));
   } catch (error) {

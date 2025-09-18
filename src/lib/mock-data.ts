@@ -60,7 +60,8 @@ export const TAREFAS_EXEMPLO: Task[] = [
     prioridade: "alta",
     impedimento: false,
     impedimentoMotivo: "",
-    dataInicio: new Date('2025-09-18T09:30:00'),
+    dataCadastro: new Date('2025-09-16T08:00:00'),
+    dataInicio: new Date('2025-09-18T09:30:00'), // Definida quando mudou para "fazendo"
     dataFim: null
   },
   {
@@ -71,8 +72,9 @@ export const TAREFAS_EXEMPLO: Task[] = [
     prioridade: "normal",
     impedimento: false,
     impedimentoMotivo: "",
-    dataInicio: new Date('2025-09-17T14:20:00'),
-    dataFim: new Date('2025-09-18T11:45:00')
+    dataCadastro: new Date('2025-09-15T10:30:00'),
+    dataInicio: new Date('2025-09-17T14:20:00'), // Definida quando mudou para "fazendo"
+    dataFim: new Date('2025-09-18T11:45:00') // Definida quando mudou para "concluido"
   },
   {
     id: 3,
@@ -82,7 +84,8 @@ export const TAREFAS_EXEMPLO: Task[] = [
     prioridade: "media",
     impedimento: true,
     impedimentoMotivo: "Aguardando liberação do servidor",
-    dataInicio: new Date('2025-09-18T08:00:00'),
+    dataCadastro: new Date('2025-09-17T16:45:00'),
+    dataInicio: null, // Ainda não iniciou (não mudou para "fazendo")
     dataFim: null
   },
   {
@@ -93,7 +96,8 @@ export const TAREFAS_EXEMPLO: Task[] = [
     prioridade: "normal",
     impedimento: false,
     impedimentoMotivo: "",
-    dataInicio: new Date('2025-09-18T10:15:00'),
+    dataCadastro: new Date('2025-09-18T07:20:00'),
+    dataInicio: new Date('2025-09-18T10:15:00'), // Definida quando mudou para "fazendo"
     dataFim: null
   }
 ];

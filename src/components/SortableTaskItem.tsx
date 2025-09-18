@@ -77,7 +77,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
   };
 
   const calcularTempoDecorrido = () => {
-    if (!task.dataFim) return null;
+    if (!task.dataFim || !task.dataInicio) return null;
     const inicio = new Date(task.dataInicio);
     const fim = new Date(task.dataFim);
     const diffMs = fim.getTime() - inicio.getTime();
@@ -174,7 +174,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
               
               <div className="text-xs text-muted-foreground mt-1 space-y-1">
                 <div>
-                  Início: {new Date(task.dataInicio).toLocaleString('pt-BR', {
+                  Cadastro: {new Date(task.dataCadastro).toLocaleString('pt-BR', {
                     day: '2-digit',
                     month: '2-digit',
                     year: '2-digit',
@@ -182,6 +182,17 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
                     minute: '2-digit'
                   })}
                 </div>
+                {task.dataInicio && (
+                  <div>
+                    Início: {new Date(task.dataInicio).toLocaleString('pt-BR', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </div>
+                )}
                 {task.dataFim && (
                   <div>
                     Fim: {new Date(task.dataFim).toLocaleString('pt-BR', {

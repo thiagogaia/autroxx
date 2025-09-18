@@ -7,14 +7,14 @@ export function Metrics() {
   const { tasks } = useTaskContext();
 
   // Calcular métricas úteis
-  const tarefasConcluidas = tasks.filter(t => t.statusAtual === 'concluido' && t.dataFim);
+  const tarefasConcluidas = tasks.filter(t => t.statusAtual === 'concluido' && t.dataFim && t.dataInicio);
   const tarefasEmAndamento = tasks.filter(t => t.statusAtual === 'fazendo');
   const tarefasComImpedimento = tasks.filter(t => t.impedimento);
   
   // Tempo médio de conclusão
   const tempoMedio = tarefasConcluidas.length > 0 ? 
     tarefasConcluidas.reduce((acc, tarefa) => {
-      const diffMs = new Date(tarefa.dataFim!).getTime() - new Date(tarefa.dataInicio).getTime();
+      const diffMs = new Date(tarefa.dataFim!).getTime() - new Date(tarefa.dataInicio!).getTime();
       return acc + diffMs;
     }, 0) / tarefasConcluidas.length : 0;
   

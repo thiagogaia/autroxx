@@ -7,8 +7,8 @@ import { FilterType } from '@/types/task';
 export function TaskFilter() {
   const { filtroAtivo, setFilter } = useTaskContext();
 
-  const handleFilterChange = (value: FilterType) => {
-    setFilter(value);
+  const handleFilterChange = (value: string) => {
+    setFilter(value as FilterType);
   };
 
   return (

@@ -10,8 +10,9 @@ export interface Task {
   prioridade: TaskPriority;
   impedimento: boolean;
   impedimentoMotivo: string;
-  dataInicio: Date;
-  dataFim: Date | null;
+  dataCadastro: Date; // Data de cadastro da tarefa
+  dataInicio: Date | null; // Data de início (quando muda para "fazendo")
+  dataFim: Date | null; // Data de fim (quando muda para "concluido")
   ordem?: number; // Novo campo para ordenação
 }
 
