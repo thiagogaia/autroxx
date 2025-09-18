@@ -184,8 +184,8 @@ Edite o componente `Metrics.tsx` para adicionar novas métricas calculadas.
 
 ## 🎯 Próximos Passos Inicial
 
-- [ ] Persistência de dados (localStorage/API)
-- [ ] Drag & Drop para reordenar tarefas
+- [x] Persistência de dados (localStorage/API)
+- [x] Drag & Drop para reordenar tarefas
 - [ ] Notificações push
 - [ ] Colaboração em tempo real
 - [ ] Exportação de relatórios
@@ -208,7 +208,7 @@ Edite o componente `Metrics.tsx` para adicionar novas métricas calculadas.
 - [ ] Relatórios avançados
 
 ### Melhorias UX
-- [ ] Drag & Drop para reordenar
+- [x] Drag & Drop para reordenar
 - [ ] Atalhos de teclado
 - [ ] Temas personalizáveis
 - [ ] PWA (Progressive Web App)
