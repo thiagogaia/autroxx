@@ -21,8 +21,7 @@ export default function TaskManagerPage() {
             </p>
           </div>
           
-          {/* Tutorial Drag & Drop */}
-          <DragDropTutorial />
+          
           
           {/* Filtros */}
           <TaskFilter />
