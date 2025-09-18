@@ -13,7 +13,8 @@ type TaskAction =
   | { type: 'REMOVE_IMPEDIMENT'; payload: { id: number } }
   | { type: 'SET_FILTER'; payload: { filter: FilterType } }
   | { type: 'LOAD_TASKS'; payload: { tasks: Task[] } }
-  | { type: 'DELETE_TASK'; payload: { id: number } };
+  | { type: 'DELETE_TASK'; payload: { id: number } }
+  | { type: 'REORDER_TASKS'; payload: { taskIds: number[] } };
 
 interface TaskState {
   tasks: Task[];
@@ -28,9 +29,14 @@ const initialState: TaskState = {
 function taskReducer(state: TaskState, action: TaskAction): TaskState {
   switch (action.type) {
     case 'LOAD_TASKS':
+      // Garante que as tarefas tenham ordem definida
+      const tasksWithOrder = action.payload.tasks.map((task, index) => ({
+        ...task,
+        ordem: task.ordem !== undefined ? task.ordem : index
+      }));
       return {
         ...state,
-        tasks: action.payload.tasks
+        tasks: tasksWithOrder.sort((a, b) => (a.ordem || 0) - (b.ordem || 0))
       };
 
     case 'ADD_TASK':
@@ -43,11 +49,19 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         impedimento: false,
         impedimentoMotivo: '',
         dataInicio: new Date(),
-        dataFim: null
+        dataFim: null,
+        ordem: 0 // Nova tarefa vai para o topo
       };
+      
+      // Atualiza a ordem das outras tarefas
+      const updatedTasks = state.tasks.map(task => ({
+        ...task,
+        ordem: (task.ordem || 0) + 1
+      }));
+      
       return {
         ...state,
-        tasks: [newTask, ...state.tasks]
+        tasks: [newTask, ...updatedTasks]
       };
 
     case 'UPDATE_STATUS':
@@ -107,6 +121,18 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
       return {
         ...state,
         tasks: state.tasks.filter(task => task.id !== action.payload.id)
+      };
+
+    case 'REORDER_TASKS':
+      const taskMap = new Map(state.tasks.map(task => [task.id, task]));
+      const reorderedTasks = action.payload.taskIds.map((id, index) => ({
+        ...taskMap.get(id)!,
+        ordem: index
+      }));
+      
+      return {
+        ...state,
+        tasks: reorderedTasks
       };
 
     case 'SET_FILTER':
@@ -174,7 +200,10 @@ export function TaskProvider({ children }: { children: ReactNode }) {
 
   const setFilter = (filter: FilterType) => {
     setFiltroAtivo(filter);
-    dispatch({ type: 'SET_FILTER', payload: { filter } });
+  };
+
+  const reorderTasks = (taskIds: number[]) => {
+    dispatch({ type: 'REORDER_TASKS', payload: { taskIds } });
   };
 
   return (
@@ -187,6 +216,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       setImpediment,
       removeImpediment,
       deleteTask,
+      reorderTasks,
       setFilter
     }}>
       {children}

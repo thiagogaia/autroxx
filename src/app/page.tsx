@@ -4,6 +4,7 @@ import { TaskForm } from '@/components/TaskForm';
 import { TaskList } from '@/components/TaskList';
 import { Metrics } from '@/components/Metrics';
 import { DataManagement } from '@/components/DataManagement';
+import { DragDropTutorial } from '@/components/DragDropTutorial';
 
 export default function TaskManagerPage() {
   return (
@@ -16,9 +17,12 @@ export default function TaskManagerPage() {
               Task Manager MVP
             </h1>
             <p className="text-muted-foreground">
-              Gerencie suas tarefas de forma simples e eficiente
+              Gerencie suas tarefas de forma simples e eficiente com drag & drop
             </p>
           </div>
+          
+          {/* Tutorial Drag & Drop */}
+          <DragDropTutorial />
           
           {/* Filtros */}
           <TaskFilter />

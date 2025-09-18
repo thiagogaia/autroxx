@@ -116,7 +116,7 @@ export function DataManagement() {
         { titulo: 'Fazer deploy da aplicação', prioridade: 'alta' as const }
       ];
       
-      sampleTasks.forEach(task => {
+      sampleTasks.forEach((task, index) => {
         addTask(task.titulo, task.prioridade);
       });
       

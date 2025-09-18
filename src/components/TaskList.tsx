@@ -1,13 +1,47 @@
 'use client';
 
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  restrictToVerticalAxis,
+  restrictToParentElement,
+} from '@dnd-kit/modifiers';
+
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { SortableTaskItem } from './SortableTaskItem';
 import { TaskItem } from './TaskItem';
 import { EmptyState } from './EmptyState';
 import { useTaskContext } from '@/contexts/TaskContext';
+import { ArrowUpDown } from 'lucide-react';
 
 export function TaskList() {
-  const { tasks, filtroAtivo } = useTaskContext();
+  const { tasks, filtroAtivo, reorderTasks } = useTaskContext();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Precisa arrastar 8px para iniciar o drag
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Filtrar tarefas baseado na aba ativa
   const tarefasFiltradas = tasks.filter(tarefa => {
@@ -36,25 +70,74 @@ export function TaskList() {
     );
   }
 
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      const oldIndex = tarefasFiltradas.findIndex(task => task.id === active.id);
+      const newIndex = tarefasFiltradas.findIndex(task => task.id === over?.id);
+
+      // Reordena apenas as tarefas filtradas
+      const reorderedFiltered = arrayMove(tarefasFiltradas, oldIndex, newIndex);
+      
+      // Se estamos filtrando, precisamos mesclar com as tarefas não filtradas
+      if (filtroAtivo !== 'tudo') {
+        const nonFilteredTasks = tasks.filter(tarefa => {
+          if (filtroAtivo === 'normal') return tarefa.prioridade !== 'normal';
+          if (filtroAtivo === 'urgente') return tarefa.prioridade !== 'alta';
+          return false;
+        });
+        
+        // Combina as tarefas reordenadas com as não filtradas
+        const allReorderedIds = [
+          ...reorderedFiltered.map(task => task.id),
+          ...nonFilteredTasks.map(task => task.id)
+        ];
+        
+        reorderTasks(allReorderedIds);
+      } else {
+        // Se não há filtro, reordena todas as tarefas
+        reorderTasks(reorderedFiltered.map(task => task.id));
+      }
+    }
+  }
+
   return (
     <Card className="overflow-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-muted/50">
-            <TableHead className="text-center font-medium">Status</TableHead>
-            <TableHead className="text-center font-medium">Fazendo</TableHead>
-            <TableHead className="text-center font-medium">Concluído</TableHead>
-            <TableHead className="font-medium">Tarefa</TableHead>
-            <TableHead className="text-center font-medium">Impedimento</TableHead>
-            <TableHead className="text-center font-medium">Prioridade</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {tarefasFiltradas.map(tarefa => (
-            <TaskItem key={tarefa.id} task={tarefa} />
-          ))}
-        </TableBody>
-      </Table>
+      
+      
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+        modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+      >
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              <TableHead className="text-center font-medium w-8">
+                <ArrowUpDown className="h-4 w-4 mx-auto" />
+              </TableHead>
+              <TableHead className="text-center font-medium">Status</TableHead>
+              <TableHead className="text-center font-medium">Fazendo</TableHead>
+              <TableHead className="text-center font-medium">Concluído</TableHead>
+              <TableHead className="font-medium">Tarefa</TableHead>
+              <TableHead className="text-center font-medium">Impedimento</TableHead>
+              <TableHead className="text-center font-medium">Prioridade</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <SortableContext
+              items={tarefasFiltradas.map(task => task.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {tarefasFiltradas.map(tarefa => (
+                <SortableTaskItem key={tarefa.id} task={tarefa} />
+              ))}
+            </SortableContext>
+          </TableBody>
+        </Table>
+      </DndContext>
     </Card>
   );
 }

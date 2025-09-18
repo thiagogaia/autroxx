@@ -1,0 +1,94 @@
+/* Estilos para melhorar a experiência de drag & drop */
+
+/* Cursor durante o drag */
+.dragging {
+  cursor: grabbing !important;
+}
+
+.dragging * {
+  cursor: grabbing !important;
+}
+
+/* Melhora a aparência do handle de drag */
+.drag-handle {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Transição suave para as linhas durante reordenação */
+tbody tr {
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+/* Estado de hover para o handle */
+.drag-handle:hover {
+  background-color: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+/* Estado ativo do drag handle */
+.drag-handle:active {
+  background-color: hsl(var(--muted)) !important;
+  transform: scale(0.95);
+}
+
+/* Feedback visual quando item está sendo arrastado */
+.sortable-drag-overlay {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  transform: rotate(2deg);
+}
+
+/* Animação para feedback visual */
+@keyframes drag-start {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.02);
+  }
+}
+
+.drag-starting {
+  animation: drag-start 150ms ease-out;
+}
+
+/* Remove seleção de texto durante drag */
+.dragging-context * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+/* Indicador visual de onde o item será solto */
+.drop-indicator {
+  position: relative;
+}
+
+.drop-indicator::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: hsl(var(--primary));
+  border-radius: 2px;
+  z-index: 10;
+}
+
+/* Melhora a responsividade em dispositivos touch */
+@media (pointer: coarse) {
+  .drag-handle {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

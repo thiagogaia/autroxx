@@ -12,6 +12,7 @@ export interface Task {
   impedimentoMotivo: string;
   dataInicio: Date;
   dataFim: Date | null;
+  ordem?: number; // Novo campo para ordenação
 }
 
 export interface StatusConfig {
@@ -38,5 +39,6 @@ export interface TaskContextType {
   setImpediment: (id: number, motivo: string) => void;
   removeImpediment: (id: number) => void;
   deleteTask: (id: number) => void;
+  reorderTasks: (taskIds: number[]) => void; // Nova função para reordenar
   setFilter: (filter: FilterType) => void;
 }
