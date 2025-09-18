@@ -211,6 +211,17 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
                     )}
                   </div>
                 )}
+                {task.dataImpedimento && (
+                  <div className="text-red-600">
+                    Impedimento: {new Date(task.dataImpedimento).toLocaleString('pt-BR', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </div>
+                )}
               </div>
             </div>
             

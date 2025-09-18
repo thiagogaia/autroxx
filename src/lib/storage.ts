@@ -12,7 +12,8 @@ export const serializeTasks = (tasks: Task[]): string => {
     ...task,
     dataCadastro: task.dataCadastro.toISOString(),
     dataInicio: task.dataInicio ? task.dataInicio.toISOString() : null,
-    dataFim: task.dataFim ? task.dataFim.toISOString() : null
+    dataFim: task.dataFim ? task.dataFim.toISOString() : null,
+    dataImpedimento: task.dataImpedimento ? task.dataImpedimento.toISOString() : null
   }));
   
   return JSON.stringify(serializedTasks);
@@ -27,7 +28,8 @@ export const deserializeTasks = (tasksJson: string): Task[] => {
       ...task,
       dataCadastro: new Date(task.dataCadastro),
       dataInicio: task.dataInicio ? new Date(task.dataInicio) : null,
-      dataFim: task.dataFim ? new Date(task.dataFim) : null
+      dataFim: task.dataFim ? new Date(task.dataFim) : null,
+      dataImpedimento: task.dataImpedimento ? new Date(task.dataImpedimento) : null
     }));
   } catch (error) {
     console.warn('Erro ao deserializar tarefas:', error);

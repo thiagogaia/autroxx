@@ -1,6 +1,6 @@
 export type TaskStatus = 'a_fazer' | 'fazendo' | 'concluido';
 export type TaskPriority = 'baixa' | 'normal' | 'media' | 'alta';
-export type FilterType = 'tudo' | 'normal' | 'urgente';
+export type FilterType = 'tudo' | 'fazendo' | 'normal' | 'urgente';
 
 export interface Task {
   id: number;
@@ -11,6 +11,7 @@ export interface Task {
   prioridade: TaskPriority;
   impedimento: boolean;
   impedimentoMotivo: string;
+  dataImpedimento: Date | null; // Data do impedimento (quando foi marcado)
   dataCadastro: Date; // Data de cadastro da tarefa
   dataInicio: Date | null; // Data de início (quando muda para "fazendo")
   dataFim: Date | null; // Data de fim (quando muda para "concluido")

@@ -51,6 +51,7 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         prioridade: action.payload.prioridade,
         impedimento: false,
         impedimentoMotivo: '',
+        dataImpedimento: null, // Será preenchida quando impedimento for marcado
         dataCadastro: now, // Data de cadastro da tarefa
         dataInicio: null, // Será preenchida quando mudar para "fazendo"
         dataFim: null,
@@ -123,7 +124,12 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         ...state,
         tasks: state.tasks.map(task =>
           task.id === action.payload.id
-            ? { ...task, impedimento: true, impedimentoMotivo: action.payload.motivo }
+            ? { 
+                ...task, 
+                impedimento: true, 
+                impedimentoMotivo: action.payload.motivo,
+                dataImpedimento: new Date() // Define a data do impedimento como "agora"
+              }
             : task
         )
       };
@@ -133,7 +139,12 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         ...state,
         tasks: state.tasks.map(task =>
           task.id === action.payload.id
-            ? { ...task, impedimento: false, impedimentoMotivo: '' }
+            ? { 
+                ...task, 
+                impedimento: false, 
+                impedimentoMotivo: '',
+                dataImpedimento: null // Remove a data do impedimento
+              }
             : task
         )
       };
