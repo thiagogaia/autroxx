@@ -55,6 +55,7 @@ export const TAREFAS_EXEMPLO: Task[] = [
   {
     id: 1,
     titulo: "Desenvolver API de usuários",
+    descricao: "Criar endpoints para CRUD de usuários com validação de dados e autenticação JWT. Incluir testes unitários e documentação da API.",
     statusHistorico: ["a_fazer", "fazendo"],
     statusAtual: "fazendo",
     prioridade: "alta",
@@ -67,6 +68,7 @@ export const TAREFAS_EXEMPLO: Task[] = [
   {
     id: 2,
     titulo: "Criar telas de login",
+    descricao: "Implementar interface de login responsiva com validação em tempo real e integração com API de autenticação.",
     statusHistorico: ["a_fazer", "fazendo", "concluido"],
     statusAtual: "concluido",
     prioridade: "normal",
@@ -79,6 +81,7 @@ export const TAREFAS_EXEMPLO: Task[] = [
   {
     id: 3,
     titulo: "Configurar banco de dados",
+    descricao: "Configurar PostgreSQL com migrations, índices otimizados e backup automático. Aguardando liberação do servidor de produção.",
     statusHistorico: ["a_fazer"],
     statusAtual: "a_fazer",
     prioridade: "media",
@@ -91,6 +94,7 @@ export const TAREFAS_EXEMPLO: Task[] = [
   {
     id: 4,
     titulo: "Implementar sistema de notificações",
+    descricao: "Desenvolver sistema de notificações push e email com templates personalizáveis e histórico de envios.",
     statusHistorico: ["a_fazer", "fazendo"],
     statusAtual: "fazendo",
     prioridade: "normal",

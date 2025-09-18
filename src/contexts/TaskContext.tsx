@@ -9,6 +9,7 @@ type TaskAction =
   | { type: 'ADD_TASK'; payload: { titulo: string; prioridade: TaskPriority } }
   | { type: 'UPDATE_STATUS'; payload: { id: number; status: TaskStatus } }
   | { type: 'UPDATE_PRIORITY'; payload: { id: number; prioridade: TaskPriority } }
+  | { type: 'UPDATE_TASK'; payload: { id: number; updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade'>> } }
   | { type: 'SET_IMPEDIMENT'; payload: { id: number; motivo: string } }
   | { type: 'REMOVE_IMPEDIMENT'; payload: { id: number } }
   | { type: 'SET_FILTER'; payload: { filter: FilterType } }
@@ -44,6 +45,7 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
       const newTask: Task = {
         id: Date.now(),
         titulo: action.payload.titulo,
+        descricao: '', // Campo de descrição sempre inicia vazio
         statusHistorico: ['a_fazer'],
         statusAtual: 'a_fazer',
         prioridade: action.payload.prioridade,
@@ -102,6 +104,16 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         tasks: state.tasks.map(task =>
           task.id === action.payload.id
             ? { ...task, prioridade: action.payload.prioridade }
+            : task
+        )
+      };
+
+    case 'UPDATE_TASK':
+      return {
+        ...state,
+        tasks: state.tasks.map(task =>
+          task.id === action.payload.id
+            ? { ...task, ...action.payload.updates }
             : task
         )
       };
@@ -195,6 +207,10 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'UPDATE_PRIORITY', payload: { id, prioridade } });
   };
 
+  const updateTask = (id: number, updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade'>>) => {
+    dispatch({ type: 'UPDATE_TASK', payload: { id, updates } });
+  };
+
   const setImpediment = (id: number, motivo: string) => {
     dispatch({ type: 'SET_IMPEDIMENT', payload: { id, motivo } });
   };
@@ -222,6 +238,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       addTask,
       updateTaskStatus,
       updateTaskPriority,
+      updateTask,
       setImpediment,
       removeImpediment,
       deleteTask,

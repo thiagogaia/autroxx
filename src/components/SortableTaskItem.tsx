@@ -6,8 +6,9 @@ import { CSS } from '@dnd-kit/utilities';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Trash2, GripVertical } from 'lucide-react';
+import { Trash2, GripVertical, Edit } from 'lucide-react';
 import { ImpedimentDialog } from './ImpedimentDialog';
+import { EditTaskSheet } from './EditTaskSheet';
 import { useTaskContext } from '@/contexts/TaskContext';
 import { Task, TaskStatus, TaskPriority } from '@/types/task';
 import { STATUS_CONFIG, PRIORIDADE_CONFIG } from '@/lib/mock-data';
@@ -31,6 +32,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
   const { updateTaskStatus, updateTaskPriority, setImpediment, removeImpediment, deleteTask } = useTaskContext();
   const [impedimentDialogOpen, setImpedimentDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editSheetOpen, setEditSheetOpen] = useState(false);
 
   const {
     attributes,
@@ -212,35 +214,48 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
               </div>
             </div>
             
-            {/* Botão de Excluir */}
-            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 cursor-pointer"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Excluir Tarefa</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleDeleteTask}
-                    className="bg-red-600 hover:bg-red-700"
+            {/* Botões de Ação */}
+            <div className="flex items-center gap-1">
+              {/* Botão de Editar */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 text-blue-500 hover:text-blue-700 hover:bg-blue-50 cursor-pointer"
+                onClick={() => setEditSheetOpen(true)}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+
+              {/* Botão de Excluir */}
+              <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 cursor-pointer"
                   >
-                    Excluir
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Excluir Tarefa</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDeleteTask}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      Excluir
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
         </td>
 
@@ -280,6 +295,12 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
         onClose={() => setImpedimentDialogOpen(false)}
         onSave={handleImpedimentSave}
         initialMotivo={task.impedimentoMotivo}
+      />
+
+      <EditTaskSheet
+        task={task}
+        isOpen={editSheetOpen}
+        onClose={() => setEditSheetOpen(false)}
       />
     </>
   );

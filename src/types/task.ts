@@ -5,6 +5,7 @@ export type FilterType = 'tudo' | 'normal' | 'urgente';
 export interface Task {
   id: number;
   titulo: string;
+  descricao: string; // Campo para detalhes/anotações da tarefa
   statusHistorico: TaskStatus[];
   statusAtual: TaskStatus;
   prioridade: TaskPriority;
@@ -37,6 +38,7 @@ export interface TaskContextType {
   addTask: (titulo: string, prioridade?: TaskPriority) => void;
   updateTaskStatus: (id: number, status: TaskStatus) => void;
   updateTaskPriority: (id: number, prioridade: TaskPriority) => void;
+  updateTask: (id: number, updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade'>>) => void;
   setImpediment: (id: number, motivo: string) => void;
   removeImpediment: (id: number) => void;
   deleteTask: (id: number) => void;
