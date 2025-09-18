@@ -11,6 +11,17 @@ import { ImpedimentDialog } from './ImpedimentDialog';
 import { useTaskContext } from '@/contexts/TaskContext';
 import { Task, TaskStatus, TaskPriority } from '@/types/task';
 import { STATUS_CONFIG, PRIORIDADE_CONFIG } from '@/lib/mock-data';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface SortableTaskItemProps {
   task: Task;
@@ -19,6 +30,7 @@ interface SortableTaskItemProps {
 export function SortableTaskItem({ task }: SortableTaskItemProps) {
   const { updateTaskStatus, updateTaskPriority, setImpediment, removeImpediment, deleteTask } = useTaskContext();
   const [impedimentDialogOpen, setImpedimentDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const {
     attributes,
@@ -60,9 +72,8 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
   };
 
   const handleDeleteTask = () => {
-    if (window.confirm('Tem certeza que deseja excluir esta tarefa?')) {
-      deleteTask(task.id);
-    }
+    deleteTask(task.id);
+    setDeleteDialogOpen(false);
   };
 
   const calcularTempoDecorrido = () => {
@@ -191,14 +202,34 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
             </div>
             
             {/* Botão de Excluir */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleDeleteTask}
-              className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 cursor-pointer"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 cursor-pointer"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Excluir Tarefa</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteTask}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    Excluir
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </td>
 
