@@ -40,7 +40,7 @@ export default function TaskManagerPage() {
           <Metrics />
           
           {/* Gerenciamento de Dados */}
-          {/* <DataManagement /> */}
+          <DataManagement />
         </div>
       </div>
     </TaskProvider>

@@ -37,6 +37,7 @@ export interface TaskContextType {
   tasks: Task[];
   filtroAtivo: FilterType;
   addTask: (titulo: string, prioridade?: TaskPriority) => void;
+  addTaskFull: (task: Task) => void;
   updateTaskStatus: (id: number, status: TaskStatus) => void;
   updateTaskPriority: (id: number, prioridade: TaskPriority) => void;
   updateTask: (id: number, updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade'>>) => void;

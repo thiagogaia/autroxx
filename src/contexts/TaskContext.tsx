@@ -7,6 +7,7 @@ import { STORAGE_KEYS, saveTasksToStorage, loadTasksFromStorage } from '@/lib/st
 
 type TaskAction =
   | { type: 'ADD_TASK'; payload: { titulo: string; prioridade: TaskPriority } }
+  | { type: 'ADD_TASK_FULL'; payload: { task: Task } }
   | { type: 'UPDATE_STATUS'; payload: { id: number; status: TaskStatus } }
   | { type: 'UPDATE_PRIORITY'; payload: { id: number; prioridade: TaskPriority } }
   | { type: 'UPDATE_TASK'; payload: { id: number; updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade'>> } }
@@ -67,6 +68,12 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
       return {
         ...state,
         tasks: [newTask, ...updatedTasks]
+      };
+
+    case 'ADD_TASK_FULL':
+      return {
+        ...state,
+        tasks: [...state.tasks, action.payload.task]
       };
 
     case 'UPDATE_STATUS':
@@ -210,6 +217,10 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'ADD_TASK', payload: { titulo, prioridade } });
   };
 
+  const addTaskFull = (task: Task) => {
+    dispatch({ type: 'ADD_TASK_FULL', payload: { task } });
+  };
+
   const updateTaskStatus = (id: number, status: TaskStatus) => {
     dispatch({ type: 'UPDATE_STATUS', payload: { id, status } });
   };
@@ -247,6 +258,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       tasks: state.tasks,
       filtroAtivo: state.filtroAtivo,
       addTask,
+      addTaskFull,
       updateTaskStatus,
       updateTaskPriority,
       updateTask,

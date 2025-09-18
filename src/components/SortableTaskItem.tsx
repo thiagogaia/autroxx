@@ -102,8 +102,8 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
         ref={setNodeRef} 
         style={style}
         className={`hover:bg-muted/50 transition-colors ${
-          isAltaPrioridade ? 'bg-red-50/50 border-l-4 border-l-red-500 animate-pulse' : 
-          isMediaPrioridade ? 'bg-yellow-50/50 border-l-4 border-l-yellow-500' : ''
+          isAltaPrioridade ? 'bg-red-50/50 dark:bg-red-950/20 border-l-4 border-l-red-500 dark:border-l-red-400 animate-pulse' : 
+          isMediaPrioridade ? 'bg-yellow-50/50 dark:bg-yellow-950/20 border-l-4 border-l-yellow-500 dark:border-l-yellow-400' : ''
         } ${isDragging ? 'bg-muted shadow-lg' : ''}`}
         {...attributes}
       >
@@ -137,7 +137,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
                   ⚠️
                 </span>
                 {task.impedimentoMotivo && (
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap max-w-48 text-center">
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-popover text-popover-foreground border border-border text-xs rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap max-w-48 text-center z-50">
                     {task.impedimentoMotivo}
                   </div>
                 )}
@@ -205,14 +205,14 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
                       minute: '2-digit'
                     })}
                     {tempoDecorrido && (
-                      <span className="font-medium text-green-600 ml-1">
+                      <span className="font-medium text-green-600 dark:text-green-400 ml-1">
                         ({tempoDecorrido})
                       </span>
                     )}
                   </div>
                 )}
                 {task.dataImpedimento && (
-                  <div className="text-red-600">
+                  <div className="text-red-600 dark:text-red-400">
                     Impedimento: {new Date(task.dataImpedimento).toLocaleString('pt-BR', {
                       day: '2-digit',
                       month: '2-digit',
@@ -231,7 +231,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0 text-blue-500 hover:text-blue-700 hover:bg-blue-50 cursor-pointer"
+                className="h-8 w-8 p-0 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/20 cursor-pointer"
                 onClick={() => setEditSheetOpen(true)}
               >
                 <Edit className="h-4 w-4" />
@@ -243,7 +243,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 cursor-pointer"
+                    className="h-8 w-8 p-0 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -283,10 +283,12 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
         <td className="text-center p-4">
           <Select value={task.prioridade} onValueChange={handlePriorityChange}>
             <SelectTrigger 
-              className="w-24 text-xs cursor-pointer"
+              className={`w-24 text-xs cursor-pointer ${
+                isAltaPrioridade ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800' : 
+                isMediaPrioridade ? 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800' : ''
+              }`}
               style={{ 
-                color: prioridadeConfig.color,
-                backgroundColor: isAltaPrioridade ? '#fef2f2' : isMediaPrioridade ? '#fefbf0' : 'white'
+                color: prioridadeConfig.color
               }}
             >
               <SelectValue />

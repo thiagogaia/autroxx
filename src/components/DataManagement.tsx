@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, Upload, Trash2, RefreshCw } from 'lucide-react';
 import { useTaskContext } from '@/contexts/TaskContext';
 import { Task } from '@/types/task';
-import { serializeTasks, deserializeTasks, STORAGE_KEYS } from '@/lib/storage';
+import { deserializeTasks, STORAGE_KEYS } from '@/lib/storage';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,19 +20,75 @@ import {
 } from '@/components/ui/alert-dialog';
 
 export function DataManagement() {
-  const { tasks, addTask } = useTaskContext();
+  const { tasks, addTaskFull } = useTaskContext();
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const [doubleConfirmDialogOpen, setDoubleConfirmDialogOpen] = useState(false);
   const [sampleDialogOpen, setSampleDialogOpen] = useState(false);
   const [tasksToImport, setTasksToImport] = useState<any[]>([]);
+  const [importErrors, setImportErrors] = useState<string[]>([]);
+  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  // Validar estrutura de dados importados
+  const validateImportedData = (data: any): { isValid: boolean; errors: string[] } => {
+    const errors: string[] = [];
+    
+    if (!data.tasks || !Array.isArray(data.tasks)) {
+      errors.push('Arquivo deve conter um array de tarefas');
+      return { isValid: false, errors };
+    }
+    
+    data.tasks.forEach((task: any, index: number) => {
+      if (!task.titulo || typeof task.titulo !== 'string') {
+        errors.push(`Tarefa ${index + 1}: título é obrigatório`);
+      }
+      
+      if (!task.prioridade || !['baixa', 'normal', 'media', 'alta'].includes(task.prioridade)) {
+        errors.push(`Tarefa ${index + 1}: prioridade inválida`);
+      }
+      
+      if (!task.statusAtual || !['a_fazer', 'fazendo', 'concluido'].includes(task.statusAtual)) {
+        errors.push(`Tarefa ${index + 1}: status atual inválido`);
+      }
+      
+      if (task.dataCadastro && isNaN(new Date(task.dataCadastro).getTime())) {
+        errors.push(`Tarefa ${index + 1}: data de cadastro inválida`);
+      }
+      
+      if (task.dataInicio && isNaN(new Date(task.dataInicio).getTime())) {
+        errors.push(`Tarefa ${index + 1}: data de início inválida`);
+      }
+      
+      if (task.dataFim && isNaN(new Date(task.dataFim).getTime())) {
+        errors.push(`Tarefa ${index + 1}: data de fim inválida`);
+      }
+    });
+    
+    return { isValid: errors.length === 0, errors };
+  };
 
   // Exportar dados para JSON
   const exportData = () => {
     const dataToExport = {
       tasks: tasks,
-      exportDate: new Date().toISOString(),
-      version: '1.0'
+      metadata: {
+        exportDate: new Date().toISOString(),
+        version: '1.0',
+        totalTasks: tasks.length,
+        tasksByStatus: {
+          a_fazer: tasks.filter(t => t.statusAtual === 'a_fazer').length,
+          fazendo: tasks.filter(t => t.statusAtual === 'fazendo').length,
+          concluido: tasks.filter(t => t.statusAtual === 'concluido').length
+        },
+        tasksByPriority: {
+          baixa: tasks.filter(t => t.prioridade === 'baixa').length,
+          normal: tasks.filter(t => t.prioridade === 'normal').length,
+          media: tasks.filter(t => t.prioridade === 'media').length,
+          alta: tasks.filter(t => t.prioridade === 'alta').length
+        },
+        impediments: tasks.filter(t => t.impedimento).length
+      }
     };
     
     const jsonString = JSON.stringify(dataToExport, null, 2);
@@ -64,15 +120,25 @@ export function DataManagement() {
           const content = e.target?.result as string;
           const data = JSON.parse(content);
           
+          // Validar dados
+          const validation = validateImportedData(data);
+          
+          if (!validation.isValid) {
+            setImportErrors(validation.errors);
+            setErrorMessage(`Erro na validação:\n${validation.errors.join('\n')}`);
+            return;
+          }
+          
           if (data.tasks && Array.isArray(data.tasks)) {
             setTasksToImport(data.tasks);
+            setImportErrors([]);
             setImportDialogOpen(true);
           } else {
-            alert('Formato de arquivo inválido!');
+            setErrorMessage('Formato de arquivo inválido!');
           }
         } catch (error) {
           console.error('Erro ao importar:', error);
-          alert('Erro ao processar o arquivo!');
+          setErrorMessage('Erro ao processar o arquivo!');
         }
       };
       
@@ -83,20 +149,40 @@ export function DataManagement() {
   };
 
   const handleImportConfirm = () => {
-    tasksToImport.forEach((task: any) => {
-      // Reconstruir a tarefa com novos IDs para evitar conflitos
-      const taskData = {
-        ...task,
-        dataInicio: new Date(task.dataInicio),
-        dataFim: task.dataFim ? new Date(task.dataFim) : null
-      };
+    try {
+      // Usar a função de deserialização do storage para garantir consistência
+      const serializedTasks = JSON.stringify(tasksToImport);
+      const deserializedTasks = deserializeTasks(serializedTasks);
       
-      addTask(taskData.titulo, taskData.prioridade);
-    });
-    
-    setImportDialogOpen(false);
-    setTasksToImport([]);
-    alert('Dados importados com sucesso!');
+      // Adicionar cada tarefa com dados completos
+      deserializedTasks.forEach((task: Task) => {
+        // Gerar novo ID para evitar conflitos
+        const newTask: Task = {
+          ...task,
+          id: Date.now() + Math.random(), // ID único
+          dataCadastro: task.dataCadastro || new Date(),
+          dataInicio: task.dataInicio || null,
+          dataFim: task.dataFim || null,
+          dataImpedimento: task.dataImpedimento || null,
+          descricao: task.descricao || '',
+          impedimento: task.impedimento || false,
+          impedimentoMotivo: task.impedimentoMotivo || '',
+          statusHistorico: task.statusHistorico || ['a_fazer'],
+          statusAtual: task.statusAtual || 'a_fazer',
+          ordem: task.ordem || 0
+        };
+        
+        // Usar a nova função addTaskFull
+        addTaskFull(newTask);
+      });
+      
+      setImportDialogOpen(false);
+      setTasksToImport([]);
+      setSuccessMessage('Dados importados com sucesso!');
+    } catch (error) {
+      console.error('Erro ao importar dados:', error);
+      setErrorMessage('Erro ao importar dados. Verifique o formato do arquivo.');
+    }
   };
 
   // Limpar todos os dados
@@ -122,20 +208,90 @@ export function DataManagement() {
   };
 
   const handleSampleConfirm = () => {
-    const sampleTasks = [
-      { titulo: 'Desenvolver API de usuários', prioridade: 'alta' as const },
-      { titulo: 'Criar telas de login', prioridade: 'normal' as const },
-      { titulo: 'Configurar banco de dados', prioridade: 'media' as const },
-      { titulo: 'Implementar sistema de notificações', prioridade: 'normal' as const },
-      { titulo: 'Fazer deploy da aplicação', prioridade: 'alta' as const }
+    const sampleTasks: Task[] = [
+      {
+        id: Date.now() + 1,
+        titulo: 'Desenvolver API de usuários',
+        descricao: 'Criar endpoints para CRUD de usuários com autenticação JWT',
+        prioridade: 'alta',
+        statusAtual: 'a_fazer',
+        statusHistorico: ['a_fazer'],
+        impedimento: false,
+        impedimentoMotivo: '',
+        dataCadastro: new Date(),
+        dataInicio: null,
+        dataFim: null,
+        dataImpedimento: null,
+        ordem: 0
+      },
+      {
+        id: Date.now() + 2,
+        titulo: 'Criar telas de login',
+        descricao: 'Implementar interface de login e registro de usuários',
+        prioridade: 'normal',
+        statusAtual: 'fazendo',
+        statusHistorico: ['a_fazer', 'fazendo'],
+        impedimento: false,
+        impedimentoMotivo: '',
+        dataCadastro: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 dias atrás
+        dataInicio: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 dia atrás
+        dataFim: null,
+        dataImpedimento: null,
+        ordem: 1
+      },
+      {
+        id: Date.now() + 3,
+        titulo: 'Configurar banco de dados',
+        descricao: 'Setup do PostgreSQL com migrations e seeds',
+        prioridade: 'media',
+        statusAtual: 'concluido',
+        statusHistorico: ['a_fazer', 'fazendo', 'concluido'],
+        impedimento: false,
+        impedimentoMotivo: '',
+        dataCadastro: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 dias atrás
+        dataInicio: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 dias atrás
+        dataFim: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 dia atrás
+        dataImpedimento: null,
+        ordem: 2
+      },
+      {
+        id: Date.now() + 4,
+        titulo: 'Implementar sistema de notificações',
+        descricao: 'Criar sistema de push notifications e email',
+        prioridade: 'normal',
+        statusAtual: 'a_fazer',
+        statusHistorico: ['a_fazer'],
+        impedimento: true,
+        impedimentoMotivo: 'Aguardando aprovação do cliente para o design',
+        dataCadastro: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 dia atrás
+        dataInicio: null,
+        dataFim: null,
+        dataImpedimento: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 horas atrás
+        ordem: 3
+      },
+      {
+        id: Date.now() + 5,
+        titulo: 'Fazer deploy da aplicação',
+        descricao: 'Deploy em produção com CI/CD pipeline',
+        prioridade: 'alta',
+        statusAtual: 'a_fazer',
+        statusHistorico: ['a_fazer'],
+        impedimento: false,
+        impedimentoMotivo: '',
+        dataCadastro: new Date(),
+        dataInicio: null,
+        dataFim: null,
+        dataImpedimento: null,
+        ordem: 4
+      }
     ];
     
-    sampleTasks.forEach((task, index) => {
-      addTask(task.titulo, task.prioridade);
+    sampleTasks.forEach((task) => {
+      addTaskFull(task);
     });
     
     setSampleDialogOpen(false);
-    alert('Tarefas de exemplo adicionadas!');
+    setSuccessMessage('Tarefas de exemplo adicionadas com sucesso!');
   };
 
   return (
@@ -231,6 +387,31 @@ export function DataManagement() {
             <p><strong>Exemplos:</strong> Adiciona tarefas de demonstração</p>
             <p><strong>Limpar:</strong> Remove todos os dados do localStorage</p>
           </div>
+          
+          {/* Feedback Messages */}
+          {successMessage && (
+            <div className="mt-4 p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-md">
+              <p className="text-green-800 dark:text-green-200 text-sm">{successMessage}</p>
+              <button 
+                onClick={() => setSuccessMessage('')}
+                className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200 text-xs mt-1"
+              >
+                ✕ Fechar
+              </button>
+            </div>
+          )}
+          
+          {errorMessage && (
+            <div className="mt-4 p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-md">
+              <p className="text-red-800 dark:text-red-200 text-sm whitespace-pre-line">{errorMessage}</p>
+              <button 
+                onClick={() => setErrorMessage('')}
+                className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 text-xs mt-1"
+              >
+                ✕ Fechar
+              </button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
