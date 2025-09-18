@@ -88,7 +88,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
       <tr 
         ref={setNodeRef} 
         style={style}
-        className={`hover:bg-muted/50 transition-colors cursor-grab active:cursor-grabbing ${
+        className={`hover:bg-muted/50 transition-colors ${
           isAltaPrioridade ? 'bg-red-50/50 border-l-4 border-l-red-500 animate-pulse' : 
           isMediaPrioridade ? 'bg-yellow-50/50 border-l-4 border-l-yellow-500' : ''
         } ${isDragging ? 'bg-muted shadow-lg' : ''}`}
@@ -138,7 +138,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
           <Checkbox
             checked={task.statusHistorico.includes('fazendo')}
             onCheckedChange={() => handleStatusChange('fazendo')}
-            className="mx-auto"
+            className="mx-auto cursor-pointer"
           />
         </td>
 
@@ -147,7 +147,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
           <Checkbox
             checked={task.statusHistorico.includes('concluido')}
             onCheckedChange={() => handleStatusChange('concluido')}
-            className="mx-auto"
+            className="mx-auto cursor-pointer"
           />
         </td>
 
@@ -195,7 +195,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
               variant="ghost"
               size="sm"
               onClick={handleDeleteTask}
-              className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+              className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 cursor-pointer"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -207,7 +207,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
           <Checkbox
             checked={task.impedimento}
             onCheckedChange={handleImpedimentChange}
-            className="mx-auto accent-red-600"
+            className="mx-auto accent-red-600 cursor-pointer"
           />
         </td>
 
@@ -215,7 +215,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
         <td className="text-center p-4">
           <Select value={task.prioridade} onValueChange={handlePriorityChange}>
             <SelectTrigger 
-              className="w-24 text-xs"
+              className="w-24 text-xs cursor-pointer"
               style={{ 
                 color: prioridadeConfig.color,
                 backgroundColor: isAltaPrioridade ? '#fef2f2' : isMediaPrioridade ? '#fefbf0' : 'white'
