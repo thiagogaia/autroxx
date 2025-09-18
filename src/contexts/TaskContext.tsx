@@ -1,8 +1,9 @@
 'use client';
 
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { Task, TaskContextType, TaskStatus, TaskPriority, FilterType } from '@/types/task';
-import { TAREFAS_EXEMPLO } from '@/lib/mock-data';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { STORAGE_KEYS, saveTasksToStorage, loadTasksFromStorage } from '@/lib/storage';
 
 type TaskAction =
   | { type: 'ADD_TASK'; payload: { titulo: string; prioridade: TaskPriority } }
@@ -10,7 +11,9 @@ type TaskAction =
   | { type: 'UPDATE_PRIORITY'; payload: { id: number; prioridade: TaskPriority } }
   | { type: 'SET_IMPEDIMENT'; payload: { id: number; motivo: string } }
   | { type: 'REMOVE_IMPEDIMENT'; payload: { id: number } }
-  | { type: 'SET_FILTER'; payload: { filter: FilterType } };
+  | { type: 'SET_FILTER'; payload: { filter: FilterType } }
+  | { type: 'LOAD_TASKS'; payload: { tasks: Task[] } }
+  | { type: 'DELETE_TASK'; payload: { id: number } };
 
 interface TaskState {
   tasks: Task[];
@@ -18,12 +21,18 @@ interface TaskState {
 }
 
 const initialState: TaskState = {
-  tasks: TAREFAS_EXEMPLO,
+  tasks: [],
   filtroAtivo: 'tudo'
 };
 
 function taskReducer(state: TaskState, action: TaskAction): TaskState {
   switch (action.type) {
+    case 'LOAD_TASKS':
+      return {
+        ...state,
+        tasks: action.payload.tasks
+      };
+
     case 'ADD_TASK':
       const newTask: Task = {
         id: Date.now(),
@@ -94,6 +103,12 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         )
       };
 
+    case 'DELETE_TASK':
+      return {
+        ...state,
+        tasks: state.tasks.filter(task => task.id !== action.payload.id)
+      };
+
     case 'SET_FILTER':
       return {
         ...state,
@@ -109,6 +124,29 @@ const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
 export function TaskProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(taskReducer, initialState);
+  const [filtroAtivo, setFiltroAtivo, filterLoaded] = useLocalStorage<FilterType>(STORAGE_KEYS.FILTER, 'tudo');
+
+  // Carregar tarefas do localStorage na inicialização
+  useEffect(() => {
+    const storedTasks = loadTasksFromStorage();
+    if (storedTasks.length > 0) {
+      dispatch({ type: 'LOAD_TASKS', payload: { tasks: storedTasks } });
+    }
+  }, []);
+
+  // Sincronizar filtro com localStorage
+  useEffect(() => {
+    if (filterLoaded) {
+      dispatch({ type: 'SET_FILTER', payload: { filter: filtroAtivo } });
+    }
+  }, [filtroAtivo, filterLoaded]);
+
+  // Salvar tarefas no localStorage sempre que mudarem
+  useEffect(() => {
+    if (state.tasks.length > 0) {
+      saveTasksToStorage(state.tasks);
+    }
+  }, [state.tasks]);
 
   const addTask = (titulo: string, prioridade: TaskPriority = 'normal') => {
     dispatch({ type: 'ADD_TASK', payload: { titulo, prioridade } });
@@ -130,7 +168,12 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'REMOVE_IMPEDIMENT', payload: { id } });
   };
 
+  const deleteTask = (id: number) => {
+    dispatch({ type: 'DELETE_TASK', payload: { id } });
+  };
+
   const setFilter = (filter: FilterType) => {
+    setFiltroAtivo(filter);
     dispatch({ type: 'SET_FILTER', payload: { filter } });
   };
 
@@ -143,6 +186,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       updateTaskPriority,
       setImpediment,
       removeImpediment,
+      deleteTask,
       setFilter
     }}>
       {children}

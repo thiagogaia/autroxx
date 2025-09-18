@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
 import { ImpedimentDialog } from './ImpedimentDialog';
 import { useTaskContext } from '@/contexts/TaskContext';
 import { Task, TaskStatus, TaskPriority } from '@/types/task';
@@ -13,7 +15,7 @@ interface TaskItemProps {
 }
 
 export function TaskItem({ task }: TaskItemProps) {
-  const { updateTaskStatus, updateTaskPriority, setImpediment, removeImpediment } = useTaskContext();
+  const { updateTaskStatus, updateTaskPriority, setImpediment, removeImpediment, deleteTask } = useTaskContext();
   const [impedimentDialogOpen, setImpedimentDialogOpen] = useState(false);
 
   const statusConfig = STATUS_CONFIG[task.statusAtual];
@@ -37,6 +39,12 @@ export function TaskItem({ task }: TaskItemProps) {
 
   const handleImpedimentSave = (motivo: string) => {
     setImpediment(task.id, motivo);
+  };
+
+  const handleDeleteTask = () => {
+    if (window.confirm('Tem certeza que deseja excluir esta tarefa?')) {
+      deleteTask(task.id);
+    }
   };
 
   const calcularTempoDecorrido = () => {
@@ -112,42 +120,55 @@ export function TaskItem({ task }: TaskItemProps) {
 
         {/* Título da Tarefa */}
         <td className="col-span-2 p-4">
-          <div className="flex flex-col items-start">
-            <span className={`font-medium ${
-              task.statusAtual === 'concluido' ? 'line-through text-muted-foreground' : ''
-            } ${isAltaPrioridade ? 'animate-pulse' : ''}`}>
-              {task.titulo}
-            </span>
-            
-            <div className="text-xs text-muted-foreground mt-1 space-y-1">
-              <div>
-                Início: {new Date(task.dataInicio).toLocaleString('pt-BR', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </div>
-              {task.dataFim && (
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col items-start flex-1">
+              <span className={`font-medium ${
+                task.statusAtual === 'concluido' ? 'line-through text-muted-foreground' : ''
+              } ${isAltaPrioridade ? 'animate-pulse' : ''}`}>
+                {task.titulo}
+              </span>
+              
+              <div className="text-xs text-muted-foreground mt-1 space-y-1">
                 <div>
-                  Fim: {new Date(task.dataFim).toLocaleString('pt-BR', {
+                  Início: {new Date(task.dataInicio).toLocaleString('pt-BR', {
                     day: '2-digit',
                     month: '2-digit',
                     year: '2-digit',
                     hour: '2-digit',
                     minute: '2-digit'
                   })}
-                  {tempoDecorrido && (
-                    <span className="font-medium text-green-600 ml-1">
-                      ({tempoDecorrido})
-                    </span>
-                  )}
                 </div>
-              )}
+                {task.dataFim && (
+                  <div>
+                    Fim: {new Date(task.dataFim).toLocaleString('pt-BR', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                    {tempoDecorrido && (
+                      <span className="font-medium text-green-600 ml-1">
+                        ({tempoDecorrido})
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
+            
+            {/* Botão de Excluir */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleDeleteTask}
+              className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </div>
         </td>
+
 
         {/* Checkbox Impedimento */}
         <td className="text-center p-4">

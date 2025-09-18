@@ -37,5 +37,6 @@ export interface TaskContextType {
   updateTaskPriority: (id: number, prioridade: TaskPriority) => void;
   setImpediment: (id: number, motivo: string) => void;
   removeImpediment: (id: number) => void;
+  deleteTask: (id: number) => void;
   setFilter: (filter: FilterType) => void;
 }

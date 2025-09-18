@@ -3,6 +3,7 @@
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card } from '@/components/ui/card';
 import { TaskItem } from './TaskItem';
+import { EmptyState } from './EmptyState';
 import { useTaskContext } from '@/contexts/TaskContext';
 
 export function TaskList() {
@@ -15,6 +16,25 @@ export function TaskList() {
     if (filtroAtivo === 'urgente') return tarefa.prioridade === 'alta';
     return true;
   });
+
+  // Se não há tarefas, mostra o estado vazio
+  if (tasks.length === 0) {
+    return <EmptyState />;
+  }
+
+  // Se há tarefas mas nenhuma corresponde ao filtro
+  if (tarefasFiltradas.length === 0) {
+    return (
+      <Card className="p-8">
+        <div className="text-center text-muted-foreground">
+          <p className="text-lg font-medium">Nenhuma tarefa encontrada</p>
+          <p className="text-sm mt-1">
+            Não há tarefas com o filtro "{filtroAtivo}" aplicado.
+          </p>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="overflow-hidden">
