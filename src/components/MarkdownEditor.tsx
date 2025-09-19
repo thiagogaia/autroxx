@@ -287,6 +287,9 @@ export function MarkdownEditor({ value, onChange, placeholder, className, onTask
                         {...props}
                         disabled={false} // Remover disabled
                         onChange={(e) => {
+                          // Prevenir propagação e manter foco
+                          e.stopPropagation();
+                          
                           // Encontrar e atualizar a linha correspondente
                           const lines = value.split('\n');
                           // Buscar por linhas com checkbox
@@ -309,6 +312,14 @@ export function MarkdownEditor({ value, onChange, placeholder, className, onTask
                             lines[targetLine.index] = newLine;
                             onChange(lines.join('\n'));
                           }
+                          // Manter foco no checkbox - método mais robusto para Chrome
+                          setTimeout(() => {
+                              e.target.focus();
+                            }, 0);
+                        }}
+                        onClick={(e) => {
+                          // Prevenir que o clique propague para outros elementos
+                          e.stopPropagation();
                         }}
                         className="mr-2 cursor-pointer"
                       />
@@ -317,32 +328,46 @@ export function MarkdownEditor({ value, onChange, placeholder, className, onTask
                   
                   return <input {...props} />;
                 },
-                // Componente para links de tarefas (#123)
-                a({ href, children, ...props }) {
-                  // Verificar se é um link de tarefa (#123)
-                  const taskMatch = href?.match(/^#(\d+)$/);
-                  if (taskMatch && onTaskLinkClick) {
-                    const taskId = parseInt(taskMatch[1]);
-                    return (
-                      <button
-                        onClick={() => onTaskLinkClick(taskId)}
-                        className="text-blue-600 hover:text-blue-800 underline cursor-pointer bg-transparent border-none p-0 font-inherit"
-                        {...props}
-                      >
-                        {children}
-                      </button>
-                    );
-                  }
-                  // Links normais
-                  return (
-                    <a href={href} className="text-blue-600 hover:text-blue-800 underline" {...props}>
-                      {children}
-                    </a>
-                  );
+                // Interceptar parágrafos para converter #123 e [#123] em links clicáveis
+                p: ({ children, ...props }: any) => {
+                  // Processar texto dentro de parágrafos
+                  const processChildren = (children: any): any => {
+                    if (typeof children === 'string' && (children.includes('#') || children.includes('[#'))) {
+                      // Suportar tanto #123 quanto [#123]
+                      const parts = children.split(/(#\d+|\[#\d+\])/);
+                      return parts.map((part, index) => {
+                        // Detectar #123 ou [#123]
+                        const taskMatch = part.match(/^(?:\[)?#(\d+)(?:\])?$/);
+                        if (taskMatch && onTaskLinkClick) {
+                          const taskId = parseInt(taskMatch[1]);
+                          return (
+                            <button
+                              key={index}
+                              onClick={() => onTaskLinkClick(taskId)}
+                              className="text-blue-600 hover:text-blue-800 underline cursor-pointer bg-transparent border-none p-0 font-inherit"
+                            >
+                              {part}
+                            </button>
+                          );
+                        }
+                        return part;
+                      });
+                    }
+                    return children;
+                  };
+
+                  const processedChildren = Array.isArray(children)
+                    ? children.map(processChildren)
+                    : processChildren(children);
+
+                  return <p {...props} className="mb-2">{processedChildren}</p>;
                 },
-                code({ node, inline, className, children, ...props }) {
+                // Componente para links de tarefas (#123) - removido pois agora usamos componente p
+                code({ className, children, ...props }: any) {
                   const match = /language-(\w+)/.exec(className || '');
-                  return !inline && match ? (
+                  const isInline = !match;
+                  
+                  return !isInline && match ? (
                     <SyntaxHighlighter
                       style={tomorrow}
                       language={match[1]}
@@ -361,10 +386,8 @@ export function MarkdownEditor({ value, onChange, placeholder, className, onTask
                 h1: ({ children }) => <h1 className="text-2xl font-bold mb-4">{children}</h1>,
                 h2: ({ children }) => <h2 className="text-xl font-semibold mb-3">{children}</h2>,
                 h3: ({ children }) => <h3 className="text-lg font-medium mb-2">{children}</h3>,
-                p: ({ children }) => <p className="mb-2">{children}</p>,
                 ul: ({ children }) => <ul className="list-disc list-inside mb-2">{children}</ul>,
                 ol: ({ children }) => <ol className="list-decimal list-inside mb-2">{children}</ol>,
-                li: ({ children }) => <li className="mb-1">{children}</li>,
                 blockquote: ({ children }) => (
                   <blockquote className="border-l-4 border-muted-foreground pl-4 italic mb-2">
                     {children}

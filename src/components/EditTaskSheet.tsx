@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import {
   Sheet,
   SheetContent,
@@ -23,15 +24,18 @@ interface EditTaskSheetProps {
   task: Task | null;
   isOpen: boolean;
   onClose: () => void;
+  stackLevel?: number; // Nível de profundidade (0 = primeiro nível)
 }
 
-export function EditTaskSheet({ task, isOpen, onClose }: EditTaskSheetProps) {
+export function EditTaskSheet({ task, isOpen, onClose, stackLevel = 0 }: EditTaskSheetProps) {
   const { updateTask, tasks } = useTaskContext();
   const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
   const [prioridade, setPrioridade] = useState<TaskPriority>('normal');
   const [tags, setTags] = useState<string[]>([]);
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
+  const [nestedSheetOpen, setNestedSheetOpen] = useState(false);
+  const [nestedTask, setNestedTask] = useState<Task | null>(null);
 
   // Atualizar os campos quando a tarefa mudar
   useEffect(() => {
@@ -48,9 +52,14 @@ export function EditTaskSheet({ task, isOpen, onClose }: EditTaskSheetProps) {
     const targetTask = tasks.find((t: Task) => t.id === taskId);
     if (targetTask) {
       setSelectedTaskId(taskId);
+      console.log('Abrindo tarefa referenciada:', targetTask);
+      setNestedTask(targetTask);
+      setNestedSheetOpen(true);
       // Aqui você pode implementar a lógica para abrir a tarefa
       // Por exemplo, abrir um modal ou navegar para a tarefa
       console.log('Abrir tarefa:', targetTask);
+    } else {
+      alert('Tarefa não encontrada');
     }
   }, [tasks]);
 
@@ -83,8 +92,11 @@ export function EditTaskSheet({ task, isOpen, onClose }: EditTaskSheetProps) {
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="h-full flex flex-col">
         <SheetHeader>
-          <SheetTitle>
+          <SheetTitle className="flex items-center gap-3">
             Editar Tarefa
+            <Badge variant="outline" className="text-xs font-mono bg-muted">
+              #{task?.id}
+            </Badge>
           </SheetTitle>
         </SheetHeader>
 
@@ -237,6 +249,16 @@ export function EditTaskSheet({ task, isOpen, onClose }: EditTaskSheetProps) {
           </Button>
         </SheetFooter>
       </SheetContent>
+
+      {/* Sheet aninhado para tarefas referenciadas */}
+      {nestedSheetOpen && (
+        <EditTaskSheet 
+          task={nestedTask} 
+          isOpen={nestedSheetOpen} 
+          onClose={() => setNestedSheetOpen(false)} 
+          stackLevel={stackLevel + 1} 
+        />
+      )}
     </Sheet>
   );
 }
