@@ -385,7 +385,6 @@ export function DataManagement() {
                   <AlertDialogCancel>Cancelar</AlertDialogCancel>
                   <AlertDialogAction 
                     onClick={handleClearConfirm}
-                    className="bg-red-600 hover:bg-red-700"
                   >
                     Excluir
                   </AlertDialogAction>
@@ -459,7 +458,6 @@ export function DataManagement() {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDoubleConfirm}
-              className="bg-red-600 hover:bg-red-700"
             >
               SIM, EXCLUIR TUDO
             </AlertDialogAction>
