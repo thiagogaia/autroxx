@@ -1,6 +1,8 @@
 export type TaskStatus = 'a_fazer' | 'fazendo' | 'concluido';
 export type TaskPriority = 'baixa' | 'normal' | 'media' | 'alta';
 export type FilterType = 'tudo' | 'fazendo' | 'normal' | 'urgente';
+export type TaskCategory = 'desenvolvimento' | 'reuniao' | 'bug' | 'documentacao';
+export type TaskComplexity = 'simples' | 'media' | 'complexa';
 
 export interface Task {
   id: number;
@@ -17,6 +19,12 @@ export interface Task {
   dataFim: Date | null; // Data de fim (quando muda para "concluido")
   ordem?: number; // Novo campo para ordenação
   tags?: string[]; // Tags para categorizar a tarefa
+  categoria?: TaskCategory; // Categoria da tarefa
+  estimativaTempo?: number; // Estimativa em minutos
+  complexidade?: TaskComplexity; // Complexidade da tarefa
+  numeroMudancasPrioridade?: number; // Número de mudanças de prioridade
+  tempoTotalImpedimento?: number; // Tempo total de impedimento em minutos
+  foiRetrabalho?: boolean; // Se foi retrabalho
 }
 
 export interface StatusConfig {
@@ -41,7 +49,7 @@ export interface TaskContextType {
   addTaskFull: (task: Task) => void;
   updateTaskStatus: (id: number, status: TaskStatus) => void;
   updateTaskPriority: (id: number, prioridade: TaskPriority) => void;
-  updateTask: (id: number, updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade' | 'tags'>>) => void;
+  updateTask: (id: number, updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade' | 'tags' | 'categoria' | 'estimativaTempo' | 'complexidade' | 'numeroMudancasPrioridade' | 'tempoTotalImpedimento' | 'foiRetrabalho'>>) => void;
   setImpediment: (id: number, motivo: string) => void;
   removeImpediment: (id: number) => void;
   deleteTask: (id: number) => void;

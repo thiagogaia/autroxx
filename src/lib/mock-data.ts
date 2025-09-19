@@ -1,4 +1,4 @@
-import { Task, StatusConfig, PriorityConfig, TaskStatus, TaskPriority } from '@/types/task';
+import { Task, StatusConfig, PriorityConfig, TaskStatus, TaskPriority, TaskCategory, TaskComplexity } from '@/types/task';
 
 export const STATUS_CONFIG: Record<TaskStatus, StatusConfig> = {
   a_fazer: {
@@ -64,7 +64,14 @@ export const TAREFAS_EXEMPLO: Task[] = [
     dataImpedimento: null,
     dataCadastro: new Date('2025-09-16T08:00:00'),
     dataInicio: new Date('2025-09-18T09:30:00'), // Definida quando mudou para "fazendo"
-    dataFim: null
+    dataFim: null,
+    tags: ["backend", "api", "crud"],
+    categoria: "desenvolvimento",
+    estimativaTempo: 480, // 8 horas
+    complexidade: "media",
+    numeroMudancasPrioridade: 1,
+    tempoTotalImpedimento: 0,
+    foiRetrabalho: false
   },
   {
     id: 2,
@@ -78,7 +85,14 @@ export const TAREFAS_EXEMPLO: Task[] = [
     dataImpedimento: null,
     dataCadastro: new Date('2025-09-15T10:30:00'),
     dataInicio: new Date('2025-09-17T14:20:00'), // Definida quando mudou para "fazendo"
-    dataFim: new Date('2025-09-18T11:45:00') // Definida quando mudou para "concluido"
+    dataFim: new Date('2025-09-18T11:45:00'), // Definida quando mudou para "concluido"
+    tags: ["frontend", "ui", "auth"],
+    categoria: "desenvolvimento",
+    estimativaTempo: 240, // 4 horas
+    complexidade: "simples",
+    numeroMudancasPrioridade: 0,
+    tempoTotalImpedimento: 0,
+    foiRetrabalho: false
   },
   {
     id: 3,
@@ -92,7 +106,14 @@ export const TAREFAS_EXEMPLO: Task[] = [
     dataImpedimento: new Date('2025-09-18T14:30:00'), // Definida quando impedimento foi marcado
     dataCadastro: new Date('2025-09-17T16:45:00'),
     dataInicio: null, // Ainda não iniciou (não mudou para "fazendo")
-    dataFim: null
+    dataFim: null,
+    tags: ["infra", "database", "postgresql"],
+    categoria: "desenvolvimento",
+    estimativaTempo: 180, // 3 horas
+    complexidade: "media",
+    numeroMudancasPrioridade: 2,
+    tempoTotalImpedimento: 120, // 2 horas de impedimento
+    foiRetrabalho: false
   },
   {
     id: 4,
@@ -106,6 +127,76 @@ export const TAREFAS_EXEMPLO: Task[] = [
     dataImpedimento: null,
     dataCadastro: new Date('2025-09-18T07:20:00'),
     dataInicio: new Date('2025-09-18T10:15:00'), // Definida quando mudou para "fazendo"
-    dataFim: null
+    dataFim: null,
+    tags: ["notifications", "email", "push"],
+    categoria: "desenvolvimento",
+    estimativaTempo: 360, // 6 horas
+    complexidade: "complexa",
+    numeroMudancasPrioridade: 0,
+    tempoTotalImpedimento: 0,
+    foiRetrabalho: false
+  },
+  {
+    id: 5,
+    titulo: "Reunião de planejamento sprint",
+    descricao: "Reunião para definir prioridades e estimativas para a próxima sprint. Participantes: dev team, PO, SM.",
+    statusHistorico: ["a_fazer", "concluido"],
+    statusAtual: "concluido",
+    prioridade: "normal",
+    impedimento: false,
+    impedimentoMotivo: "",
+    dataImpedimento: null,
+    dataCadastro: new Date('2025-09-16T09:00:00'),
+    dataInicio: new Date('2025-09-16T10:00:00'),
+    dataFim: new Date('2025-09-16T11:30:00'),
+    tags: ["meeting", "planning"],
+    categoria: "reuniao",
+    estimativaTempo: 90, // 1.5 horas
+    complexidade: "simples",
+    numeroMudancasPrioridade: 0,
+    tempoTotalImpedimento: 0,
+    foiRetrabalho: false
+  },
+  {
+    id: 6,
+    titulo: "Corrigir bug no login mobile",
+    descricao: "Usuários reportam que o login não funciona em dispositivos iOS. Investigar e corrigir problema de autenticação.",
+    statusHistorico: ["a_fazer", "fazendo"],
+    statusAtual: "fazendo",
+    prioridade: "alta",
+    impedimento: false,
+    impedimentoMotivo: "",
+    dataImpedimento: null,
+    dataCadastro: new Date('2025-09-18T08:30:00'),
+    dataInicio: new Date('2025-09-18T13:00:00'),
+    dataFim: null,
+    tags: ["bug", "mobile", "ios", "urgent"],
+    categoria: "bug",
+    estimativaTempo: 120, // 2 horas
+    complexidade: "media",
+    numeroMudancasPrioridade: 3,
+    tempoTotalImpedimento: 30, // 30 minutos de impedimento
+    foiRetrabalho: true
+  },
+  {
+    id: 7,
+    titulo: "Documentar API endpoints",
+    descricao: "Criar documentação completa da API com exemplos de uso, códigos de resposta e guias de integração.",
+    statusHistorico: ["a_fazer"],
+    statusAtual: "a_fazer",
+    prioridade: "baixa",
+    impedimento: false,
+    impedimentoMotivo: "",
+    dataImpedimento: null,
+    dataCadastro: new Date('2025-09-17T14:00:00'),
+    dataInicio: null,
+    dataFim: null,
+    tags: ["documentation", "api", "swagger"],
+    categoria: "documentacao",
+    estimativaTempo: 300, // 5 horas
+    complexidade: "simples",
+    numeroMudancasPrioridade: 0,
+    tempoTotalImpedimento: 0,
+    foiRetrabalho: false
   }
 ];

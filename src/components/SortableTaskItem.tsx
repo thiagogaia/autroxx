@@ -11,8 +11,9 @@ import { Trash2, GripVertical, Edit, AlertTriangle } from 'lucide-react';
 import { ImpedimentDialog } from './ImpedimentDialog';
 import { EditTaskSheet } from './EditTaskSheet';
 import { useTaskContext } from '@/contexts/TaskContext';
-import { Task, TaskStatus, TaskPriority } from '@/types/task';
+import { Task, TaskStatus, TaskPriority, TaskCategory, TaskComplexity } from '@/types/task';
 import { STATUS_CONFIG, PRIORIDADE_CONFIG } from '@/lib/mock-data';
+import { formatMinutesToString } from '@/lib/time-converter';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -96,6 +97,45 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
   const tempoDecorrido = calcularTempoDecorrido();
   const isAltaPrioridade = task.prioridade === 'alta';
   const isMediaPrioridade = task.prioridade === 'media';
+
+  // Funções para obter cores dos badges
+  const getCategoriaColor = (categoria: TaskCategory) => {
+    const colors = {
+      desenvolvimento: 'bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800',
+      reuniao: 'bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+      bug: 'bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800',
+      documentacao: 'bg-purple-50 dark:bg-purple-950/20 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
+    };
+    return colors[categoria];
+  };
+
+  const getComplexidadeColor = (complexidade: TaskComplexity) => {
+    const colors = {
+      simples: 'bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800',
+      media: 'bg-yellow-50 dark:bg-yellow-950/20 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800',
+      complexa: 'bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800'
+    };
+    return colors[complexidade];
+  };
+
+  const getCategoriaLabel = (categoria: TaskCategory) => {
+    const labels = {
+      desenvolvimento: 'Desenvolvimento',
+      reuniao: 'Reunião',
+      bug: 'Bug',
+      documentacao: 'Documentação'
+    };
+    return labels[categoria];
+  };
+
+  const getComplexidadeLabel = (complexidade: TaskComplexity) => {
+    const labels = {
+      simples: 'Simples',
+      media: 'Média',
+      complexa: 'Complexa'
+    };
+    return labels[complexidade];
+  };
 
   return (
     <>
@@ -237,6 +277,39 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
                   ))}
                 </div>
               )}
+
+              {/* Badges de Categoria, Estimativa e Complexidade */}
+              <div className="flex flex-wrap gap-1 mt-2">
+                {/* Badge de Categoria */}
+                {task.categoria && (
+                  <Badge
+                    variant="outline"
+                    className={`text-xs px-2 py-0.5 ${getCategoriaColor(task.categoria)}`}
+                  >
+                    {getCategoriaLabel(task.categoria)}
+                  </Badge>
+                )}
+
+                {/* Badge de Estimativa de Tempo */}
+                {task.estimativaTempo && (
+                  <Badge
+                    variant="outline"
+                    className="text-xs px-2 py-0.5 bg-orange-50 dark:bg-orange-950/20 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800"
+                  >
+                    {formatMinutesToString(task.estimativaTempo)}
+                  </Badge>
+                )}
+
+                {/* Badge de Complexidade */}
+                {task.complexidade && (
+                  <Badge
+                    variant="outline"
+                    className={`text-xs px-2 py-0.5 ${getComplexidadeColor(task.complexidade)}`}
+                  >
+                    {getComplexidadeLabel(task.complexidade)}
+                  </Badge>
+                )}
+              </div>
             </div>
             
             {/* Botões de Ação */}

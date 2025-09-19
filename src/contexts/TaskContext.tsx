@@ -10,7 +10,7 @@ type TaskAction =
   | { type: 'ADD_TASK_FULL'; payload: { task: Task } }
   | { type: 'UPDATE_STATUS'; payload: { id: number; status: TaskStatus } }
   | { type: 'UPDATE_PRIORITY'; payload: { id: number; prioridade: TaskPriority } }
-  | { type: 'UPDATE_TASK'; payload: { id: number; updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade'>> } }
+  | { type: 'UPDATE_TASK'; payload: { id: number; updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade' | 'tags' | 'categoria' | 'estimativaTempo' | 'complexidade' | 'numeroMudancasPrioridade' | 'tempoTotalImpedimento' | 'foiRetrabalho'>> } }
   | { type: 'SET_IMPEDIMENT'; payload: { id: number; motivo: string } }
   | { type: 'REMOVE_IMPEDIMENT'; payload: { id: number } }
   | { type: 'SET_FILTER'; payload: { filter: FilterType } }
@@ -112,7 +112,11 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         ...state,
         tasks: state.tasks.map(task =>
           task.id === action.payload.id
-            ? { ...task, prioridade: action.payload.prioridade }
+            ? { 
+                ...task, 
+                prioridade: action.payload.prioridade,
+                numeroMudancasPrioridade: (task.numeroMudancasPrioridade || 0) + 1
+              }
             : task
         )
       };
@@ -120,11 +124,21 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
     case 'UPDATE_TASK':
       return {
         ...state,
-        tasks: state.tasks.map(task =>
-          task.id === action.payload.id
-            ? { ...task, ...action.payload.updates }
-            : task
-        )
+        tasks: state.tasks.map(task => {
+          if (task.id === action.payload.id) {
+            const updates = action.payload.updates;
+            // Se a prioridade está sendo alterada, incrementar o contador
+            if (updates.prioridade && updates.prioridade !== task.prioridade) {
+              return { 
+                ...task, 
+                ...updates,
+                numeroMudancasPrioridade: (task.numeroMudancasPrioridade || 0) + 1
+              };
+            }
+            return { ...task, ...updates };
+          }
+          return task;
+        })
       };
 
     case 'SET_IMPEDIMENT':
@@ -145,16 +159,27 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
     case 'REMOVE_IMPEDIMENT':
       return {
         ...state,
-        tasks: state.tasks.map(task =>
-          task.id === action.payload.id
-            ? { 
-                ...task, 
-                impedimento: false, 
-                impedimentoMotivo: '',
-                dataImpedimento: null // Remove a data do impedimento
-              }
-            : task
-        )
+        tasks: state.tasks.map(task => {
+          if (task.id === action.payload.id) {
+            // Calcular tempo de impedimento se havia dataImpedimento
+            let tempoImpedimentoCalculado = task.tempoTotalImpedimento || 0;
+            if (task.dataImpedimento) {
+              const agora = new Date();
+              const diferencaMs = agora.getTime() - task.dataImpedimento.getTime();
+              const diferencaMinutos = Math.floor(diferencaMs / (1000 * 60));
+              tempoImpedimentoCalculado += diferencaMinutos;
+            }
+            
+            return { 
+              ...task, 
+              impedimento: false, 
+              impedimentoMotivo: '',
+              dataImpedimento: null,
+              tempoTotalImpedimento: tempoImpedimentoCalculado
+            };
+          }
+          return task;
+        })
       };
 
     case 'DELETE_TASK':
@@ -230,7 +255,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'UPDATE_PRIORITY', payload: { id, prioridade } });
   };
 
-  const updateTask = (id: number, updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade'>>) => {
+  const updateTask = (id: number, updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade' | 'tags' | 'categoria' | 'estimativaTempo' | 'complexidade' | 'numeroMudancasPrioridade' | 'tempoTotalImpedimento' | 'foiRetrabalho'>>) => {
     dispatch({ type: 'UPDATE_TASK', payload: { id, updates } });
   };
 

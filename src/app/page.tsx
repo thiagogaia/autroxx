@@ -3,6 +3,7 @@ import { TaskFilter } from '@/components/TaskFilter';
 import { TaskForm } from '@/components/TaskForm';
 import { TaskList } from '@/components/TaskList';
 import { Metrics } from '@/components/Metrics';
+import { Insights } from '@/components/Insights';
 import { DataManagement } from '@/components/DataManagement';
 import { DragDropTutorial } from '@/components/DragDropTutorial';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -38,6 +39,9 @@ export default function TaskManagerPage() {
           
           {/* Métricas */}
           <Metrics />
+          
+          {/* Insights */}
+          <Insights />
           
           {/* Gerenciamento de Dados */}
           <DataManagement />

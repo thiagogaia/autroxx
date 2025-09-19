@@ -3,22 +3,22 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
 import { useTaskContext } from '@/contexts/TaskContext';
-import { Task, TaskPriority } from '@/types/task';
+import { Task, TaskPriority, TaskCategory, TaskComplexity } from '@/types/task';
 import { PRIORIDADE_CONFIG } from '@/lib/mock-data';
 import { TagsInput } from './TagsInput';
 import { MarkdownEditor } from './MarkdownEditor';
+import { parseTimeString, formatMinutesToString } from '@/lib/time-converter';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface EditTaskSheetProps {
   task: Task | null;
@@ -33,7 +33,10 @@ export function EditTaskSheet({ task, isOpen, onClose, stackLevel = 0 }: EditTas
   const [descricao, setDescricao] = useState('');
   const [prioridade, setPrioridade] = useState<TaskPriority>('normal');
   const [tags, setTags] = useState<string[]>([]);
-  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
+  const [categoria, setCategoria] = useState<TaskCategory | undefined>(undefined);
+  const [estimativaTempoString, setEstimativaTempoString] = useState('');
+  const [complexidade, setComplexidade] = useState<TaskComplexity | undefined>(undefined);
+  const [foiRetrabalho, setFoiRetrabalho] = useState<boolean>(false);
   const [nestedSheetOpen, setNestedSheetOpen] = useState(false);
   const [nestedTask, setNestedTask] = useState<Task | null>(null);
 
@@ -44,6 +47,10 @@ export function EditTaskSheet({ task, isOpen, onClose, stackLevel = 0 }: EditTas
       setDescricao(task.descricao || '');
       setPrioridade(task.prioridade);
       setTags(task.tags || []);
+      setCategoria(task.categoria);
+      setEstimativaTempoString(task.estimativaTempo ? formatMinutesToString(task.estimativaTempo) : '');
+      setComplexidade(task.complexidade);
+      setFoiRetrabalho(task.foiRetrabalho || false);
     }
   }, [task]);
 
@@ -66,11 +73,18 @@ export function EditTaskSheet({ task, isOpen, onClose, stackLevel = 0 }: EditTas
   const handleSave = () => {
     if (!task) return;
 
+    // Converter string de tempo para minutos
+    const estimativaTempo = estimativaTempoString ? parseTimeString(estimativaTempoString).minutes : undefined;
+
     updateTask(task.id, {
       titulo: titulo.trim(),
       descricao: descricao.trim(),
       prioridade,
-      tags
+      tags,
+      categoria,
+      estimativaTempo,
+      complexidade,
+      foiRetrabalho: foiRetrabalho || undefined
     });
 
     onClose();
@@ -82,11 +96,15 @@ export function EditTaskSheet({ task, isOpen, onClose, stackLevel = 0 }: EditTas
       setTitulo(task.titulo);
       setDescricao(task.descricao || '');
       setPrioridade(task.prioridade);
+      setTags(task.tags || []);
+      setCategoria(task.categoria);
+      setEstimativaTempoString(task.estimativaTempo ? formatMinutesToString(task.estimativaTempo) : '');
+      setComplexidade(task.complexidade);
+      setFoiRetrabalho(task.foiRetrabalho || false);
     }
     onClose();
   };
 
-  const prioridadeConfig = PRIORIDADE_CONFIG[prioridade];
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
@@ -185,6 +203,113 @@ export function EditTaskSheet({ task, isOpen, onClose, stackLevel = 0 }: EditTas
                 Use tags para categorizar e organizar suas tarefas. Isso ajuda a gerar melhores métricas e insights.
               </p>
             </div>
+
+            {/* Categoria */}
+            <div className="grid gap-3">
+              <label htmlFor="categoria" className="text-sm font-medium">
+                Categoria
+              </label>
+              <Select value={categoria || ''} onValueChange={(value: TaskCategory) => setCategoria(value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione uma categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="desenvolvimento">
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-600">●</span>
+                      Desenvolvimento
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="reuniao">
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-600">●</span>
+                      Reunião
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="bug">
+                    <div className="flex items-center gap-2">
+                      <span className="text-red-600">●</span>
+                      Bug
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="documentacao">
+                    <div className="flex items-center gap-2">
+                      <span className="text-purple-600">●</span>
+                      Documentação
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Categorize a tarefa para melhor análise de tempo e produtividade.
+              </p>
+            </div>
+
+            {/* Estimativa de Tempo */}
+            <div className="grid gap-3">
+              <label htmlFor="estimativaTempo" className="text-sm font-medium">
+                Estimativa de Tempo
+              </label>
+              <Input
+                id="estimativaTempo"
+                value={estimativaTempoString}
+                onChange={(e) => setEstimativaTempoString(e.target.value)}
+                placeholder="Ex: 1h, 0.5h, 30min, 45"
+                className="w-full"
+              />
+              <p className="text-xs text-muted-foreground">
+                Digite o tempo estimado. Exemplos: 1h, 0.5h, 30min, 45 (minutos).
+              </p>
+            </div>
+
+            {/* Complexidade */}
+            <div className="grid gap-3">
+              <label htmlFor="complexidade" className="text-sm font-medium">
+                Complexidade
+              </label>
+              <Select value={complexidade || ''} onValueChange={(value: TaskComplexity) => setComplexidade(value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione a complexidade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="simples">
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-600">●</span>
+                      Simples
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="media">
+                    <div className="flex items-center gap-2">
+                      <span className="text-yellow-600">●</span>
+                      Média
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="complexa">
+                    <div className="flex items-center gap-2">
+                      <span className="text-red-600">●</span>
+                      Complexa
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+             {/* Campos Adicionais */}
+             <div className="grid gap-4 p-4 bg-muted/30 rounded-lg">
+               <h4 className="text-sm font-medium text-muted-foreground">Métricas Adicionais</h4>
+               
+               {/* Foi Retrabalho */}
+               <div className="flex items-center space-x-2">
+                 <Checkbox
+                   id="foiRetrabalho"
+                   checked={foiRetrabalho}
+                   onCheckedChange={(checked) => setFoiRetrabalho(checked as boolean)}
+                 />
+                 <label htmlFor="foiRetrabalho" className="text-sm font-medium">
+                   Foi retrabalho
+                 </label>
+               </div>
+             </div>
 
             {/* Informações da Tarefa */}
             {task && (
