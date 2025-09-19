@@ -4,6 +4,7 @@ import './drag-drop.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import { GamificationProvider } from '@/contexts/GamificationContext'
 import { TaskGamificationProvider } from '@/contexts/TaskGamificationIntegration'
+import { Toaster } from '@/components/ui/sonner'
 import { GamificationNotifications } from '@/components/GamificationNotifications'
 
 const geistSans = Geist({
@@ -41,6 +42,7 @@ export default function RootLayout({
             <TaskGamificationProvider>
               {children}
               <GamificationNotifications />
+              <Toaster />
             </TaskGamificationProvider>
           </GamificationProvider>
         </ThemeProvider>
