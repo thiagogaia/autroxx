@@ -45,6 +45,7 @@ import {
 import { format, subDays, startOfWeek, endOfWeek, differenceInDays } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { BottleneckAnalysis } from '@/components/BottleneckAnalysis';
+import { Navigation } from '@/components/Navigation';
 
 
 type PeriodFilter = '7d' | '30d' | '90d' | 'all';
@@ -406,6 +407,9 @@ export default function ReportsPage() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* Navigation */}
+        <Navigation />
+        
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>

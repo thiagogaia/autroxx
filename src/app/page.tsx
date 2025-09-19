@@ -4,6 +4,8 @@ import { TaskList } from '@/components/TaskList';
 import { Metrics } from '@/components/Metrics';
 import { Insights } from '@/components/Insights';
 import { DataManagement } from '@/components/DataManagement';
+import { GamificationWidget } from '@/components/GamificationWidget';
+import { Navigation } from '@/components/Navigation';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function TaskManagerPage() {
@@ -23,8 +25,9 @@ export default function TaskManagerPage() {
           </p>
         </div>
         
-        
-        
+        {/* Navigation */}
+        <Navigation />
+
         {/* Filtros */}
         <TaskFilter />
         

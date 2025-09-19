@@ -50,21 +50,30 @@ export function Insights() {
 
     // Análise de estimativas vs realidade
     const estimateAnalysis = tasksWithEstimate.filter(task => 
-      task.dataInicio && task.dataFim && task.estimativaTempo
+      task.statusAtual === 'concluido' && 
+      task.dataInicio && 
+      task.dataFim && 
+      task.estimativaTempo &&
+      task.estimativaTempo > 0
     ).map(task => {
       const startTime = new Date(task.dataInicio!).getTime();
       const endTime = new Date(task.dataFim!).getTime();
       const actualTime = Math.round((endTime - startTime) / (1000 * 60));
       const estimatedTime = task.estimativaTempo!;
       
+      // Proteção contra divisão por zero e tempo muito pequeno
+      if (actualTime <= 0) {
+        return null;
+      }
+      
       return {
         task,
         estimated: estimatedTime,
         actual: actualTime,
-        accuracy: Math.round((estimatedTime / actualTime) * 100),
-        category: task.categoria
+        accuracy: Math.round((actualTime / estimatedTime) * 100), // Corrigido: agora mostra precisão correta
+        category: task.categoria || 'sem_categoria' // Categoria padrão para tarefas sem categoria
       };
-    });
+    }).filter(Boolean); // Remove valores null
 
     // Análise de mudanças de prioridade
     const priorityChanges = tasks.reduce((acc, task) => {
@@ -127,7 +136,8 @@ export function Insights() {
       desenvolvimento: <Zap className="h-4 w-4" />,
       reuniao: <Users className="h-4 w-4" />,
       bug: <AlertTriangle className="h-4 w-4" />,
-      documentacao: <FileText className="h-4 w-4" />
+      documentacao: <FileText className="h-4 w-4" />,
+      sem_categoria: <Activity className="h-4 w-4" />
     };
     return icons[category];
   };
@@ -137,7 +147,8 @@ export function Insights() {
       desenvolvimento: 'text-green-600',
       reuniao: 'text-blue-600',
       bug: 'text-red-600',
-      documentacao: 'text-purple-600'
+      documentacao: 'text-purple-600',
+      sem_categoria: 'text-gray-600'
     };
     return colors[category];
   };
@@ -147,7 +158,8 @@ export function Insights() {
       desenvolvimento: 'Desenvolvimento',
       reuniao: 'Reunião',
       bug: 'Bug',
-      documentacao: 'Documentação'
+      documentacao: 'Documentação',
+      sem_categoria: 'Sem Categoria'
     };
     return labels[category];
   };
@@ -284,17 +296,32 @@ export function Insights() {
               <div className="space-y-3">
                 {Object.entries(
                   insights.estimateAnalysis.reduce((acc, item) => {
-                    if (!item.category) return acc;
-                    if (!acc[item.category]) {
-                      acc[item.category] = { total: 0, count: 0, accuracies: [] };
+                    const category = item.category || 'sem_categoria';
+                    if (!acc[category]) {
+                      acc[category] = { total: 0, count: 0, accuracies: [] };
                     }
-                    acc[item.category].total += item.actual;
-                    acc[item.category].count += 1;
-                    acc[item.category].accuracies.push(item.accuracy);
+                    acc[category].total += item.actual;
+                    acc[category].count += 1;
+                    acc[category].accuracies.push(item.accuracy);
                     return acc;
                   }, {} as Record<TaskCategory, { total: number; count: number; accuracies: number[] }>)
                 ).map(([category, data]) => {
                   const avgAccuracy = Math.round(data.accuracies.reduce((a, b) => a + b, 0) / data.accuracies.length);
+                  
+                  // Interpretação melhorada da precisão:
+                  // 100% = estimativa perfeita
+                  // <100% = subestimou (levou menos tempo que estimado)
+                  // >100% = superestimou (levou mais tempo que estimado)
+                  const getAccuracyColor = (accuracy: number) => {
+                    if (accuracy >= 90 && accuracy <= 110) {
+                      return 'text-green-600 border-green-200'; // Excelente (90-110%)
+                    } else if (accuracy >= 70 && accuracy <= 130) {
+                      return 'text-yellow-600 border-yellow-200'; // Bom (70-130%)
+                    } else {
+                      return 'text-red-600 border-red-200'; // Precisa melhorar (<70% ou >130%)
+                    }
+                  };
+                  
                   return (
                     <div key={category} className="space-y-2">
                       <div className="flex items-center justify-between">
@@ -306,19 +333,19 @@ export function Insights() {
                         </div>
                         <Badge 
                           variant="outline" 
-                          className={`text-xs ${
-                            avgAccuracy < 80 ? 'text-red-600 border-red-200' : 
-                            avgAccuracy < 120 ? 'text-green-600 border-green-200' : 
-                            'text-yellow-600 border-yellow-200'
-                          }`}
+                          className={`text-xs ${getAccuracyColor(avgAccuracy)}`}
                         >
                           {avgAccuracy}%
                         </Badge>
                       </div>
                       <Progress 
-                        value={Math.min(avgAccuracy, 200)} 
+                        value={Math.min(Math.max(avgAccuracy, 0), 200)} 
                         className="h-2"
                       />
+                      <div className="text-xs text-muted-foreground">
+                        {data.count} tarefa{data.count !== 1 ? 's' : ''} • 
+                        {avgAccuracy < 100 ? ' Subestimou' : avgAccuracy > 100 ? ' Superestimou' : ' Perfeita'}
+                      </div>
                     </div>
                   );
                 })}

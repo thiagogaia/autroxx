@@ -1,7 +1,7 @@
 export type TaskStatus = 'a_fazer' | 'fazendo' | 'concluido';
 export type TaskPriority = 'baixa' | 'normal' | 'media' | 'alta';
 export type FilterType = 'tudo' | 'fazendo' | 'normal' | 'urgente';
-export type TaskCategory = 'desenvolvimento' | 'reuniao' | 'bug' | 'documentacao';
+export type TaskCategory = 'desenvolvimento' | 'reuniao' | 'bug' | 'documentacao' | 'sem_categoria';
 export type TaskComplexity = 'simples' | 'media' | 'complexa';
 
 export interface StatusHistoryEntry {

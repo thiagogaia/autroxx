@@ -2,7 +2,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import './drag-drop.css'
 import { ThemeProvider } from '@/components/theme-provider'
-import { TaskProvider } from '@/contexts/TaskContext'
+import { GamificationProvider } from '@/contexts/GamificationContext'
+import { TaskGamificationProvider } from '@/contexts/TaskGamificationIntegration'
+import { GamificationNotifications } from '@/components/GamificationNotifications'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,9 +37,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <TaskProvider>
-            {children}
-          </TaskProvider>
+          <GamificationProvider>
+            <TaskGamificationProvider>
+              {children}
+              <GamificationNotifications />
+            </TaskGamificationProvider>
+          </GamificationProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -15,6 +15,7 @@ import {
   Target,
   BarChart3
 } from 'lucide-react';
+import { Navigation } from '@/components/Navigation';
 
 export default function Reports2Page() {
   const { tasks } = useTaskContext();
@@ -80,6 +81,9 @@ export default function Reports2Page() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* Navigation */}
+        <Navigation />
+        
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
