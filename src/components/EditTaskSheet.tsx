@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,6 +17,7 @@ import { useTaskContext } from '@/contexts/TaskContext';
 import { Task, TaskPriority } from '@/types/task';
 import { PRIORIDADE_CONFIG } from '@/lib/mock-data';
 import { TagsInput } from './TagsInput';
+import { MarkdownEditor } from './MarkdownEditor';
 
 interface EditTaskSheetProps {
   task: Task | null;
@@ -25,11 +26,12 @@ interface EditTaskSheetProps {
 }
 
 export function EditTaskSheet({ task, isOpen, onClose }: EditTaskSheetProps) {
-  const { updateTask } = useTaskContext();
+  const { updateTask, tasks } = useTaskContext();
   const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
   const [prioridade, setPrioridade] = useState<TaskPriority>('normal');
   const [tags, setTags] = useState<string[]>([]);
+  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
 
   // Atualizar os campos quando a tarefa mudar
   useEffect(() => {
@@ -40,6 +42,17 @@ export function EditTaskSheet({ task, isOpen, onClose }: EditTaskSheetProps) {
       setTags(task.tags || []);
     }
   }, [task]);
+
+  // Função para lidar com cliques em links de tarefas
+  const handleTaskLinkClick = useCallback((taskId: number) => {
+    const targetTask = tasks.find((t: Task) => t.id === taskId);
+    if (targetTask) {
+      setSelectedTaskId(taskId);
+      // Aqui você pode implementar a lógica para abrir a tarefa
+      // Por exemplo, abrir um modal ou navegar para a tarefa
+      console.log('Abrir tarefa:', targetTask);
+    }
+  }, [tasks]);
 
   const handleSave = () => {
     if (!task) return;
@@ -96,15 +109,14 @@ export function EditTaskSheet({ task, isOpen, onClose }: EditTaskSheetProps) {
               <label htmlFor="descricao" className="text-sm font-medium">
                 Descrição
               </label>
-              <Textarea
-                id="descricao"
+              <MarkdownEditor
                 value={descricao}
-                onChange={(e) => setDescricao(e.target.value)}
-                placeholder="Adicione detalhes, anotações ou observações sobre a tarefa..."
-                className="min-h-[120px] resize-none"
+                onChange={setDescricao}
+                placeholder="Adicione detalhes, anotações ou observações sobre a tarefa usando Markdown..."
+                onTaskLinkClick={handleTaskLinkClick}
               />
               <p className="text-xs text-muted-foreground">
-                Use este campo para adicionar detalhes importantes, contexto ou observações sobre a tarefa.
+                Use Markdown para formatação rica. Suporte a checkboxes interativos, links para outras tarefas (#123), código e muito mais.
               </p>
             </div>
 
