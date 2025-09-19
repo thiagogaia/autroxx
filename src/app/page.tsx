@@ -13,7 +13,7 @@ export default function TaskManagerPage() {
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
+        {/* <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-3">
             <h1 className="text-3xl font-bold text-foreground">
               Task Manager MVP
@@ -23,7 +23,7 @@ export default function TaskManagerPage() {
           <p className="text-muted-foreground">
             Gerencie suas tarefas de forma simples e eficiente com drag & drop
           </p>
-        </div>
+        </div> */}
         
         {/* Navigation */}
         <Navigation />

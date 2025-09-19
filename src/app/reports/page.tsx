@@ -24,7 +24,9 @@ import {
   Download,
   Filter,
   CheckCircle,
-  Timer
+  Timer,
+  ReceiptPoundSterling,
+  ChartBar
 } from 'lucide-react';
 import { 
   LineChart, 
@@ -412,14 +414,14 @@ export default function ReportsPage() {
         
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-              <BarChart3 className="h-8 w-8 text-primary" />
-              Relatórios Avançados
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Análise detalhada da sua produtividade e padrões de trabalho
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
+              <ChartBar className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-semibold text-foreground">Relatórios</h1>
+              <p className="text-sm text-muted-foreground">Métricas focadas em valor e ação</p>
+            </div>
           </div>
           
           <div className="flex items-center gap-3">

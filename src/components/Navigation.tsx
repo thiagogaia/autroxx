@@ -12,6 +12,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useGamification } from '@/contexts/GamificationContext';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -32,7 +33,8 @@ export function Navigation() {
   };
 
   return (
-    <nav className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
+    <nav className="flex items-center justify-between gap-2 p-2 bg-muted/50 rounded-lg">
+      <div className="flex items-center gap-2">
       {navItems.map(({ href, label, icon: Icon }) => (
         <Link key={href} href={href}>
           <Button
@@ -54,6 +56,8 @@ export function Navigation() {
           </Button>
         </Link>
       ))}
+      </div>
+      <ThemeToggle />
     </nav>
   );
 }
