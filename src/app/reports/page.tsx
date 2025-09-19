@@ -4,8 +4,13 @@ import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useTaskContext } from '@/contexts/TaskContext';
+import { formatMinutesToString } from '@/lib/time-converter';
+import { hasStatusInHistory } from '@/lib/utils';
+import { Task } from '@/types/task';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -16,7 +21,9 @@ import {
   Calendar,
   PieChart,
   Download,
-  Filter
+  Filter,
+  CheckCircle,
+  Timer
 } from 'lucide-react';
 import { 
   LineChart, 
@@ -37,40 +44,6 @@ import { format, subDays, startOfWeek, endOfWeek, differenceInDays } from 'date-
 import { pt } from 'date-fns/locale';
 import { BottleneckAnalysis } from '@/components/BottleneckAnalysis';
 
-// Simulando dados do localStorage para desenvolvimento
-const mockData = [
-  {
-    "id": 1758233036813,
-    "titulo": "Checkout Novo - Regras de exibição e redirecionamento de URLs",
-    "descricao": "",
-    "statusHistorico": ["a_fazer", "fazendo"],
-    "statusAtual": "fazendo",
-    "prioridade": "alta",
-    "impedimento": false,
-    "impedimentoMotivo": "",
-    "dataCadastro": "2025-09-18T22:03:56.813Z",
-    "dataInicio": "2025-09-18T22:03:58.752Z",
-    "dataFim": null,
-    "ordem": 0,
-    "dataImpedimento": null
-  },
-  {
-    "id": 1758231297467,
-    "titulo": "[derick] - conversa sobre a estrutura do checkout",
-    "statusHistorico": ["a_fazer"],
-    "statusAtual": "a_fazer",
-    "prioridade": "normal",
-    "impedimento": false,
-    "impedimentoMotivo": "",
-    "dataCadastro": "2025-09-18T21:34:57.467Z",
-    "dataInicio": null,
-    "dataFim": null,
-    "ordem": 1,
-    "descricao": "Bah MEO ficou bom",
-    "dataImpedimento": null
-  }
-  // Adicione mais dados conforme necessário
-];
 
 type PeriodFilter = '7d' | '30d' | '90d' | 'all';
 
@@ -91,7 +64,7 @@ const PRIORITY_COLORS = {
 
 export default function ReportsPage() {
   const [periodFilter, setPeriodFilter] = useState<PeriodFilter>('30d');
-  const [tasks] = useState(mockData); // Em produção, viria do Context
+  const { tasks } = useTaskContext();
 
   // Filtrar dados por período
   const filteredTasks = useMemo(() => {
@@ -100,7 +73,7 @@ export default function ReportsPage() {
     const daysMap = { '7d': 7, '30d': 30, '90d': 90 };
     const cutoffDate = subDays(new Date(), daysMap[periodFilter]);
     
-    return tasks.filter(task => 
+    return tasks.filter((task: Task) => 
       new Date(task.dataCadastro) >= cutoffDate
     );
   }, [tasks, periodFilter]);
@@ -108,10 +81,58 @@ export default function ReportsPage() {
   // Métricas principais
   const metrics = useMemo(() => {
     const total = filteredTasks.length;
-    const concluidas = filteredTasks.filter(t => t.statusAtual === 'concluido').length;
-    const emAndamento = filteredTasks.filter(t => t.statusAtual === 'fazendo').length;
-    const impedidas = filteredTasks.filter(t => t.impedimento).length;
-    const altaPrioridade = filteredTasks.filter(t => t.prioridade === 'alta').length;
+    const concluidas = filteredTasks.filter((t: Task) => t.statusAtual === 'concluido').length;
+    const emAndamento = filteredTasks.filter((t: Task) => t.statusAtual === 'fazendo').length;
+    const impedidas = filteredTasks.filter((t: Task) => t.impedimento).length;
+    const altaPrioridade = filteredTasks.filter((t: Task) => t.prioridade === 'alta').length;
+    
+    // Progresso geral
+    const progressPercentage = total > 0 ? Math.round((concluidas / total) * 100) : 0;
+    
+    // Tempo médio de conclusão (apenas tarefas concluídas com dados completos)
+    const completedWithTime = filteredTasks.filter((t: Task) => 
+      t.statusAtual === 'concluido' && 
+      t.dataInicio && 
+      t.dataFim
+    );
+    
+    const avgCompletionTime = completedWithTime.length > 0 
+      ? completedWithTime.reduce((acc: number, task: Task) => {
+          const diffMs = new Date(task.dataFim!).getTime() - new Date(task.dataInicio!).getTime();
+          return acc + diffMs;
+        }, 0) / completedWithTime.length
+      : 0;
+    
+    const avgCompletionTimeMinutes = Math.round(avgCompletionTime / (1000 * 60));
+    
+    // Produtividade semanal (tarefas concluídas nos últimos 7 dias)
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    
+    const weeklyCompleted = filteredTasks.filter((t: Task) => {
+      if (t.statusAtual !== 'concluido' || !t.dataFim) return false;
+      return new Date(t.dataFim) >= oneWeekAgo;
+    }).length;
+    
+    // Gargalos críticos (tarefas em "a_fazer" há mais de 7 dias)
+    const criticalBottlenecks = filteredTasks.filter((t: Task) => {
+      if (t.statusAtual !== 'a_fazer') return false;
+      const daysInBacklog = (Date.now() - new Date(t.dataCadastro).getTime()) / (1000 * 60 * 60 * 24);
+      return daysInBacklog > 7;
+    });
+    
+    // Análise de impedimentos por categoria
+    const impedimentAnalysis = filteredTasks.reduce((acc: Record<string, number>, task: Task) => {
+      if (task.impedimento && task.categoria) {
+        acc[task.categoria] = (acc[task.categoria] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+    
+    // Tempo total de impedimento
+    const totalImpedimentTime = filteredTasks.reduce((acc: number, task: Task) => {
+      return acc + (task.tempoTotalImpedimento || 0);
+    }, 0);
     
     return {
       total,
@@ -119,8 +140,14 @@ export default function ReportsPage() {
       emAndamento,
       impedidas,
       altaPrioridade,
+      progressPercentage,
       taxaConclusao: total > 0 ? Math.round((concluidas / total) * 100) : 0,
-      taxaImpedimento: total > 0 ? Math.round((impedidas / total) * 100) : 0
+      taxaImpedimento: total > 0 ? Math.round((impedidas / total) * 100) : 0,
+      avgCompletionTimeMinutes,
+      weeklyCompleted,
+      criticalBottlenecks: criticalBottlenecks.length,
+      impedimentAnalysis,
+      totalImpedimentTime
     };
   }, [filteredTasks]);
 
@@ -131,14 +158,14 @@ export default function ReportsPage() {
     
     for (let i = days - 1; i >= 0; i--) {
       const date = subDays(new Date(), i);
-      const dayTasks = filteredTasks.filter(task => 
+      const dayTasks = filteredTasks.filter((task: Task) => 
         format(new Date(task.dataCadastro), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
       );
       
       data.push({
         date: format(date, 'dd/MM'),
         criadas: dayTasks.length,
-        concluidas: dayTasks.filter(t => t.statusAtual === 'concluido').length
+        concluidas: dayTasks.filter((t: Task) => t.statusAtual === 'concluido').length
       });
     }
     
@@ -147,7 +174,7 @@ export default function ReportsPage() {
 
   // Dados para gráfico de pizza (distribuição por status)
   const statusData = useMemo(() => {
-    const statusCount = filteredTasks.reduce((acc, task) => {
+    const statusCount = filteredTasks.reduce((acc: Record<string, number>, task: Task) => {
       acc[task.statusAtual] = (acc[task.statusAtual] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
@@ -161,7 +188,7 @@ export default function ReportsPage() {
 
   // Dados para gráfico de barras (tarefas por prioridade)
   const priorityData = useMemo(() => {
-    const priorityCount = filteredTasks.reduce((acc, task) => {
+    const priorityCount = filteredTasks.reduce((acc: Record<string, number>, task: Task) => {
       acc[task.prioridade] = (acc[task.prioridade] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
@@ -226,88 +253,144 @@ export default function ReportsPage() {
         </div>
 
         {/* Métricas Principais */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {/* Progresso Geral */}
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Activity className="h-4 w-4 text-blue-500" />
-                <div>
-                  <p className="text-2xl font-bold">{metrics.total}</p>
-                  <p className="text-xs text-muted-foreground">Total</p>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/20">
+                  <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                 </div>
+                Progresso Geral
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-3xl font-bold text-foreground">
+                {metrics.concluidas}/{metrics.total}
+              </div>
+              <div className="space-y-2">
+                <Progress value={metrics.progressPercentage} className="h-2" />
+                <p className="text-sm text-muted-foreground">
+                  {metrics.progressPercentage}% concluído
+                </p>
               </div>
             </CardContent>
           </Card>
           
+          {/* Carga Atual */}
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Target className="h-4 w-4 text-green-500" />
-                <div>
-                  <p className="text-2xl font-bold">{metrics.concluidas}</p>
-                  <p className="text-xs text-muted-foreground">Concluídas</p>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/20">
+                  <Clock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 </div>
+                Carga Atual
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-3xl font-bold text-foreground">
+                {metrics.emAndamento}
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">
+                  tarefas em andamento
+                </p>
+                {metrics.emAndamento > 0 && metrics.impedidas > 0 && (
+                  <p className="text-xs text-destructive">
+                    {metrics.impedidas} com impedimento
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
           
+          {/* Eficiência */}
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-yellow-500" />
-                <div>
-                  <p className="text-2xl font-bold">{metrics.emAndamento}</p>
-                  <p className="text-xs text-muted-foreground">Em Andamento</p>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/20">
+                  <Timer className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                 </div>
+                Eficiência
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-3xl font-bold text-foreground">
+                {metrics.avgCompletionTimeMinutes > 0 
+                  ? formatMinutesToString(metrics.avgCompletionTimeMinutes)
+                  : '--'
+                }
+              </div>
+              <p className="text-sm text-muted-foreground">
+                tempo médio de conclusão
+              </p>
+            </CardContent>
+          </Card>
+          
+          {/* Problemas */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/20">
+                  <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+                </div>
+                Problemas
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-3xl font-bold text-foreground">
+                {metrics.taxaImpedimento}%
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">
+                  taxa de impedimentos
+                </p>
+                {metrics.criticalBottlenecks > 0 && (
+                  <p className="text-xs text-destructive">
+                    {metrics.criticalBottlenecks} gargalos críticos
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
           
+          {/* Produtividade Semanal */}
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-red-500" />
-                <div>
-                  <p className="text-2xl font-bold">{metrics.impedidas}</p>
-                  <p className="text-xs text-muted-foreground">Impedidas</p>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/20">
+                  <TrendingUp className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                 </div>
+                Produtividade
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-3xl font-bold text-foreground">
+                {metrics.weeklyCompleted}
               </div>
+              <p className="text-sm text-muted-foreground">
+                concluídas esta semana
+              </p>
             </CardContent>
           </Card>
           
+          {/* Alta Prioridade */}
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-purple-500" />
-                <div>
-                  <p className="text-2xl font-bold">{metrics.altaPrioridade}</p>
-                  <p className="text-xs text-muted-foreground">Alta Prioridade</p>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-900/20">
+                  <Target className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                 </div>
+                Alta Prioridade
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-3xl font-bold text-foreground">
+                {metrics.altaPrioridade}
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <PieChart className="h-4 w-4 text-indigo-500" />
-                <div>
-                  <p className="text-2xl font-bold">{metrics.taxaConclusao}%</p>
-                  <p className="text-xs text-muted-foreground">Taxa Conclusão</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-orange-500" />
-                <div>
-                  <p className="text-2xl font-bold">{metrics.taxaImpedimento}%</p>
-                  <p className="text-xs text-muted-foreground">Taxa Impedimento</p>
-                </div>
-              </div>
+              <p className="text-sm text-muted-foreground">
+                tarefas urgentes
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -466,31 +549,136 @@ export default function ReportsPage() {
           </TabsContent>
         </Tabs>
 
-        {/* Insights Automáticos */}
-        <Card className="border-blue-200 bg-blue-50/50">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Activity className="h-5 w-5 text-blue-600" />
-              💡 Insights Automáticos
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-              <div className="flex items-start gap-3">
-                <Badge className="bg-green-100 text-green-800">Positivo</Badge>
-                <p>Sua produtividade aumentou 23% no período selecionado</p>
+        {/* Insights e Ações Recomendadas */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Insights Automáticos */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/20">
+                  <Activity className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                </div>
+                Insights Automáticos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {metrics.weeklyCompleted > 0 && (
+                  <div className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Positivo</Badge>
+                    <div>
+                      <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                        Produtividade semanal: {metrics.weeklyCompleted} tarefas
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {metrics.weeklyCompleted >= 5 ? 'Excelente ritmo!' : 'Bom progresso esta semana'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {metrics.avgCompletionTimeMinutes > 0 && (
+                  <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">Eficiência</Badge>
+                    <div>
+                      <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                        Tempo médio: {formatMinutesToString(metrics.avgCompletionTimeMinutes)}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {metrics.avgCompletionTimeMinutes < 240 ? 'Muito eficiente!' : 'Considere otimizar estimativas'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {metrics.totalImpedimentTime > 0 && (
+                  <div className="flex items-start gap-3 p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                    <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">Atenção</Badge>
+                    <div>
+                      <p className="text-sm font-medium text-orange-800 dark:text-orange-200">
+                        Tempo perdido: {formatMinutesToString(metrics.totalImpedimentTime)}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Identifique padrões nos impedimentos
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="flex items-start gap-3">
-                <Badge className="bg-blue-100 text-blue-800">Padrão</Badge>
-                <p>Você cria mais tarefas nas terças e quartas-feiras</p>
+            </CardContent>
+          </Card>
+
+          {/* Ações Recomendadas */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/20">
+                  <Target className="h-4 w-4 text-green-600 dark:text-green-400" />
+                </div>
+                Ações Recomendadas
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {metrics.criticalBottlenecks > 0 && (
+                  <div className="flex items-start gap-3 p-4 bg-destructive/5 dark:bg-destructive/10 rounded-lg border border-destructive/20">
+                    <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-destructive">
+                        Resolver {metrics.criticalBottlenecks} gargalos críticos
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Tarefas em backlog há mais de 7 dias
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {metrics.taxaImpedimento > 20 && (
+                  <div className="flex items-start gap-3 p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                    <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-orange-800 dark:text-orange-200">
+                        Reduzir impedimentos
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Taxa atual: {metrics.taxaImpedimento}% (meta: &lt;20%)
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {metrics.altaPrioridade > 3 && (
+                  <div className="flex items-start gap-3 p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                    <Target className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                        Priorizar tarefas urgentes
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {metrics.altaPrioridade} tarefas de alta prioridade pendentes
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
+                {metrics.taxaImpedimento <= 20 && metrics.criticalBottlenecks === 0 && metrics.altaPrioridade <= 3 && (
+                  <div className="flex items-start gap-3 p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                        Fluxo saudável
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Continue mantendo o ritmo atual
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="flex items-start gap-3">
-                <Badge className="bg-orange-100 text-orange-800">Atenção</Badge>
-                <p>Tarefas de alta prioridade levam 2.3x mais tempo</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

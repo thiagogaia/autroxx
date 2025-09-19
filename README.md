@@ -216,7 +216,7 @@ Edite o componente `Metrics.tsx` para adicionar novas métricas calculadas.
 
 ### Tarefas técnitas
 - [ ] Multi Impedimentos (array)
-- [ ] Array de historico de status com a data [para ir e voltar status]
+- [x] Array de historico de status com a data [para ir e voltar status]
 
 ## 🔒 Dados e Privacidade
 
