@@ -90,7 +90,7 @@ export function EditTaskSheet({ task, isOpen, onClose, stackLevel = 0 }: EditTas
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent className="h-full flex flex-col">
+      <SheetContent className="h-full flex flex-col w-[540px] sm:w-[620px] lg:w-[700px] xl:w-[720px] max-w-none">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-3">
             Editar Tarefa
