@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Task, TaskStatus } from "@/types/task"
+import { differenceInDays } from "date-fns"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -24,6 +25,17 @@ export function generateUniqueTaskId(): number {
 // Helper function para verificar se uma tarefa tem um status específico no histórico
 export function hasStatusInHistory(task: Task, status: TaskStatus): boolean {
   return task.statusHistorico.some(entry => entry.status === status);
+}
+
+// Função para calcular instabilidade da tarefa
+export function calcularInstabilidade(task: Task): number {
+  const mudancasPrioridade = task.numeroMudancasPrioridade || 0;
+  const mudancasImpedimento = task.impedimentoHistorico?.length || 0;
+  const tempoVida = differenceInDays(new Date(), new Date(task.dataCadastro));
+  
+  // Combina mudanças de prioridade + impedimentos
+  const totalMudancas = mudancasPrioridade + mudancasImpedimento;
+  return Math.min(100, (totalMudancas / Math.max(1, tempoVida)) * 50);
 }
 
 // Helper function para migrar dados antigos para nova estrutura

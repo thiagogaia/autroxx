@@ -9,6 +9,13 @@ export interface StatusHistoryEntry {
   timestamp: Date;
 }
 
+export interface ImpedimentoHistoryEntry {
+  id: string;
+  impedimento: boolean;
+  motivo: string;
+  timestamp: Date;
+}
+
 export interface Task {
   id: number;
   titulo: string;
@@ -18,6 +25,7 @@ export interface Task {
   prioridade: TaskPriority;
   impedimento: boolean;
   impedimentoMotivo: string;
+  impedimentoHistorico: ImpedimentoHistoryEntry[]; // Histórico de impedimentos
   dataImpedimento: Date | null; // Data do impedimento (quando foi marcado)
   dataCadastro: Date; // Data de cadastro da tarefa
   dataInicio: Date | null; // Data de início (quando muda para "fazendo")

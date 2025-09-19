@@ -11,7 +11,7 @@ import { useTaskContext } from '@/contexts/TaskContext';
 import { formatMinutesToString } from '@/lib/time-converter';
 import { hasStatusInHistory } from '@/lib/utils';
 import { Task } from '@/types/task';
-import { mockTasks } from '@/lib/mock-data';
+import { TAREFAS_EXEMPLO } from '@/lib/mock-data';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -75,7 +75,7 @@ export default function ReportsPage() {
     }
     // Fallback para dados mock se não houver tarefas reais
     try {
-      return mockTasks || [];
+      return TAREFAS_EXEMPLO || [];
     } catch (error) {
       console.warn('Erro ao carregar dados mock:', error);
       return [];

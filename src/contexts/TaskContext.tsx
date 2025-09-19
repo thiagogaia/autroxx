@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
-import { Task, TaskContextType, TaskStatus, TaskPriority, FilterType } from '@/types/task';
+import { Task, TaskContextType, TaskStatus, TaskPriority, FilterType, ImpedimentoHistoryEntry } from '@/types/task';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { STORAGE_KEYS, saveTasksToStorage, loadTasksFromStorage } from '@/lib/storage';
 import { generateUniqueTaskId } from '@/lib/utils';
@@ -53,6 +53,7 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         prioridade: action.payload.prioridade,
         impedimento: false,
         impedimentoMotivo: '',
+        impedimentoHistorico: [], // Histórico de impedimentos
         dataImpedimento: null, // Será preenchida quando impedimento for marcado
         dataCadastro: now, // Data de cadastro da tarefa
         dataInicio: null, // Será preenchida quando mudar para "fazendo"
@@ -149,16 +150,26 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
     case 'SET_IMPEDIMENT':
       return {
         ...state,
-        tasks: state.tasks.map(task =>
-          task.id === action.payload.id
-            ? { 
-                ...task, 
-                impedimento: true, 
-                impedimentoMotivo: action.payload.motivo,
-                dataImpedimento: new Date() // Define a data do impedimento como "agora"
-              }
-            : task
-        )
+        tasks: state.tasks.map(task => {
+          if (task.id === action.payload.id) {
+            const now = new Date();
+            const novoHistorico: ImpedimentoHistoryEntry = {
+              id: `imp_${task.id}_${now.getTime()}`,
+              impedimento: true,
+              motivo: action.payload.motivo,
+              timestamp: now
+            };
+            
+            return { 
+              ...task, 
+              impedimento: true, 
+              impedimentoMotivo: action.payload.motivo,
+              impedimentoHistorico: [...(task.impedimentoHistorico || []), novoHistorico],
+              dataImpedimento: now
+            };
+          }
+          return task;
+        })
       };
 
     case 'REMOVE_IMPEDIMENT':
@@ -166,11 +177,18 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         ...state,
         tasks: state.tasks.map(task => {
           if (task.id === action.payload.id) {
+            const now = new Date();
+            const novoHistorico: ImpedimentoHistoryEntry = {
+              id: `imp_${task.id}_${now.getTime()}`,
+              impedimento: false,
+              motivo: '',
+              timestamp: now
+            };
+            
             // Calcular tempo de impedimento se havia dataImpedimento
             let tempoImpedimentoCalculado = task.tempoTotalImpedimento || 0;
             if (task.dataImpedimento) {
-              const agora = new Date();
-              const diferencaMs = agora.getTime() - task.dataImpedimento.getTime();
+              const diferencaMs = now.getTime() - task.dataImpedimento.getTime();
               const diferencaMinutos = Math.floor(diferencaMs / (1000 * 60));
               tempoImpedimentoCalculado += diferencaMinutos;
             }
@@ -179,6 +197,7 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
               ...task, 
               impedimento: false, 
               impedimentoMotivo: '',
+              impedimentoHistorico: [...(task.impedimentoHistorico || []), novoHistorico],
               dataImpedimento: null,
               tempoTotalImpedimento: tempoImpedimentoCalculado
             };

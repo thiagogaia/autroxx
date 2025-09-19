@@ -64,6 +64,7 @@ export const TAREFAS_EXEMPLO: Task[] = [
     prioridade: "alta",
     impedimento: false,
     impedimentoMotivo: "",
+    impedimentoHistorico: [],
     dataImpedimento: null,
     dataCadastro: new Date('2025-09-16T08:00:00'),
     dataInicio: new Date('2025-09-18T09:30:00'), // Definida quando mudou para "fazendo"
@@ -89,6 +90,7 @@ export const TAREFAS_EXEMPLO: Task[] = [
     prioridade: "normal",
     impedimento: false,
     impedimentoMotivo: "",
+    impedimentoHistorico: [],
     dataImpedimento: null,
     dataCadastro: new Date('2025-09-15T10:30:00'),
     dataInicio: new Date('2025-09-17T14:20:00'), // Definida quando mudou para "fazendo"
@@ -112,6 +114,14 @@ export const TAREFAS_EXEMPLO: Task[] = [
     prioridade: "media",
     impedimento: true,
     impedimentoMotivo: "Aguardando liberação do servidor",
+    impedimentoHistorico: [
+      {
+        id: "imp_3_1726666200000",
+        impedimento: true,
+        motivo: "Aguardando liberação do servidor",
+        timestamp: new Date('2025-09-18T14:30:00')
+      }
+    ],
     dataImpedimento: new Date('2025-09-18T14:30:00'), // Definida quando impedimento foi marcado
     dataCadastro: new Date('2025-09-17T16:45:00'),
     dataInicio: null, // Ainda não iniciou (não mudou para "fazendo")
@@ -136,6 +146,7 @@ export const TAREFAS_EXEMPLO: Task[] = [
     prioridade: "normal",
     impedimento: false,
     impedimentoMotivo: "",
+    impedimentoHistorico: [],
     dataImpedimento: null,
     dataCadastro: new Date('2025-09-18T07:20:00'),
     dataInicio: new Date('2025-09-18T10:15:00'), // Definida quando mudou para "fazendo"
@@ -160,6 +171,7 @@ export const TAREFAS_EXEMPLO: Task[] = [
     prioridade: "normal",
     impedimento: false,
     impedimentoMotivo: "",
+    impedimentoHistorico: [],
     dataImpedimento: null,
     dataCadastro: new Date('2025-09-16T09:00:00'),
     dataInicio: new Date('2025-09-16T10:00:00'),
@@ -184,6 +196,20 @@ export const TAREFAS_EXEMPLO: Task[] = [
     prioridade: "alta",
     impedimento: false,
     impedimentoMotivo: "",
+    impedimentoHistorico: [
+      {
+        id: "imp_6_1726668000000",
+        impedimento: true,
+        motivo: "Aguardando acesso ao dispositivo iOS",
+        timestamp: new Date('2025-09-18T15:00:00')
+      },
+      {
+        id: "imp_6_1726671600000",
+        impedimento: false,
+        motivo: "",
+        timestamp: new Date('2025-09-18T16:00:00')
+      }
+    ],
     dataImpedimento: null,
     dataCadastro: new Date('2025-09-18T08:30:00'),
     dataInicio: new Date('2025-09-18T13:00:00'),
@@ -207,6 +233,7 @@ export const TAREFAS_EXEMPLO: Task[] = [
     prioridade: "baixa",
     impedimento: false,
     impedimentoMotivo: "",
+    impedimentoHistorico: [],
     dataImpedimento: null,
     dataCadastro: new Date('2025-09-17T14:00:00'),
     dataInicio: null,

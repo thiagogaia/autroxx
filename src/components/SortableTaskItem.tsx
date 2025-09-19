@@ -10,6 +10,12 @@ import { Badge } from '@/components/ui/badge';
 import { Trash2, GripVertical, Edit, AlertTriangle } from 'lucide-react';
 import { ImpedimentDialog } from './ImpedimentDialog';
 import { EditTaskSheet } from './EditTaskSheet';
+import { ImpedimentoTooltip } from './ImpedimentoTooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { useTaskContext } from '@/contexts/TaskContext';
 import { Task, TaskStatus, TaskPriority, TaskCategory, TaskComplexity } from '@/types/task';
 import { STATUS_CONFIG, PRIORIDADE_CONFIG } from '@/lib/mock-data';
@@ -253,13 +259,46 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
                 )}
                 {task.dataImpedimento && (
                   <div className="text-red-600 dark:text-red-400">
-                    Impedimento: {new Date(task.dataImpedimento).toLocaleString('pt-BR', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
+                    Impedimento: 
+                    <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span>
+                        {new Date(task.dataImpedimento).toLocaleString('pt-BR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      
+                      {task.impedimentoHistorico.map((entry) => (
+                        <div key={entry.id} className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${
+                          entry.impedimento 
+                            ? 'bg-orange-500' 
+                            : 'bg-green-500'
+                        }`} />
+                        <span className="text-muted-foreground text-xs">
+                          {new Date(entry.timestamp).toLocaleString('pt-BR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                        {entry.motivo && (
+                          <span className="text-foreground text-xs truncate max-w-32">
+                            {entry.motivo}
+                          </span>
+                        )}
+                      </div>
+                      ))}
+                    </TooltipContent>
+                    </Tooltip>
                   </div>
                 )}
               </div>
