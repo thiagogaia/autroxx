@@ -4,11 +4,16 @@ export type FilterType = 'tudo' | 'fazendo' | 'normal' | 'urgente';
 export type TaskCategory = 'desenvolvimento' | 'reuniao' | 'bug' | 'documentacao';
 export type TaskComplexity = 'simples' | 'media' | 'complexa';
 
+export interface StatusHistoryEntry {
+  status: TaskStatus;
+  timestamp: Date;
+}
+
 export interface Task {
   id: number;
   titulo: string;
   descricao: string; // Campo para detalhes/anotações da tarefa
-  statusHistorico: TaskStatus[];
+  statusHistorico: StatusHistoryEntry[];
   statusAtual: TaskStatus;
   prioridade: TaskPriority;
   impedimento: boolean;

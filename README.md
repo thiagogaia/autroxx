@@ -214,6 +214,10 @@ Edite o componente `Metrics.tsx` para adicionar novas métricas calculadas.
 - [ ] PWA (Progressive Web App)
 - [ ] Backup automático na nuvem
 
+### Tarefas técnitas
+- [ ] Multi Impedimentos (array)
+- [ ] Array de historico de status com a data [para ir e voltar status]
+
 ## 🔒 Dados e Privacidade
 
 - **Armazenamento Local**: Todos os dados ficam no seu navegador

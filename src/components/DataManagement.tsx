@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, Upload, Trash2, RefreshCw } from 'lucide-react';
+import { migrateTaskData } from '@/lib/utils';
+import { deserializeTasks, STORAGE_KEYS } from '@/lib/storage';
 import { useTaskContext } from '@/contexts/TaskContext';
 import { Task } from '@/types/task';
-import { deserializeTasks, STORAGE_KEYS } from '@/lib/storage';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -157,7 +158,7 @@ export function DataManagement() {
       // Adicionar cada tarefa com dados completos
       deserializedTasks.forEach((task: Task) => {
         // Gerar novo ID para evitar conflitos
-        const newTask: Task = {
+        const newTask: Task = migrateTaskData({
           ...task,
           id: Date.now() + Math.random(), // ID único
           dataCadastro: task.dataCadastro || new Date(),
@@ -170,7 +171,7 @@ export function DataManagement() {
           statusHistorico: task.statusHistorico || ['a_fazer'],
           statusAtual: task.statusAtual || 'a_fazer',
           ordem: task.ordem || 0
-        };
+        });
         
         // Usar a nova função addTaskFull
         addTaskFull(newTask);
@@ -215,7 +216,7 @@ export function DataManagement() {
         descricao: 'Criar endpoints para CRUD de usuários com autenticação JWT',
         prioridade: 'alta',
         statusAtual: 'a_fazer',
-        statusHistorico: ['a_fazer'],
+        statusHistorico: [{ status: 'a_fazer', timestamp: new Date() }],
         impedimento: false,
         impedimentoMotivo: '',
         dataCadastro: new Date(),
@@ -231,7 +232,10 @@ export function DataManagement() {
         descricao: 'Implementar interface de login e registro de usuários',
         prioridade: 'normal',
         statusAtual: 'fazendo',
-        statusHistorico: ['a_fazer', 'fazendo'],
+        statusHistorico: [
+          { status: 'a_fazer', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) },
+          { status: 'fazendo', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) }
+        ],
         impedimento: false,
         impedimentoMotivo: '',
         dataCadastro: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 dias atrás
@@ -247,7 +251,11 @@ export function DataManagement() {
         descricao: 'Setup do PostgreSQL com migrations e seeds',
         prioridade: 'media',
         statusAtual: 'concluido',
-        statusHistorico: ['a_fazer', 'fazendo', 'concluido'],
+        statusHistorico: [
+          { status: 'a_fazer', timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) },
+          { status: 'fazendo', timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) },
+          { status: 'concluido', timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) }
+        ],
         impedimento: false,
         impedimentoMotivo: '',
         dataCadastro: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 dias atrás
@@ -263,7 +271,7 @@ export function DataManagement() {
         descricao: 'Criar sistema de push notifications e email',
         prioridade: 'normal',
         statusAtual: 'a_fazer',
-        statusHistorico: ['a_fazer'],
+        statusHistorico: [{ status: 'a_fazer', timestamp: new Date() }],
         impedimento: true,
         impedimentoMotivo: 'Aguardando aprovação do cliente para o design',
         dataCadastro: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 dia atrás
@@ -279,7 +287,7 @@ export function DataManagement() {
         descricao: 'Deploy em produção com CI/CD pipeline',
         prioridade: 'alta',
         statusAtual: 'a_fazer',
-        statusHistorico: ['a_fazer'],
+        statusHistorico: [{ status: 'a_fazer', timestamp: new Date() }],
         impedimento: false,
         impedimentoMotivo: '',
         dataCadastro: new Date(),

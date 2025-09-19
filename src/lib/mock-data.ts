@@ -56,7 +56,10 @@ export const TAREFAS_EXEMPLO: Task[] = [
     id: 1,
     titulo: "Desenvolver API de usuários",
     descricao: "Criar endpoints para CRUD de usuários com validação de dados e autenticação JWT. Incluir testes unitários e documentação da API.",
-    statusHistorico: ["a_fazer", "fazendo"],
+    statusHistorico: [
+      { status: "a_fazer", timestamp: new Date('2025-09-16T08:00:00') },
+      { status: "fazendo", timestamp: new Date('2025-09-18T09:30:00') }
+    ],
     statusAtual: "fazendo",
     prioridade: "alta",
     impedimento: false,
@@ -77,7 +80,11 @@ export const TAREFAS_EXEMPLO: Task[] = [
     id: 2,
     titulo: "Criar telas de login",
     descricao: "Implementar interface de login responsiva com validação em tempo real e integração com API de autenticação.",
-    statusHistorico: ["a_fazer", "fazendo", "concluido"],
+    statusHistorico: [
+      { status: "a_fazer", timestamp: new Date('2025-09-15T10:30:00') },
+      { status: "fazendo", timestamp: new Date('2025-09-17T14:20:00') },
+      { status: "concluido", timestamp: new Date('2025-09-18T11:45:00') }
+    ],
     statusAtual: "concluido",
     prioridade: "normal",
     impedimento: false,
@@ -98,7 +105,9 @@ export const TAREFAS_EXEMPLO: Task[] = [
     id: 3,
     titulo: "Configurar banco de dados",
     descricao: "Configurar PostgreSQL com migrations, índices otimizados e backup automático. Aguardando liberação do servidor de produção.",
-    statusHistorico: ["a_fazer"],
+    statusHistorico: [
+      { status: "a_fazer", timestamp: new Date('2025-09-17T16:45:00') }
+    ],
     statusAtual: "a_fazer",
     prioridade: "media",
     impedimento: true,
@@ -119,7 +128,10 @@ export const TAREFAS_EXEMPLO: Task[] = [
     id: 4,
     titulo: "Implementar sistema de notificações",
     descricao: "Desenvolver sistema de notificações push e email com templates personalizáveis e histórico de envios.",
-    statusHistorico: ["a_fazer", "fazendo"],
+    statusHistorico: [
+      { status: "a_fazer", timestamp: new Date('2025-09-18T07:20:00') },
+      { status: "fazendo", timestamp: new Date('2025-09-18T10:15:00') }
+    ],
     statusAtual: "fazendo",
     prioridade: "normal",
     impedimento: false,
@@ -140,7 +152,10 @@ export const TAREFAS_EXEMPLO: Task[] = [
     id: 5,
     titulo: "Reunião de planejamento sprint",
     descricao: "Reunião para definir prioridades e estimativas para a próxima sprint. Participantes: dev team, PO, SM.",
-    statusHistorico: ["a_fazer", "concluido"],
+    statusHistorico: [
+      { status: "a_fazer", timestamp: new Date('2025-09-16T09:00:00') },
+      { status: "concluido", timestamp: new Date('2025-09-16T11:30:00') }
+    ],
     statusAtual: "concluido",
     prioridade: "normal",
     impedimento: false,
@@ -161,7 +176,10 @@ export const TAREFAS_EXEMPLO: Task[] = [
     id: 6,
     titulo: "Corrigir bug no login mobile",
     descricao: "Usuários reportam que o login não funciona em dispositivos iOS. Investigar e corrigir problema de autenticação.",
-    statusHistorico: ["a_fazer", "fazendo"],
+    statusHistorico: [
+      { status: "a_fazer", timestamp: new Date('2025-09-18T08:30:00') },
+      { status: "fazendo", timestamp: new Date('2025-09-18T13:00:00') }
+    ],
     statusAtual: "fazendo",
     prioridade: "alta",
     impedimento: false,
@@ -182,7 +200,9 @@ export const TAREFAS_EXEMPLO: Task[] = [
     id: 7,
     titulo: "Documentar API endpoints",
     descricao: "Criar documentação completa da API com exemplos de uso, códigos de resposta e guias de integração.",
-    statusHistorico: ["a_fazer"],
+    statusHistorico: [
+      { status: "a_fazer", timestamp: new Date('2025-09-17T14:00:00') }
+    ],
     statusAtual: "a_fazer",
     prioridade: "baixa",
     impedimento: false,

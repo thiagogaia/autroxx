@@ -13,6 +13,7 @@ import { EditTaskSheet } from './EditTaskSheet';
 import { useTaskContext } from '@/contexts/TaskContext';
 import { Task, TaskStatus, TaskPriority, TaskCategory, TaskComplexity } from '@/types/task';
 import { STATUS_CONFIG, PRIORIDADE_CONFIG } from '@/lib/mock-data';
+import { hasStatusInHistory } from '@/lib/utils';
 import { formatMinutesToString } from '@/lib/time-converter';
 import {
   AlertDialog,
@@ -188,7 +189,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
         {/* Checkbox Fazendo */}
         <td className="text-center p-4">
           <Checkbox
-            checked={task.statusHistorico.includes('fazendo')}
+            checked={hasStatusInHistory(task, 'fazendo')}
             onCheckedChange={() => handleStatusChange('fazendo')}
             className="mx-auto cursor-pointer"
           />
@@ -197,7 +198,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
         {/* Checkbox Concluído */}
         <td className="text-center p-4">
           <Checkbox
-            checked={task.statusHistorico.includes('concluido')}
+            checked={hasStatusInHistory(task, 'concluido')}
             onCheckedChange={() => handleStatusChange('concluido')}
             className="mx-auto cursor-pointer"
           />

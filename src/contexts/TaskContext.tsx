@@ -47,7 +47,7 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         id: Date.now(),
         titulo: action.payload.titulo,
         descricao: '', // Campo de descrição sempre inicia vazio
-        statusHistorico: ['a_fazer'],
+        statusHistorico: [{ status: 'a_fazer', timestamp: now }],
         statusAtual: 'a_fazer',
         prioridade: action.payload.prioridade,
         impedimento: false,
@@ -82,18 +82,22 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         ...state,
         tasks: state.tasks.map(task => {
           if (task.id === action.payload.id) {
+            const now = new Date();
             const novoHistorico = [...task.statusHistorico];
-            if (!novoHistorico.includes(action.payload.status)) {
-              novoHistorico.push(action.payload.status);
+            
+            // Verificar se o status já existe no histórico
+            const statusJaExiste = novoHistorico.some(entry => entry.status === action.payload.status);
+            if (!statusJaExiste) {
+              novoHistorico.push({ status: action.payload.status, timestamp: now });
             }
             
             // Define dataInicio quando muda para "fazendo" (se ainda não foi definida)
             const dataInicio = action.payload.status === 'fazendo' && !task.dataInicio 
-              ? new Date() 
+              ? now 
               : task.dataInicio;
             
             // Define dataFim quando muda para "concluido"
-            const dataFim = action.payload.status === 'concluido' ? new Date() : task.dataFim;
+            const dataFim = action.payload.status === 'concluido' ? now : task.dataFim;
             
             return {
               ...task,
