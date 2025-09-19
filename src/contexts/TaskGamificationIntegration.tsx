@@ -14,7 +14,7 @@ function TaskGamificationIntegration() {
 export function TaskGamificationProvider({ children }: { children: React.ReactNode }) {
   return (
     <TaskProvider>
-      {/* <TaskGamificationIntegration /> */}
+      <TaskGamificationIntegration />
       {children}
     </TaskProvider>
   );
