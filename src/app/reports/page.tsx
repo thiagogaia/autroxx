@@ -31,6 +31,7 @@ import {
   BarChart, 
   Bar, 
   PieChart as RechartsPieChart, 
+  Pie,
   Cell,
   XAxis, 
   YAxis, 
@@ -455,11 +456,18 @@ export default function ReportsPage() {
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
                     <RechartsPieChart>
-                      <RechartsPieChart data={statusData} cx="50%" cy="50%" outerRadius={100} dataKey="value">
+                      <Pie 
+                        data={statusData} 
+                        cx="50%" 
+                        cy="50%" 
+                        outerRadius={100} 
+                        dataKey="value"
+                        label={({ name, percent }: { name: string; percent: number }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      >
                         {statusData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
-                      </RechartsPieChart>
+                      </Pie>
                       <Tooltip />
                     </RechartsPieChart>
                   </ResponsiveContainer>
