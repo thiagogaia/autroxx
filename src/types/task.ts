@@ -16,6 +16,7 @@ export interface Task {
   dataInicio: Date | null; // Data de início (quando muda para "fazendo")
   dataFim: Date | null; // Data de fim (quando muda para "concluido")
   ordem?: number; // Novo campo para ordenação
+  tags?: string[]; // Tags para categorizar a tarefa
 }
 
 export interface StatusConfig {
@@ -40,7 +41,7 @@ export interface TaskContextType {
   addTaskFull: (task: Task) => void;
   updateTaskStatus: (id: number, status: TaskStatus) => void;
   updateTaskPriority: (id: number, prioridade: TaskPriority) => void;
-  updateTask: (id: number, updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade'>>) => void;
+  updateTask: (id: number, updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade' | 'tags'>>) => void;
   setImpediment: (id: number, motivo: string) => void;
   removeImpediment: (id: number) => void;
   deleteTask: (id: number) => void;

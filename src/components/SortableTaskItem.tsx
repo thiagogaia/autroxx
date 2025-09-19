@@ -6,6 +6,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Trash2, GripVertical, Edit, AlertTriangle } from 'lucide-react';
 import { ImpedimentDialog } from './ImpedimentDialog';
 import { EditTaskSheet } from './EditTaskSheet';
@@ -221,6 +222,21 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
                   </div>
                 )}
               </div>
+              
+              {/* Tags */}
+              {task.tags && task.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {task.tags.map((tag, index) => (
+                    <Badge
+                      key={index}
+                      variant="outline"
+                      className="text-xs px-2 py-0.5 bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800"
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
             
             {/* Botões de Ação */}

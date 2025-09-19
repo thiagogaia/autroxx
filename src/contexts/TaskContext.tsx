@@ -56,7 +56,8 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         dataCadastro: now, // Data de cadastro da tarefa
         dataInicio: null, // Será preenchida quando mudar para "fazendo"
         dataFim: null,
-        ordem: 0 // Nova tarefa vai para o topo
+        ordem: 0, // Nova tarefa vai para o topo
+        tags: [] // Tags sempre iniciam vazias
       };
       
       // Atualiza a ordem das outras tarefas

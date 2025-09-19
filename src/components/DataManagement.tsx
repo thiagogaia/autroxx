@@ -222,7 +222,8 @@ export function DataManagement() {
         dataInicio: null,
         dataFim: null,
         dataImpedimento: null,
-        ordem: 0
+        ordem: 0,
+        tags: ['backend', 'api', 'autenticação', 'jwt']
       },
       {
         id: Date.now() + 2,
@@ -237,7 +238,8 @@ export function DataManagement() {
         dataInicio: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 dia atrás
         dataFim: null,
         dataImpedimento: null,
-        ordem: 1
+        ordem: 1,
+        tags: ['frontend', 'ui', 'autenticação']
       },
       {
         id: Date.now() + 3,
@@ -252,7 +254,8 @@ export function DataManagement() {
         dataInicio: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 dias atrás
         dataFim: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 dia atrás
         dataImpedimento: null,
-        ordem: 2
+        ordem: 2,
+        tags: ['database', 'postgresql', 'infraestrutura']
       },
       {
         id: Date.now() + 4,
@@ -267,7 +270,8 @@ export function DataManagement() {
         dataInicio: null,
         dataFim: null,
         dataImpedimento: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 horas atrás
-        ordem: 3
+        ordem: 3,
+        tags: ['notificações', 'email', 'push', 'design']
       },
       {
         id: Date.now() + 5,
@@ -282,7 +286,8 @@ export function DataManagement() {
         dataInicio: null,
         dataFim: null,
         dataImpedimento: null,
-        ordem: 4
+        ordem: 4,
+        tags: ['deploy', 'produção', 'ci-cd', 'devops']
       }
     ];
     
