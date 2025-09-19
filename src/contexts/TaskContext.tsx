@@ -4,6 +4,7 @@ import React, { createContext, useContext, useReducer, useEffect, ReactNode } fr
 import { Task, TaskContextType, TaskStatus, TaskPriority, FilterType } from '@/types/task';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { STORAGE_KEYS, saveTasksToStorage, loadTasksFromStorage } from '@/lib/storage';
+import { generateUniqueTaskId } from '@/lib/utils';
 
 type TaskAction =
   | { type: 'ADD_TASK'; payload: { titulo: string; prioridade: TaskPriority } }
@@ -44,7 +45,7 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
     case 'ADD_TASK':
       const now = new Date();
       const newTask: Task = {
-        id: Date.now(),
+        id: generateUniqueTaskId(),
         titulo: action.payload.titulo,
         descricao: '', // Campo de descrição sempre inicia vazio
         statusHistorico: [{ status: 'a_fazer', timestamp: now }],

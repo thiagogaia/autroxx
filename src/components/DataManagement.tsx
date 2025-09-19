@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, Upload, Trash2, RefreshCw } from 'lucide-react';
-import { migrateTaskData } from '@/lib/utils';
+import { migrateTaskData, generateUniqueTaskId } from '@/lib/utils';
 import { deserializeTasks, STORAGE_KEYS } from '@/lib/storage';
 import { useTaskContext } from '@/contexts/TaskContext';
 import { Task } from '@/types/task';
@@ -78,17 +78,17 @@ export function DataManagement() {
         version: '1.0',
         totalTasks: tasks.length,
         tasksByStatus: {
-          a_fazer: tasks.filter(t => t.statusAtual === 'a_fazer').length,
-          fazendo: tasks.filter(t => t.statusAtual === 'fazendo').length,
-          concluido: tasks.filter(t => t.statusAtual === 'concluido').length
+          a_fazer: tasks.filter((t: Task) => t.statusAtual === 'a_fazer').length,
+          fazendo: tasks.filter((t: Task) => t.statusAtual === 'fazendo').length,
+          concluido: tasks.filter((t: Task) => t.statusAtual === 'concluido').length
         },
         tasksByPriority: {
-          baixa: tasks.filter(t => t.prioridade === 'baixa').length,
-          normal: tasks.filter(t => t.prioridade === 'normal').length,
-          media: tasks.filter(t => t.prioridade === 'media').length,
-          alta: tasks.filter(t => t.prioridade === 'alta').length
+          baixa: tasks.filter((t: Task) => t.prioridade === 'baixa').length,
+          normal: tasks.filter((t: Task) => t.prioridade === 'normal').length,
+          media: tasks.filter((t: Task) => t.prioridade === 'media').length,
+          alta: tasks.filter((t: Task) => t.prioridade === 'alta').length
         },
-        impediments: tasks.filter(t => t.impedimento).length
+        impediments: tasks.filter((t: Task) => t.impedimento).length
       }
     };
     
@@ -160,7 +160,7 @@ export function DataManagement() {
         // Gerar novo ID para evitar conflitos
         const newTask: Task = migrateTaskData({
           ...task,
-          id: Date.now() + Math.random(), // ID único
+          id: generateUniqueTaskId(), // ID único garantido
           dataCadastro: task.dataCadastro || new Date(),
           dataInicio: task.dataInicio || null,
           dataFim: task.dataFim || null,
@@ -211,7 +211,7 @@ export function DataManagement() {
   const handleSampleConfirm = () => {
     const sampleTasks: Task[] = [
       {
-        id: Date.now() + 1,
+        id: generateUniqueTaskId(),
         titulo: 'Desenvolver API de usuários',
         descricao: 'Criar endpoints para CRUD de usuários com autenticação JWT',
         prioridade: 'alta',
@@ -227,7 +227,7 @@ export function DataManagement() {
         tags: ['backend', 'api', 'autenticação', 'jwt']
       },
       {
-        id: Date.now() + 2,
+        id: generateUniqueTaskId(),
         titulo: 'Criar telas de login',
         descricao: 'Implementar interface de login e registro de usuários',
         prioridade: 'normal',
@@ -246,7 +246,7 @@ export function DataManagement() {
         tags: ['frontend', 'ui', 'autenticação']
       },
       {
-        id: Date.now() + 3,
+        id: generateUniqueTaskId(),
         titulo: 'Configurar banco de dados',
         descricao: 'Setup do PostgreSQL com migrations e seeds',
         prioridade: 'media',
@@ -266,7 +266,7 @@ export function DataManagement() {
         tags: ['database', 'postgresql', 'infraestrutura']
       },
       {
-        id: Date.now() + 4,
+        id: generateUniqueTaskId(),
         titulo: 'Implementar sistema de notificações',
         descricao: 'Criar sistema de push notifications e email',
         prioridade: 'normal',
@@ -282,7 +282,7 @@ export function DataManagement() {
         tags: ['notificações', 'email', 'push', 'design']
       },
       {
-        id: Date.now() + 5,
+        id: generateUniqueTaskId(),
         titulo: 'Fazer deploy da aplicação',
         descricao: 'Deploy em produção com CI/CD pipeline',
         prioridade: 'alta',

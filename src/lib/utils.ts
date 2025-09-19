@@ -6,6 +6,21 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// Contador global para garantir IDs únicos
+let taskIdCounter = 0;
+
+// Função para gerar IDs únicos para tarefas
+export function generateUniqueTaskId(): number {
+  // Usa timestamp + contador para garantir unicidade
+  const timestamp = Date.now();
+  const counter = ++taskIdCounter;
+  
+  // Combina timestamp (últimos 10 dígitos) com contador (primeiros 3 dígitos)
+  // Isso garante que mesmo com múltiplas criações no mesmo milissegundo,
+  // os IDs serão únicos
+  return parseInt(`${counter.toString().padStart(3, '0')}${timestamp.toString().slice(-10)}`);
+}
+
 // Helper function para verificar se uma tarefa tem um status específico no histórico
 export function hasStatusInHistory(task: Task, status: TaskStatus): boolean {
   return task.statusHistorico.some(entry => entry.status === status);
@@ -17,7 +32,7 @@ export function migrateTaskData(task: unknown): Task {
   
   // Se já está na nova estrutura, retorna como está
   if (Array.isArray(taskData.statusHistorico) && taskData.statusHistorico.length > 0 && typeof taskData.statusHistorico[0] === 'object') {
-    return taskData as Task;
+    return taskData as unknown as Task;
   }
 
   // Migrar do formato antigo (array de strings) para novo formato
@@ -52,5 +67,5 @@ export function migrateTaskData(task: unknown): Task {
   return {
     ...taskData,
     statusHistorico: migratedStatusHistorico
-  } as Task;
+  } as unknown as Task;
 }
