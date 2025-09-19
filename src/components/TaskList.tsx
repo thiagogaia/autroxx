@@ -47,8 +47,8 @@ export function TaskList() {
   const tarefasFiltradas = tasks.filter(tarefa => {
     if (filtroAtivo === 'tudo') return true;
     if (filtroAtivo === 'fazendo') return tarefa.statusAtual === 'fazendo';
-    if (filtroAtivo === 'normal') return tarefa.prioridade === 'normal';
-    if (filtroAtivo === 'urgente') return tarefa.prioridade === 'alta';
+    if (filtroAtivo === 'normal') return tarefa.prioridade === 'normal'  && tarefa.statusAtual !== 'concluido';
+    if (filtroAtivo === 'urgente') return tarefa.prioridade === 'alta' && tarefa.statusAtual !== 'concluido';
     return true;
   });
 
