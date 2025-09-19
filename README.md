@@ -218,6 +218,9 @@ Edite o componente `Metrics.tsx` para adicionar novas métricas calculadas.
 - [ ] Multi Impedimentos (array)
 - [x] Array de historico de status com a data [para ir e voltar status]
 
+### Features
+- [ ] Modo Foco
+
 ## 🔒 Dados e Privacidade
 
 - **Armazenamento Local**: Todos os dados ficam no seu navegador
