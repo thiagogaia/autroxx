@@ -11,6 +11,7 @@ import { useTaskContext } from '@/contexts/TaskContext';
 import { formatMinutesToString } from '@/lib/time-converter';
 import { hasStatusInHistory } from '@/lib/utils';
 import { Task } from '@/types/task';
+import { mockTasks } from '@/lib/mock-data';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -64,20 +65,34 @@ const PRIORITY_COLORS = {
 };
 
 export default function ReportsPage() {
-  const [periodFilter, setPeriodFilter] = useState<PeriodFilter>('30d');
+  const [periodFilter, setPeriodFilter] = useState<PeriodFilter>('all');
   const { tasks } = useTaskContext();
+  
+  // Usar dados mock se não houver tarefas reais (para demonstração)
+  const tasksToUse = useMemo(() => {
+    if (tasks && tasks.length > 0) {
+      return tasks;
+    }
+    // Fallback para dados mock se não houver tarefas reais
+    try {
+      return mockTasks || [];
+    } catch (error) {
+      console.warn('Erro ao carregar dados mock:', error);
+      return [];
+    }
+  }, [tasks]);
 
   // Filtrar dados por período
   const filteredTasks = useMemo(() => {
-    if (periodFilter === 'all') return tasks;
+    if (periodFilter === 'all') return tasksToUse;
     
     const daysMap = { '7d': 7, '30d': 30, '90d': 90 };
     const cutoffDate = subDays(new Date(), daysMap[periodFilter]);
     
-    return tasks.filter((task: Task) => 
+    return tasksToUse.filter((task: Task) => 
       new Date(task.dataCadastro) >= cutoffDate
     );
-  }, [tasks, periodFilter]);
+  }, [tasksToUse, periodFilter]);
 
   // Métricas principais
   const metrics = useMemo(() => {
@@ -1081,7 +1096,8 @@ export default function ReportsPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {metrics.weeklyCompleted > 0 && (
+                {/* Insight de Produtividade */}
+                {metrics.weeklyCompleted > 0 ? (
                   <div className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
                     <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Positivo</Badge>
                     <div>
@@ -1093,9 +1109,22 @@ export default function ReportsPage() {
                       </p>
                     </div>
                   </div>
+                ) : (
+                  <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">Dica</Badge>
+                    <div>
+                      <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                        Comece a completar tarefas
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Complete algumas tarefas para ver insights de produtividade
+                      </p>
+                    </div>
+                  </div>
                 )}
                 
-                {metrics.avgCompletionTimeMinutes > 0 && (
+                {/* Insight de Eficiência */}
+                {metrics.avgCompletionTimeMinutes > 0 ? (
                   <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
                     <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">Eficiência</Badge>
                     <div>
@@ -1107,9 +1136,22 @@ export default function ReportsPage() {
                       </p>
                     </div>
                   </div>
+                ) : (
+                  <div className="flex items-start gap-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                    <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">Sugestão</Badge>
+                    <div>
+                      <p className="text-sm font-medium text-purple-800 dark:text-purple-200">
+                        Defina datas de início e fim
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Para calcular eficiência, marque quando iniciar e concluir tarefas
+                      </p>
+                    </div>
+                  </div>
                 )}
                 
-                {metrics.totalImpedimentTime > 0 && (
+                {/* Insight de Impedimentos */}
+                {metrics.totalImpedimentTime > 0 ? (
                   <div className="flex items-start gap-3 p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
                     <Badge className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">Atenção</Badge>
                     <div>
@@ -1118,6 +1160,45 @@ export default function ReportsPage() {
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         Identifique padrões nos impedimentos
+                      </p>
+                    </div>
+                  </div>
+                ) : metrics.impedidas > 0 ? (
+                  <div className="flex items-start gap-3 p-3 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                    <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">Monitoramento</Badge>
+                    <div>
+                      <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                        {metrics.impedidas} tarefa(s) com impedimento
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Resolva os impedimentos para manter o fluxo
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Ótimo</Badge>
+                    <div>
+                      <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                        Nenhum impedimento ativo
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Fluxo de trabalho está fluindo bem
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Insight de Prioridades */}
+                {metrics.altaPrioridade > 0 && (
+                  <div className="flex items-start gap-3 p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800">
+                    <Badge className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">Urgente</Badge>
+                    <div>
+                      <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                        {metrics.altaPrioridade} tarefa(s) de alta prioridade
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Foque nas tarefas críticas primeiro
                       </p>
                     </div>
                   </div>
@@ -1138,6 +1219,7 @@ export default function ReportsPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
+                {/* Ação: Gargalos Críticos */}
                 {metrics.criticalBottlenecks > 0 && (
                   <div className="flex items-start gap-3 p-4 bg-destructive/5 dark:bg-destructive/10 rounded-lg border border-destructive/20">
                     <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
@@ -1146,49 +1228,121 @@ export default function ReportsPage() {
                         Resolver {metrics.criticalBottlenecks} gargalos críticos
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Tarefas em backlog há mais de 7 dias
+                        Tarefas em backlog há mais de 7 dias - revise prioridades
                       </p>
                     </div>
                   </div>
                 )}
                 
-                {metrics.taxaImpedimento > 20 && (
+                {/* Ação: Impedimentos */}
+                {metrics.taxaImpedimento > 20 ? (
                   <div className="flex items-start gap-3 p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
                     <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium text-orange-800 dark:text-orange-200">
-                        Reduzir impedimentos
+                        Reduzir impedimentos urgentemente
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Taxa atual: {metrics.taxaImpedimento}% (meta: &lt;20%)
+                        Taxa atual: {metrics.taxaImpedimento}% (meta: &lt;20%) - identifique causas raiz
                       </p>
                     </div>
                   </div>
-                )}
+                ) : metrics.impedidas > 0 ? (
+                  <div className="flex items-start gap-3 p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                    <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                        Monitorar impedimentos ativos
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {metrics.impedidas} tarefa(s) com impedimento - resolva rapidamente
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
                 
-                {metrics.altaPrioridade > 3 && (
+                {/* Ação: Prioridades */}
+                {metrics.altaPrioridade > 3 ? (
+                  <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800">
+                    <Target className="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                        Priorizar tarefas urgentes
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {metrics.altaPrioridade} tarefas de alta prioridade - muitas urgentes podem indicar má planejamento
+                      </p>
+                    </div>
+                  </div>
+                ) : metrics.altaPrioridade > 0 ? (
                   <div className="flex items-start gap-3 p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
                     <Target className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                        Priorizar tarefas urgentes
+                        Focar em tarefas críticas
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {metrics.altaPrioridade} tarefas de alta prioridade pendentes
+                        {metrics.altaPrioridade} tarefa(s) de alta prioridade - complete primeiro
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* Ação: Produtividade */}
+                {metrics.weeklyCompleted === 0 && metrics.total > 0 && (
+                  <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <Target className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                        Começar a completar tarefas
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Nenhuma tarefa concluída esta semana - defina metas pequenas e alcançáveis
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Ação: Eficiência */}
+                {metrics.avgCompletionTimeMinutes === 0 && metrics.concluidas > 0 && (
+                  <div className="flex items-start gap-3 p-4 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                    <Clock className="h-4 w-4 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-purple-800 dark:text-purple-200">
+                        Melhorar rastreamento de tempo
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Defina datas de início e fim para calcular eficiência
                       </p>
                     </div>
                   </div>
                 )}
                 
-                {metrics.taxaImpedimento <= 20 && metrics.criticalBottlenecks === 0 && metrics.altaPrioridade <= 3 && (
+                {/* Estado Saudável */}
+                {metrics.taxaImpedimento <= 20 && metrics.criticalBottlenecks === 0 && metrics.altaPrioridade <= 3 && metrics.weeklyCompleted > 0 && (
                   <div className="flex items-start gap-3 p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
                     <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium text-green-800 dark:text-green-200">
-                        Fluxo saudável
+                        Fluxo saudável mantido
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Continue mantendo o ritmo atual
+                        Continue mantendo o ritmo atual e monitore métricas regularmente
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Estado Inicial */}
+                {metrics.total === 0 && (
+                  <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-950/20 rounded-lg border border-gray-200 dark:border-gray-800">
+                    <Target className="h-4 w-4 text-gray-600 dark:text-gray-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                        Começar a usar o sistema
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Crie algumas tarefas para começar a receber insights e recomendações
                       </p>
                     </div>
                   </div>
