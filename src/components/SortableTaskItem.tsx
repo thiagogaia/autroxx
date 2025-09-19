@@ -6,7 +6,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Trash2, GripVertical, Edit } from 'lucide-react';
+import { Trash2, GripVertical, Edit, AlertTriangle } from 'lucide-react';
 import { ImpedimentDialog } from './ImpedimentDialog';
 import { EditTaskSheet } from './EditTaskSheet';
 import { useTaskContext } from '@/contexts/TaskContext';
@@ -130,12 +130,10 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
             
             {task.impedimento && (
               <div className="relative group">
-                <span 
-                  className="text-red-500 animate-bounce cursor-pointer"
+                <AlertTriangle 
+                  className="h-5 w-5 text-red-500 animate-pulse cursor-pointer hover:animate-shake"
                   onClick={() => setImpedimentDialogOpen(true)}
-                >
-                  ⚠️
-                </span>
+                />
                 {task.impedimentoMotivo && (
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-popover text-popover-foreground border border-border text-xs rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap max-w-48 text-center z-50">
                     {task.impedimentoMotivo}
