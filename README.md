@@ -215,7 +215,7 @@ Edite o componente `Metrics.tsx` para adicionar novas métricas calculadas.
 - [ ] Backup automático na nuvem
 
 ### Tarefas técnitas
-- [ ] Multi Impedimentos (array) *
+- [x] Multi Impedimentos (array)
 - [x] Array de historico de status com a data [para ir e voltar status]
 
 ### Features
