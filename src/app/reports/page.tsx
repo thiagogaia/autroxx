@@ -35,6 +35,7 @@ import {
 } from 'recharts';
 import { format, subDays, startOfWeek, endOfWeek, differenceInDays } from 'date-fns';
 import { pt } from 'date-fns/locale';
+import { BottleneckAnalysis } from '@/components/BottleneckAnalysis';
 
 // Simulando dados do localStorage para desenvolvimento
 const mockData = [
@@ -313,11 +314,12 @@ export default function ReportsPage() {
 
         {/* Abas dos Relatórios */}
         <Tabs defaultValue="productivity" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="productivity">Produtividade</TabsTrigger>
             <TabsTrigger value="trends">Tendências</TabsTrigger>
             <TabsTrigger value="analysis">Análise Avançada</TabsTrigger>
             <TabsTrigger value="patterns">Padrões</TabsTrigger>
+            <TabsTrigger value="bottlenecks">Gargalos</TabsTrigger>
           </TabsList>
 
           {/* Aba Produtividade */}
@@ -456,6 +458,11 @@ export default function ReportsPage() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Aba Gargalos */}
+          <TabsContent value="bottlenecks" className="space-y-6">
+            <BottleneckAnalysis />
           </TabsContent>
         </Tabs>
 

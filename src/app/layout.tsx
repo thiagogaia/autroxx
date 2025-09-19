@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import './drag-drop.css'
 import { ThemeProvider } from '@/components/theme-provider'
+import { TaskProvider } from '@/contexts/TaskContext'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,7 +35,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <TaskProvider>
+            {children}
+          </TaskProvider>
         </ThemeProvider>
       </body>
     </html>
