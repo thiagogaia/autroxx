@@ -108,10 +108,19 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
   // Funções para obter cores dos badges
   const getCategoriaColor = (categoria: TaskCategory) => {
     const colors = {
+      feature: 'bg-purple-50 dark:bg-purple-950/20 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800',
       desenvolvimento: 'bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800',
-      reuniao: 'bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+      qa: 'bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+      devops: 'bg-orange-50 dark:bg-orange-950/20 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800',
       bug: 'bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800',
-      documentacao: 'bg-purple-50 dark:bg-purple-950/20 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
+      atendimento: 'bg-cyan-50 dark:bg-cyan-950/20 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-800',
+      comercial: 'bg-yellow-50 dark:bg-yellow-950/20 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800',
+      juridico: 'bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+      design: 'bg-pink-50 dark:bg-pink-950/20 text-pink-700 dark:text-pink-300 border-pink-200 dark:border-pink-800',
+      documentacao: 'bg-purple-50 dark:bg-purple-950/20 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800',
+      reuniao: 'bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+      sem_categoria: 'bg-gray-50 dark:bg-gray-950/20 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-800',
+      outro: 'bg-gray-50 dark:bg-gray-950/20 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-800'
     };
     return colors[categoria];
   };
@@ -127,10 +136,19 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
 
   const getCategoriaLabel = (categoria: TaskCategory) => {
     const labels = {
+      feature: 'Feature',
       desenvolvimento: 'Desenvolvimento',
-      reuniao: 'Reunião',
+      qa: 'QA',
+      devops: 'DevOps',
       bug: 'Bug',
-      documentacao: 'Documentação'
+      atendimento: 'Atendimento',
+      comercial: 'Comercial',
+      juridico: 'Jurídico',
+      design: 'Design',
+      documentacao: 'Documentação',
+      reuniao: 'Reunião',
+      sem_categoria: 'Sem Categoria',
+      outro: 'Outro'
     };
     return labels[categoria];
   };

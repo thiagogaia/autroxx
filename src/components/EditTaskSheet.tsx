@@ -214,16 +214,28 @@ export function EditTaskSheet({ task, isOpen, onClose, stackLevel = 0 }: EditTas
                   <SelectValue placeholder="Selecione uma categoria" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="feature">
+                    <div className="flex items-center gap-2">
+                      <span className="text-purple-600">●</span>
+                      Feature
+                    </div>
+                  </SelectItem>
                   <SelectItem value="desenvolvimento">
                     <div className="flex items-center gap-2">
                       <span className="text-green-600">●</span>
                       Desenvolvimento
                     </div>
                   </SelectItem>
-                  <SelectItem value="reuniao">
+                  <SelectItem value="qa">
                     <div className="flex items-center gap-2">
                       <span className="text-blue-600">●</span>
-                      Reunião
+                      QA
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="devops">
+                    <div className="flex items-center gap-2">
+                      <span className="text-orange-600">●</span>
+                      DevOps
                     </div>
                   </SelectItem>
                   <SelectItem value="bug">
@@ -232,10 +244,52 @@ export function EditTaskSheet({ task, isOpen, onClose, stackLevel = 0 }: EditTas
                       Bug
                     </div>
                   </SelectItem>
+                  <SelectItem value="atendimento">
+                    <div className="flex items-center gap-2">
+                      <span className="text-cyan-600">●</span>
+                      Atendimento
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="comercial">
+                    <div className="flex items-center gap-2">
+                      <span className="text-yellow-600">●</span>
+                      Comercial
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="juridico">
+                    <div className="flex items-center gap-2">
+                      <span className="text-indigo-600">●</span>
+                      Jurídico
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="design">
+                    <div className="flex items-center gap-2">
+                      <span className="text-pink-600">●</span>
+                      Design
+                    </div>
+                  </SelectItem>
                   <SelectItem value="documentacao">
                     <div className="flex items-center gap-2">
                       <span className="text-purple-600">●</span>
                       Documentação
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="reuniao">
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-600">●</span>
+                      Reunião
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="sem_categoria">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-600">●</span>
+                      Sem Categoria
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="outro">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-600">●</span>
+                      Outro
                     </div>
                   </SelectItem>
                 </SelectContent>

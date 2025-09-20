@@ -1,7 +1,7 @@
 export type TaskStatus = 'a_fazer' | 'fazendo' | 'concluido';
 export type TaskPriority = 'baixa' | 'normal' | 'media' | 'alta';
 export type FilterType = 'tudo' | 'a_fazer' | 'fazendo' | 'normal' | 'urgente';
-export type TaskCategory = 'desenvolvimento' | 'reuniao' | 'bug' | 'documentacao' | 'sem_categoria';
+export type TaskCategory = 'feature' | 'desenvolvimento' | 'qa' | 'devops' | 'bug' | 'atendimento' | 'comercial' | 'juridico' | 'design' | 'documentacao' | 'reuniao' | 'sem_categoria' | 'outro';
 export type TaskComplexity = 'simples' | 'media' | 'complexa';
 
 export interface StatusHistoryEntry {
@@ -38,6 +38,9 @@ export interface Task {
   numeroMudancasPrioridade?: number; // Número de mudanças de prioridade
   tempoTotalImpedimento?: number; // Tempo total de impedimento em minutos
   foiRetrabalho?: boolean; // Se foi retrabalho
+  is_active?: boolean; // Visível na listagem? -> não
+  rsync?: boolean; // Visível na listagem? -> não
+  id_rsync?: number | null; // Visível na listagem? -> não
 }
 
 export interface StatusConfig {
