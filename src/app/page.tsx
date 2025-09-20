@@ -1,12 +1,12 @@
 import { TaskFilter } from '@/components/TaskFilter';
+import { AdvancedFilters } from '@/components/AdvancedFilters';
+import { Pagination } from '@/components/Pagination';
 import { TaskForm } from '@/components/TaskForm';
 import { TaskList } from '@/components/TaskList';
 import { Metrics } from '@/components/Metrics';
 import { Insights } from '@/components/Insights';
 import { DataManagement } from '@/components/DataManagement';
-import { GamificationWidget } from '@/components/GamificationWidget';
 import { Navigation } from '@/components/Navigation';
-import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function TaskManagerPage() {
   return (
@@ -28,14 +28,22 @@ export default function TaskManagerPage() {
         {/* Navigation */}
         <Navigation />
 
-        {/* Filtros */}
-        <TaskFilter />
+        <div className="flex justify-between ">
+          {/* Filtros básicos (abas) */}
+          <TaskFilter />
+        
+          {/* Filtros avançados */}
+          <AdvancedFilters />
+        </div>
         
         {/* Formulário */}
         <TaskForm />
         
         {/* Lista de Tarefas */}
         <TaskList />
+        
+        {/* Paginação */}
+        <Pagination />
         
         {/* Métricas */}
         <Metrics />

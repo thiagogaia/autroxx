@@ -60,9 +60,60 @@ export interface PriorityConfig {
   badge: string;
 }
 
+// Tipos para paginação (preparado para migração SQL)
+export interface PaginationParams {
+  page: number;
+  limit: number;
+  offset: number;
+}
+
+export interface PaginationResult<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+}
+
+// Tipos para filtros avançados (preparado para migração SQL)
+export interface TaskFilters {
+  // Filtros básicos (abas existentes)
+  statusFilter: FilterType;
+  
+  // Filtros avançados
+  titleSearch?: string;
+  dateRange?: {
+    start: Date | null;
+    end: Date | null;
+  };
+  priorityFilter?: TaskPriority[];
+  categoryFilter?: TaskCategory[];
+  tagsFilter?: string[];
+  impedimentFilter?: boolean | null; // null = todos, true = com impedimento, false = sem impedimento
+  complexityFilter?: TaskComplexity[];
+  
+  // Ordenação
+  sortBy?: 'dataCadastro' | 'titulo' | 'prioridade' | 'dataInicio' | 'dataFim';
+  sortOrder?: 'asc' | 'desc';
+}
+
 export interface TaskContextType {
   tasks: Task[];
   filtroAtivo: FilterType;
+  
+  // Paginação
+  pagination: PaginationParams;
+  paginatedTasks: Task[];
+  totalTasks: number;
+  
+  // Filtros avançados
+  advancedFilters: TaskFilters;
+  
+  // Métodos básicos
   addTask: (titulo: string, prioridade?: TaskPriority) => void;
   addTaskFull: (task: Task) => void;
   updateTaskStatus: (id: number, status: TaskStatus) => void;
@@ -71,6 +122,11 @@ export interface TaskContextType {
   setImpediment: (id: number, motivo: string) => void;
   removeImpediment: (id: number) => void;
   deleteTask: (id: number) => void;
-  reorderTasks: (taskIds: number[]) => void; // Nova função para reordenar
+  reorderTasks: (taskIds: number[]) => void;
+  
+  // Métodos de filtro e paginação
   setFilter: (filter: FilterType) => void;
+  setAdvancedFilters: (filters: Partial<TaskFilters>) => void;
+  setPagination: (params: Partial<PaginationParams>) => void;
+  resetFilters: () => void;
 }

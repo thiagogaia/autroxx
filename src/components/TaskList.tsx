@@ -22,15 +22,13 @@ import {
 
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { SortableTaskItem } from './SortableTaskItem';
-import { TaskItem } from './TaskItem';
 import { EmptyState } from './EmptyState';
 import { useTaskContext } from '@/contexts/TaskContext';
 import { ArrowUpDown } from 'lucide-react';
 
 export function TaskList() {
-  const { tasks, filtroAtivo, reorderTasks } = useTaskContext();
+  const { tasks, paginatedTasks, totalTasks, reorderTasks } = useTaskContext();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -43,29 +41,19 @@ export function TaskList() {
     })
   );
 
-  // Filtrar tarefas baseado na aba ativa
-  const tarefasFiltradas = tasks.filter(tarefa => {
-    if (filtroAtivo === 'tudo') return true;
-    if (filtroAtivo === 'a_fazer') return tarefa.statusAtual === 'a_fazer';
-    if (filtroAtivo === 'fazendo') return tarefa.statusAtual === 'fazendo';
-    if (filtroAtivo === 'normal') return tarefa.prioridade === 'normal'  && tarefa.statusAtual !== 'concluido';
-    if (filtroAtivo === 'urgente') return tarefa.prioridade === 'alta' && tarefa.statusAtual !== 'concluido';
-    return true;
-  });
-
   // Se não há tarefas, mostra o estado vazio
   if (tasks.length === 0) {
     return <EmptyState />;
   }
 
   // Se há tarefas mas nenhuma corresponde ao filtro
-  if (tarefasFiltradas.length === 0) {
+  if (totalTasks === 0) {
     return (
       <Card className="p-8">
         <div className="text-center text-muted-foreground">
           <p className="text-lg font-medium">Nenhuma tarefa encontrada</p>
           <p className="text-sm mt-1">
-            Não há tarefas com o filtro "{filtroAtivo}" aplicado.
+            Não há tarefas com os filtros aplicados.
           </p>
         </div>
       </Card>
@@ -76,33 +64,15 @@ export function TaskList() {
     const { active, over } = event;
 
     if (active.id !== over?.id) {
-      const oldIndex = tarefasFiltradas.findIndex(task => task.id === active.id);
-      const newIndex = tarefasFiltradas.findIndex(task => task.id === over?.id);
+      const oldIndex = paginatedTasks.findIndex(task => task.id === active.id);
+      const newIndex = paginatedTasks.findIndex(task => task.id === over?.id);
 
-      // Reordena apenas as tarefas filtradas
-      const reorderedFiltered = arrayMove(tarefasFiltradas, oldIndex, newIndex);
+      // Reordena apenas as tarefas da página atual
+      const reorderedPage = arrayMove(paginatedTasks, oldIndex, newIndex);
       
-      // Se estamos filtrando, precisamos mesclar com as tarefas não filtradas
-      if (filtroAtivo !== 'tudo') {
-        const nonFilteredTasks = tasks.filter(tarefa => {
-          if (filtroAtivo === 'a_fazer') return tarefa.statusAtual !== 'a_fazer';
-          if (filtroAtivo === 'fazendo') return tarefa.statusAtual !== 'fazendo';
-          if (filtroAtivo === 'normal') return tarefa.prioridade !== 'normal';
-          if (filtroAtivo === 'urgente') return tarefa.prioridade !== 'alta';
-          return false;
-        });
-        
-        // Combina as tarefas reordenadas com as não filtradas
-        const allReorderedIds = [
-          ...reorderedFiltered.map(task => task.id),
-          ...nonFilteredTasks.map(task => task.id)
-        ];
-        
-        reorderTasks(allReorderedIds);
-      } else {
-        // Se não há filtro, reordena todas as tarefas
-        reorderTasks(reorderedFiltered.map(task => task.id));
-      }
+      // Para simplificar, vamos reordenar apenas dentro da página atual
+      // Em uma implementação mais robusta, você poderia implementar reordenação global
+      reorderTasks(reorderedPage.map(task => task.id));
     }
   }
 
@@ -132,10 +102,10 @@ export function TaskList() {
           </TableHeader>
           <TableBody>
             <SortableContext
-              items={tarefasFiltradas.map(task => task.id)}
+              items={paginatedTasks.map(task => task.id)}
               strategy={verticalListSortingStrategy}
             >
-              {tarefasFiltradas.map(tarefa => (
+              {paginatedTasks.map(tarefa => (
                 <SortableTaskItem key={tarefa.id} task={tarefa} />
               ))}
             </SortableContext>

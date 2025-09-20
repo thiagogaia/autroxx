@@ -1,7 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
-import { Task, TaskContextType, TaskStatus, TaskPriority, FilterType, ImpedimentoHistoryEntry } from '@/types/task';
+import React, { createContext, useContext, useReducer, useEffect, ReactNode, useMemo } from 'react';
+import { Task, TaskContextType, TaskStatus, TaskPriority, FilterType, ImpedimentoHistoryEntry, PaginationParams, TaskFilters } from '@/types/task';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { STORAGE_KEYS, saveTasksToStorage, loadTasksFromStorage } from '@/lib/storage';
 import { generateUniqueTaskId } from '@/lib/utils';
@@ -15,6 +15,9 @@ type TaskAction =
   | { type: 'SET_IMPEDIMENT'; payload: { id: number; motivo: string } }
   | { type: 'REMOVE_IMPEDIMENT'; payload: { id: number } }
   | { type: 'SET_FILTER'; payload: { filter: FilterType } }
+  | { type: 'SET_ADVANCED_FILTERS'; payload: { filters: Partial<TaskFilters> } }
+  | { type: 'SET_PAGINATION'; payload: { params: Partial<PaginationParams> } }
+  | { type: 'RESET_FILTERS' }
   | { type: 'LOAD_TASKS'; payload: { tasks: Task[] } }
   | { type: 'DELETE_TASK'; payload: { id: number } }
   | { type: 'REORDER_TASKS'; payload: { taskIds: number[] } };
@@ -22,11 +25,34 @@ type TaskAction =
 interface TaskState {
   tasks: Task[];
   filtroAtivo: FilterType;
+  pagination: PaginationParams;
+  advancedFilters: TaskFilters;
 }
+
+const initialPagination: PaginationParams = {
+  page: 1,
+  limit: 10,
+  offset: 0
+};
+
+const initialAdvancedFilters: TaskFilters = {
+  statusFilter: 'tudo',
+  titleSearch: '',
+  dateRange: { start: null, end: null },
+  priorityFilter: [],
+  categoryFilter: [],
+  tagsFilter: [],
+  impedimentFilter: null,
+  complexityFilter: [],
+  sortBy: 'dataCadastro',
+  sortOrder: 'desc'
+};
 
 const initialState: TaskState = {
   tasks: [],
-  filtroAtivo: 'tudo'
+  filtroAtivo: 'tudo',
+  pagination: initialPagination,
+  advancedFilters: initialAdvancedFilters
 };
 
 function taskReducer(state: TaskState, action: TaskAction): TaskState {
@@ -230,7 +256,49 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
     case 'SET_FILTER':
       return {
         ...state,
-        filtroAtivo: action.payload.filter
+        filtroAtivo: action.payload.filter,
+        advancedFilters: {
+          ...state.advancedFilters,
+          statusFilter: action.payload.filter
+        }
+      };
+
+    case 'SET_ADVANCED_FILTERS':
+      return {
+        ...state,
+        advancedFilters: {
+          ...state.advancedFilters,
+          ...action.payload.filters
+        },
+        pagination: {
+          ...state.pagination,
+          page: 1, // Reset para primeira página quando filtros mudam
+          offset: 0
+        }
+      };
+
+    case 'SET_PAGINATION':
+      const newPage = action.payload.params.page || state.pagination.page;
+      const newLimit = action.payload.params.limit || state.pagination.limit;
+      return {
+        ...state,
+        pagination: {
+          page: newPage,
+          limit: newLimit,
+          offset: (newPage - 1) * newLimit
+        }
+      };
+
+    case 'RESET_FILTERS':
+      return {
+        ...state,
+        filtroAtivo: 'tudo',
+        advancedFilters: initialAdvancedFilters,
+        pagination: {
+          ...state.pagination,
+          page: 1,
+          offset: 0
+        }
       };
 
     default:
@@ -243,6 +311,131 @@ const TaskContext = createContext<TaskContextType | undefined>(undefined);
 export function TaskProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(taskReducer, initialState);
   const [filtroAtivo, setFiltroAtivo, filterLoaded] = useLocalStorage<FilterType>(STORAGE_KEYS.FILTER, 'tudo');
+
+  // Função para aplicar filtros avançados
+  const applyAdvancedFilters = useMemo(() => {
+    return (tasks: Task[], filters: TaskFilters): Task[] => {
+      let filteredTasks = [...tasks];
+
+      // Filtro por status (abas existentes)
+      if (filters.statusFilter !== 'tudo') {
+        if (filters.statusFilter === 'a_fazer') {
+          filteredTasks = filteredTasks.filter(task => task.statusAtual === 'a_fazer');
+        } else if (filters.statusFilter === 'fazendo') {
+          filteredTasks = filteredTasks.filter(task => task.statusAtual === 'fazendo');
+        } else if (filters.statusFilter === 'normal') {
+          filteredTasks = filteredTasks.filter(task => task.prioridade === 'normal' && task.statusAtual !== 'concluido');
+        } else if (filters.statusFilter === 'urgente') {
+          filteredTasks = filteredTasks.filter(task => task.prioridade === 'alta' && task.statusAtual !== 'concluido');
+        }
+      }
+
+      // Filtro por título
+      if (filters.titleSearch) {
+        const searchTerm = filters.titleSearch.toLowerCase();
+        filteredTasks = filteredTasks.filter(task => 
+          task.titulo.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      // Filtro por data de cadastro
+      if (filters.dateRange?.start || filters.dateRange?.end) {
+        filteredTasks = filteredTasks.filter(task => {
+          const taskDate = new Date(task.dataCadastro);
+          if (filters.dateRange?.start && taskDate < filters.dateRange.start) return false;
+          if (filters.dateRange?.end && taskDate > filters.dateRange.end) return false;
+          return true;
+        });
+      }
+
+      // Filtro por prioridade
+      if (filters.priorityFilter && filters.priorityFilter.length > 0) {
+        filteredTasks = filteredTasks.filter(task => 
+          filters.priorityFilter!.includes(task.prioridade)
+        );
+      }
+
+      // Filtro por categoria
+      if (filters.categoryFilter && filters.categoryFilter.length > 0) {
+        filteredTasks = filteredTasks.filter(task => 
+          task.categoria && filters.categoryFilter!.includes(task.categoria)
+        );
+      }
+
+      // Filtro por tags
+      if (filters.tagsFilter && filters.tagsFilter.length > 0) {
+        filteredTasks = filteredTasks.filter(task => 
+          task.tags && task.tags.some(tag => filters.tagsFilter!.includes(tag))
+        );
+      }
+
+      // Filtro por impedimento
+      if (filters.impedimentFilter !== null) {
+        filteredTasks = filteredTasks.filter(task => 
+          task.impedimento === filters.impedimentFilter
+        );
+      }
+
+      // Filtro por complexidade
+      if (filters.complexityFilter && filters.complexityFilter.length > 0) {
+        filteredTasks = filteredTasks.filter(task => 
+          task.complexidade && filters.complexityFilter!.includes(task.complexidade)
+        );
+      }
+
+      // Ordenação
+      if (filters.sortBy) {
+        filteredTasks.sort((a, b) => {
+          let aValue: string | number, bValue: string | number;
+          
+          switch (filters.sortBy) {
+            case 'titulo':
+              aValue = a.titulo.toLowerCase();
+              bValue = b.titulo.toLowerCase();
+              break;
+            case 'prioridade':
+              const priorityOrder = { 'baixa': 1, 'normal': 2, 'media': 3, 'alta': 4 };
+              aValue = priorityOrder[a.prioridade];
+              bValue = priorityOrder[b.prioridade];
+              break;
+            case 'dataCadastro':
+              aValue = new Date(a.dataCadastro).getTime();
+              bValue = new Date(b.dataCadastro).getTime();
+              break;
+            case 'dataInicio':
+              aValue = a.dataInicio ? new Date(a.dataInicio).getTime() : 0;
+              bValue = b.dataInicio ? new Date(b.dataInicio).getTime() : 0;
+              break;
+            case 'dataFim':
+              aValue = a.dataFim ? new Date(a.dataFim).getTime() : 0;
+              bValue = b.dataFim ? new Date(b.dataFim).getTime() : 0;
+              break;
+            default:
+              return 0;
+          }
+
+          if (filters.sortOrder === 'asc') {
+            return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+          } else {
+            return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+          }
+        });
+      }
+
+      return filteredTasks;
+    };
+  }, []);
+
+  // Calcular tarefas filtradas e paginadas
+  const filteredTasks = useMemo(() => {
+    return applyAdvancedFilters(state.tasks, state.advancedFilters);
+  }, [state.tasks, state.advancedFilters, applyAdvancedFilters]);
+
+  const paginatedTasks = useMemo(() => {
+    const start = state.pagination.offset;
+    const end = start + state.pagination.limit;
+    return filteredTasks.slice(start, end);
+  }, [filteredTasks, state.pagination]);
 
   // Carregar tarefas do localStorage na inicialização
   useEffect(() => {
@@ -302,6 +495,18 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     setFiltroAtivo(filter);
   };
 
+  const setAdvancedFilters = (filters: Partial<TaskFilters>) => {
+    dispatch({ type: 'SET_ADVANCED_FILTERS', payload: { filters } });
+  };
+
+  const setPagination = (params: Partial<PaginationParams>) => {
+    dispatch({ type: 'SET_PAGINATION', payload: { params } });
+  };
+
+  const resetFilters = () => {
+    dispatch({ type: 'RESET_FILTERS' });
+  };
+
   const reorderTasks = (taskIds: number[]) => {
     dispatch({ type: 'REORDER_TASKS', payload: { taskIds } });
   };
@@ -310,6 +515,10 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     <TaskContext.Provider value={{
       tasks: state.tasks,
       filtroAtivo: state.filtroAtivo,
+      pagination: state.pagination,
+      paginatedTasks,
+      totalTasks: filteredTasks.length,
+      advancedFilters: state.advancedFilters,
       addTask,
       addTaskFull,
       updateTaskStatus,
@@ -319,7 +528,10 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       removeImpediment,
       deleteTask,
       reorderTasks,
-      setFilter
+      setFilter,
+      setAdvancedFilters,
+      setPagination,
+      resetFilters
     }}>
       {children}
     </TaskContext.Provider>
