@@ -64,6 +64,16 @@ export function DataManagement() {
       if (task.dataFim && isNaN(new Date(task.dataFim).getTime())) {
         errors.push(`Tarefa ${index + 1}: data de fim inválida`);
       }
+      
+      // Validar categoria se presente
+      if (task.categoria && !['feature', 'desenvolvimento', 'qa', 'devops', 'bug', 'atendimento', 'comercial', 'juridico', 'design', 'documentacao', 'reuniao', 'sem_categoria', 'outro'].includes(task.categoria)) {
+        errors.push(`Tarefa ${index + 1}: categoria inválida`);
+      }
+      
+      // Validar complexidade se presente
+      if (task.complexidade && !['simples', 'media', 'complexa'].includes(task.complexidade)) {
+        errors.push(`Tarefa ${index + 1}: complexidade inválida`);
+      }
     });
     
     return { isValid: errors.length === 0, errors };
@@ -170,7 +180,11 @@ export function DataManagement() {
           impedimentoMotivo: task.impedimentoMotivo || '',
           statusHistorico: task.statusHistorico || ['a_fazer'],
           statusAtual: task.statusAtual || 'a_fazer',
-          ordem: task.ordem || 0
+          ordem: task.ordem || 0,
+          // Novos campos com valores padrão
+          is_active: task.is_active !== undefined ? task.is_active : true,
+          rsync: task.rsync !== undefined ? task.rsync : false,
+          id_rsync: task.id_rsync || null
         });
         
         // Usar a nova função addTaskFull
@@ -219,12 +233,18 @@ export function DataManagement() {
         statusHistorico: [{ status: 'a_fazer', timestamp: new Date() }],
         impedimento: false,
         impedimentoMotivo: '',
+        impedimentoHistorico: [],
         dataCadastro: new Date(),
         dataInicio: null,
         dataFim: null,
         dataImpedimento: null,
         ordem: 0,
-        tags: ['backend', 'api', 'autenticação', 'jwt']
+        tags: ['backend', 'api', 'autenticação', 'jwt'],
+        categoria: 'desenvolvimento',
+        complexidade: 'media',
+        is_active: true,
+        rsync: false,
+        id_rsync: null
       },
       {
         id: generateUniqueTaskId(),
@@ -238,12 +258,18 @@ export function DataManagement() {
         ],
         impedimento: false,
         impedimentoMotivo: '',
+        impedimentoHistorico: [],
         dataCadastro: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 dias atrás
         dataInicio: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 dia atrás
         dataFim: null,
         dataImpedimento: null,
         ordem: 1,
-        tags: ['frontend', 'ui', 'autenticação']
+        tags: ['frontend', 'ui', 'autenticação'],
+        categoria: 'design',
+        complexidade: 'simples',
+        is_active: true,
+        rsync: false,
+        id_rsync: null
       },
       {
         id: generateUniqueTaskId(),
@@ -258,12 +284,18 @@ export function DataManagement() {
         ],
         impedimento: false,
         impedimentoMotivo: '',
+        impedimentoHistorico: [],
         dataCadastro: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 dias atrás
         dataInicio: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 dias atrás
         dataFim: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 dia atrás
         dataImpedimento: null,
         ordem: 2,
-        tags: ['database', 'postgresql', 'infraestrutura']
+        tags: ['database', 'postgresql', 'infraestrutura'],
+        categoria: 'devops',
+        complexidade: 'media',
+        is_active: true,
+        rsync: false,
+        id_rsync: null
       },
       {
         id: generateUniqueTaskId(),
@@ -274,12 +306,18 @@ export function DataManagement() {
         statusHistorico: [{ status: 'a_fazer', timestamp: new Date() }],
         impedimento: true,
         impedimentoMotivo: 'Aguardando aprovação do cliente para o design',
+        impedimentoHistorico: [],
         dataCadastro: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 dia atrás
         dataInicio: null,
         dataFim: null,
         dataImpedimento: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 horas atrás
         ordem: 3,
-        tags: ['notificações', 'email', 'push', 'design']
+        tags: ['notificações', 'email', 'push', 'design'],
+        categoria: 'feature',
+        complexidade: 'complexa',
+        is_active: true,
+        rsync: false,
+        id_rsync: null
       },
       {
         id: generateUniqueTaskId(),
@@ -290,12 +328,18 @@ export function DataManagement() {
         statusHistorico: [{ status: 'a_fazer', timestamp: new Date() }],
         impedimento: false,
         impedimentoMotivo: '',
+        impedimentoHistorico: [],
         dataCadastro: new Date(),
         dataInicio: null,
         dataFim: null,
         dataImpedimento: null,
         ordem: 4,
-        tags: ['deploy', 'produção', 'ci-cd', 'devops']
+        tags: ['deploy', 'produção', 'ci-cd', 'devops'],
+        categoria: 'devops',
+        complexidade: 'media',
+        is_active: true,
+        rsync: false,
+        id_rsync: null
       }
     ];
     
