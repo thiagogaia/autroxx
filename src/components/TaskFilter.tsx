@@ -18,6 +18,7 @@ export function TaskFilter() {
           <TabsTrigger value="tudo">Tudo</TabsTrigger>
           <TabsTrigger value="a_fazer">A Fazer</TabsTrigger>
           <TabsTrigger value="fazendo">Fazendo</TabsTrigger>
+          <TabsTrigger value="concluido">Concluído</TabsTrigger>
           <TabsTrigger value="normal">Normal</TabsTrigger>
           <TabsTrigger value="urgente">Urgente</TabsTrigger>
         </TabsList>

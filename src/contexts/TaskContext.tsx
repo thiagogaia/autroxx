@@ -323,6 +323,8 @@ export function TaskProvider({ children }: { children: ReactNode }) {
           filteredTasks = filteredTasks.filter(task => task.statusAtual === 'a_fazer');
         } else if (filters.statusFilter === 'fazendo') {
           filteredTasks = filteredTasks.filter(task => task.statusAtual === 'fazendo');
+        } else if (filters.statusFilter === 'concluido') {
+          filteredTasks = filteredTasks.filter(task => task.statusAtual === 'concluido');
         } else if (filters.statusFilter === 'normal') {
           filteredTasks = filteredTasks.filter(task => task.prioridade === 'normal' && task.statusAtual !== 'concluido');
         } else if (filters.statusFilter === 'urgente') {
