@@ -3,7 +3,7 @@
     {
       "id": 28400831406,
       "titulo": "Gaiaban - [Ajuste total da pagina principal]",
-      "descricao": "- [ ] Paginação\n- [ ] Cadastro de Pausa\n- [ ] Cadastro de tarefa Referenciada\n- [ ] Implementar DeadLine\n- [ ] Revisar Metricas Pagina Inicial\n- [ ] Melhorar regras de status => Remover Fazendo => Só pode concluir depois de Fazendo. => pode remover de concluir e remover de fazendo. Deixando tudo no histórico do status.",
+      "descricao": "- [x] Paginação\n- [x] Implementar Filtros\n- [ ] Cadastro de Pausa\n- [ ] Cadastro de tarefa Referenciada\n- [ ] Implementar DeadLine\n- [x] Revisar Metricas Pagina Inicial\n- [ ] Melhorar regras de status => Remover Fazendo => Só pode concluir depois de Fazendo. => pode remover de concluir e remover de fazendo. Deixando tudo no histórico do status.",
       "statusHistorico": [
         {
           "status": "a_fazer",
