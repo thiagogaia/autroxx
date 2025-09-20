@@ -20,59 +20,88 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
+interface ImportedData {
+  tasks: unknown[];
+}
+
 export function DataManagement() {
   const { tasks, addTaskFull } = useTaskContext();
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const [doubleConfirmDialogOpen, setDoubleConfirmDialogOpen] = useState(false);
   const [sampleDialogOpen, setSampleDialogOpen] = useState(false);
-  const [tasksToImport, setTasksToImport] = useState<any[]>([]);
+  const [tasksToImport, setTasksToImport] = useState<Task[]>([]);
   const [importErrors, setImportErrors] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   // Validar estrutura de dados importados
-  const validateImportedData = (data: any): { isValid: boolean; errors: string[] } => {
+  const validateImportedData = (data: unknown): { isValid: boolean; errors: string[] } => {
     const errors: string[] = [];
     
-    if (!data.tasks || !Array.isArray(data.tasks)) {
+    // Verificar se é um objeto com propriedade tasks
+    if (!data || typeof data !== 'object' || !('tasks' in data)) {
+      errors.push('Arquivo deve conter um objeto com propriedade "tasks"');
+      return { isValid: false, errors };
+    }
+    
+    const importedData = data as ImportedData;
+    
+    if (!importedData.tasks || !Array.isArray(importedData.tasks)) {
       errors.push('Arquivo deve conter um array de tarefas');
       return { isValid: false, errors };
     }
     
-    data.tasks.forEach((task: any, index: number) => {
-      if (!task.titulo || typeof task.titulo !== 'string') {
+    importedData.tasks.forEach((task: unknown, index: number) => {
+      if (!task || typeof task !== 'object') {
+        errors.push(`Tarefa ${index + 1}: deve ser um objeto`);
+        return;
+      }
+      
+      const taskObj = task as Record<string, unknown>;
+      
+      if (!taskObj.titulo || typeof taskObj.titulo !== 'string') {
         errors.push(`Tarefa ${index + 1}: título é obrigatório`);
       }
       
-      if (!task.prioridade || !['baixa', 'normal', 'media', 'alta'].includes(task.prioridade)) {
+      if (!taskObj.prioridade || !['baixa', 'normal', 'media', 'alta'].includes(taskObj.prioridade as string)) {
         errors.push(`Tarefa ${index + 1}: prioridade inválida`);
       }
       
-      if (!task.statusAtual || !['a_fazer', 'fazendo', 'concluido'].includes(task.statusAtual)) {
+      if (!taskObj.statusAtual || !['a_fazer', 'fazendo', 'concluido'].includes(taskObj.statusAtual as string)) {
         errors.push(`Tarefa ${index + 1}: status atual inválido`);
       }
       
-      if (task.dataCadastro && isNaN(new Date(task.dataCadastro).getTime())) {
+      if (taskObj.dataCadastro && isNaN(new Date(taskObj.dataCadastro as string).getTime())) {
         errors.push(`Tarefa ${index + 1}: data de cadastro inválida`);
       }
       
-      if (task.dataInicio && isNaN(new Date(task.dataInicio).getTime())) {
+      if (taskObj.dataInicio && isNaN(new Date(taskObj.dataInicio as string).getTime())) {
         errors.push(`Tarefa ${index + 1}: data de início inválida`);
       }
       
-      if (task.dataFim && isNaN(new Date(task.dataFim).getTime())) {
+      if (taskObj.dataFim && isNaN(new Date(taskObj.dataFim as string).getTime())) {
         errors.push(`Tarefa ${index + 1}: data de fim inválida`);
       }
       
       // Validar categoria se presente
-      if (task.categoria && !['feature', 'desenvolvimento', 'qa', 'devops', 'bug', 'atendimento', 'comercial', 'juridico', 'design', 'documentacao', 'reuniao', 'sem_categoria', 'outro'].includes(task.categoria)) {
+      if (taskObj.categoria && !['feature', 'desenvolvimento', 'qa', 'devops', 'bug', 'atendimento', 'comercial', 'juridico', 'design', 'documentacao', 'reuniao', 'sem_categoria', 'outro'].includes(taskObj.categoria as string)) {
         errors.push(`Tarefa ${index + 1}: categoria inválida`);
       }
       
       // Validar complexidade se presente
-      if (task.complexidade && !['simples', 'media', 'complexa'].includes(task.complexidade)) {
+      if (taskObj.complexidade && !['simples', 'media', 'complexa'].includes(taskObj.complexidade as string)) {
         errors.push(`Tarefa ${index + 1}: complexidade inválida`);
+      }
+      
+      // Validar referenced_task_id se presente (deve ser string ou null)
+      if (taskObj.referenced_task_id !== undefined && taskObj.referenced_task_id !== null && typeof taskObj.referenced_task_id !== 'string') {
+        errors.push(`Tarefa ${index + 1}: referenced_task_id deve ser string ou null`);
+      }
+      
+      // Validar parent_id se presente (deve ser string ou null)
+      if (taskObj.parent_id !== undefined && taskObj.parent_id !== null && typeof taskObj.parent_id !== 'string') {
+        errors.push(`Tarefa ${index + 1}: parent_id deve ser string ou null`);
       }
     });
     
@@ -140,8 +169,8 @@ export function DataManagement() {
             return;
           }
           
-          if (data.tasks && Array.isArray(data.tasks)) {
-            setTasksToImport(data.tasks);
+          if (data && typeof data === 'object' && 'tasks' in data && Array.isArray((data as ImportedData).tasks)) {
+            setTasksToImport((data as ImportedData).tasks as Task[]);
             setImportErrors([]);
             setImportDialogOpen(true);
           } else {
@@ -184,7 +213,9 @@ export function DataManagement() {
           // Novos campos com valores padrão
           is_active: task.is_active !== undefined ? task.is_active : true,
           rsync: task.rsync !== undefined ? task.rsync : false,
-          id_rsync: task.id_rsync || null
+          id_rsync: task.id_rsync || null,
+          referenced_task_id: task.referenced_task_id || null,
+          parent_id: task.parent_id || null
         });
         
         // Usar a nova função addTaskFull
@@ -244,7 +275,9 @@ export function DataManagement() {
         complexidade: 'media',
         is_active: true,
         rsync: false,
-        id_rsync: null
+        id_rsync: null,
+        referenced_task_id: null,
+        parent_id: null
       },
       {
         id: generateUniqueTaskId(),
@@ -269,7 +302,9 @@ export function DataManagement() {
         complexidade: 'simples',
         is_active: true,
         rsync: false,
-        id_rsync: null
+        id_rsync: null,
+        referenced_task_id: null,
+        parent_id: null
       },
       {
         id: generateUniqueTaskId(),
@@ -295,7 +330,9 @@ export function DataManagement() {
         complexidade: 'media',
         is_active: true,
         rsync: false,
-        id_rsync: null
+        id_rsync: null,
+        referenced_task_id: null,
+        parent_id: null
       },
       {
         id: generateUniqueTaskId(),
@@ -317,7 +354,9 @@ export function DataManagement() {
         complexidade: 'complexa',
         is_active: true,
         rsync: false,
-        id_rsync: null
+        id_rsync: null,
+        referenced_task_id: null,
+        parent_id: null
       },
       {
         id: generateUniqueTaskId(),
@@ -339,7 +378,9 @@ export function DataManagement() {
         complexidade: 'media',
         is_active: true,
         rsync: false,
-        id_rsync: null
+        id_rsync: null,
+        referenced_task_id: null,
+        parent_id: null
       }
     ];
     
