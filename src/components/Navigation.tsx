@@ -22,7 +22,7 @@ export function Navigation() {
     { href: '/', label: 'Dashboard', icon: Home },
     { href: '/reports', label: 'Relatórios', icon: BarChart3 },
     { href: '/essencial', label: 'Essencial', icon: BarChart3 },
-    { href: '/gamification', label: 'Gamificação', icon: Trophy },
+    { href: '/gamification', label: 'Forja XP', icon: Trophy },
   ];
 
   const isActive = (href: string) => {

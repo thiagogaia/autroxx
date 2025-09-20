@@ -98,7 +98,7 @@ export function GamificationDashboard() {
             <Trophy className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Gamificação</h2>
+            <h2 className="text-2xl font-bold text-foreground">Templo dos Heróis</h2>
             <p className="text-sm text-muted-foreground">Transforme produtividade em diversão</p>
           </div>
         </div>
