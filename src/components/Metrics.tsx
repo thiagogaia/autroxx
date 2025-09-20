@@ -135,7 +135,7 @@ export function Metrics() {
           {metricas.map((metrica, index) => {
             const IconComponent = metrica.icon;
             return (
-              <Card key={index} className={`${metrica.bgColor} ${metrica.borderColor}`}>
+              <Card key={index} className={` ${metrica.borderColor}`}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-3">
                     <Tooltip>

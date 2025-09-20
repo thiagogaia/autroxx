@@ -1,0 +1,978 @@
+{
+  "tasks": [
+    {
+      "id": 28400831406,
+      "titulo": "Gaiaban - [Ajuste total da pagina principal]",
+      "descricao": "- [ ] Paginação\n- [ ] Cadastro de Pausa\n- [ ] Cadastro de tarefa Referenciada\n- [ ] Implementar DeadLine\n- [ ] Revisar Metricas Pagina Inicial\n- [ ] Melhorar regras de status => Remover Fazendo => Só pode concluir depois de Fazendo. => pode remover de concluir e remover de fazendo. Deixando tudo no histórico do status.",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-20T20:40:31.406Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-20T20:41:08.291Z"
+        }
+      ],
+      "statusAtual": "fazendo",
+      "prioridade": "baixa",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "impedimentoHistorico": [],
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-20T20:40:31.406Z",
+      "dataInicio": "2025-09-20T20:41:08.291Z",
+      "dataFim": null,
+      "ordem": 0,
+      "tags": [],
+      "is_active": true,
+      "rsync": false,
+      "id_rsync": null,
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 120,
+      "complexidade": "simples",
+      "referenced_task_id": null
+    },
+    {
+      "id": 28388131726,
+      "titulo": "GaiaBan [fase 3]",
+      "descricao": "- [x] verificar o esquema do banco de dados e lembrar do rsync (false/true) na tarefa e id_rsync (id da tarefa a ser sincronizada numa outra conta)\n- [x] implementar shema (banco de dados default) default para tasks\n- [x] criar o campo referenced_task_id para referenciar bugs\n- [x] criar o campo parent_id para referenciar a arvore de tarefas",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-20T17:08:51.726Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-20T17:14:23.410Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-20T20:09:18.447Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "baixa",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "impedimentoHistorico": [],
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-20T17:08:51.726Z",
+      "dataInicio": "2025-09-20T17:14:23.410Z",
+      "dataFim": "2025-09-20T20:09:18.447Z",
+      "ordem": 1,
+      "tags": [],
+      "numeroMudancasPrioridade": 1,
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 240,
+      "complexidade": "complexa",
+      "referenced_task_id": null
+    },
+    {
+      "id": 18335676761,
+      "titulo": "Reunião Wallet",
+      "descricao": "one time token\ndo nosso lado (MVP)\napple tá ok. (+adyen)\ngooglepay tá dando erro de configuração",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-19T14:19:57.117Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-19T18:05:30.573Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-19T18:58:39.202Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-19T14:19:57.117Z",
+      "dataInicio": "2025-09-19T18:05:30.573Z",
+      "dataFim": "2025-09-19T18:58:39.202Z",
+      "ordem": 2,
+      "tags": [],
+      "categoria": "reuniao",
+      "estimativaTempo": 30,
+      "complexidade": "simples"
+    },
+    {
+      "id": 28335676761,
+      "titulo": "Checkout Novo - Regras de exibição e redirecionamento de URLs",
+      "descricao": "1 - novos produtos\n2 - produtos digitais\n3 - produtos onzevita\n4 - Produtos fisicos codigos especifico.\n\nHoje 1 e 2 só\n\nProdutos novos\nProdutos digitais\n\nTodos os digitais estarão com o template clássico\n\n--> A tarefa aparece somente para novos produtos -- Novos Produtos Deploy da feature de Template (default template clássico) -- Fazer o redirecionamento para esses mesmos produtos.\n--> Ozemvita >> o pay abrir no classico. [todos os checkouts ou todos os produtos]\n\nPRA AMANHÃ/HOJE: OZENVITA\n- [x] Checkouts ozenvita clássico no pay\n- [ ] Revisar o MR da Tarefa do template (VEN-3190) [atualizar com a master]\n- [ ] criar a função wavePay para ir adicionando a feature\n- [ ] colocar a regra de direcionamento usando a função\n- [ ] Colocar em PROD (deploy)",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T22:03:56.813Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-18T22:03:58.752Z"
+        }
+      ],
+      "statusAtual": "fazendo",
+      "prioridade": "alta",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T22:03:56.813Z",
+      "dataInicio": "2025-09-18T22:03:58.752Z",
+      "dataFim": null,
+      "ordem": 3,
+      "dataImpedimento": null,
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 120,
+      "complexidade": "media",
+      "tempoTotalImpedimento": 127
+    },
+    {
+      "id": 38335676761,
+      "titulo": "tarefa monetizze pixel",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:33:21.293Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-18T21:36:56.136Z"
+        }
+      ],
+      "statusAtual": "fazendo",
+      "prioridade": "alta",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:33:21.293Z",
+      "dataInicio": "2025-09-18T21:36:56.136Z",
+      "dataFim": null,
+      "ordem": 4,
+      "dataImpedimento": null,
+      "descricao": "",
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 480,
+      "complexidade": "complexa"
+    },
+    {
+      "id": 48335676761,
+      "titulo": "fazer n8n agendamento (docker.n8n.io/n8nio/n8n:1.101.2)",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:33:37.663Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-18T23:31:13.929Z"
+        }
+      ],
+      "statusAtual": "fazendo",
+      "prioridade": "media",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:33:37.663Z",
+      "dataInicio": "2025-09-18T23:31:13.929Z",
+      "dataFim": null,
+      "ordem": 5,
+      "dataImpedimento": null,
+      "descricao": "",
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 480,
+      "complexidade": "media"
+    },
+    {
+      "id": 58335676761,
+      "titulo": "Projeto GaiaBan [segunda fase]",
+      "descricao": "",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-19T12:22:55.314Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-19T12:23:41.587Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-20T16:57:36.121Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "baixa",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-19T12:22:55.314Z",
+      "dataInicio": "2025-09-19T12:23:41.587Z",
+      "dataFim": "2025-09-20T16:57:36.121Z",
+      "ordem": 6,
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 120,
+      "complexidade": "media",
+      "numeroMudancasPrioridade": 1
+    },
+    {
+      "id": 68335676761,
+      "titulo": "BKP docker Linux to MAC",
+      "descricao": "docker save $(docker images -q) | gzip > docker-images.tar.gz\n\nBoa observação 👌 você já deixou o **export das imagens** mais eficiente com `gzip`.\nDe fato, para **containers** e **volumes**, vale padronizar também para gerar `.tar.gz`.\n\nAqui está a versão ajustada:\n\n---\n\n### 🔹 Exportar **containers** compactados\n\n```bash\nfor c in $(docker ps -a -q); do\n  docker export $c | gzip > container-$c.tar.gz\ndone\n```\n\n---\n\n### 🔹 Exportar **volumes** compactados\n\n```bash\nfor v in $(docker volume ls -q); do\n  docker run --rm -v $v:/volume -v $(pwd):/backup alpine \\\n    sh -c \"cd /volume && tar czf /backup/volume-$v.tar.gz .\"\ndone\n```\n\n---\n\n### 🔹 Importar de volta no Mac\n\n**Imagens:**\n\n```bash\ngunzip -c docker-images.tar.gz | docker load\n```\n\n**Containers (viram imagens importadas):**\n\n```bash\nfor f in container-*.tar.gz; do\n  name=$(basename $f .tar.gz)\n  gunzip -c $f | docker import - $name\ndone\n```\n\n**Volumes:**\n\n```bash\nfor f in volume-*.tar.gz; do\n  v=$(basename $f .tar.gz | sed 's/volume-//')\n  docker volume create $v\n  docker run --rm -v $v:/volume -v $(pwd):/backup alpine \\\n    sh -c \"cd /volume && tar xzf /backup/$f\"\ndone\n```\n\n---\n\n📌 Assim você mantém **tudo comprimido em `.tar.gz`**, economiza espaço e transfere mais rápido para o Mac.\n\n👉 Quer que eu te entregue isso já como **dois scripts prontos (`backup-docker.sh` e `restore-docker.sh`)** para só rodar no Linux e no Mac sem se preocupar?",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-19T12:06:03.868Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-19T12:06:17.421Z"
+        }
+      ],
+      "statusAtual": "fazendo",
+      "prioridade": "media",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-19T12:06:03.868Z",
+      "dataInicio": "2025-09-19T12:06:17.421Z",
+      "dataFim": null,
+      "ordem": 7,
+      "tags": [],
+      "numeroMudancasPrioridade": 1,
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 240,
+      "complexidade": "media"
+    },
+    {
+      "id": 78335676761,
+      "titulo": "resolver credenciais google places",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:32:48.091Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-18T21:37:46.925Z"
+        }
+      ],
+      "statusAtual": "fazendo",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:32:48.091Z",
+      "dataInicio": "2025-09-18T21:37:46.925Z",
+      "dataFim": null,
+      "ordem": 8,
+      "dataImpedimento": null,
+      "descricao": "",
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 60,
+      "complexidade": "simples",
+      "numeroMudancasPrioridade": 1
+    },
+    {
+      "id": 88335676761,
+      "titulo": "conectar newrelic (kae9Roopoo5oovae6fiwah7voe9nah6m) [impedimento]",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:32:36.606Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-18T23:55:54.309Z"
+        }
+      ],
+      "statusAtual": "fazendo",
+      "prioridade": "baixa",
+      "impedimento": true,
+      "impedimentoMotivo": "Senha passada não funcionou.",
+      "dataCadastro": "2025-09-18T21:32:36.606Z",
+      "dataInicio": "2025-09-18T23:55:54.309Z",
+      "dataFim": null,
+      "ordem": 9,
+      "dataImpedimento": "2025-09-19T17:12:35.120Z",
+      "numeroMudancasPrioridade": 1,
+      "descricao": "[19/09/2025, 12:00:07] Renato Diniz: kae9Roopoo5oovae6fiwah7voe9nah6m\n[19/09/2025, 12:00:20] Renato Diniz: adm.newrelic@monetizze.com.br\n\nhttps://login.newrelic.com/login?login%5Baccount_id%5D=1344427&login%5Bemail%5D=adm.newrelic%40monetizze.com.br&login%5Bremember_me%5D=1&return_to=https%3A%2F%2Fone.newrelic.com%2Fnr1-core%2Ferrors-inbox%2Fentity-inbox%2FMTM0NDQyN3xBUE18QVBQTElDQVRJT058MjM5ODI3NjM%3Faccount%3D1344427%26duration%3D1800000%26state%3De6dc036f-67a3-2aba-4282-7aa59cc4d26a",
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 30,
+      "complexidade": "simples",
+      "impedimentoHistorico": [
+        {
+          "id": "imp_1758231156606_1758300907232",
+          "impedimento": false,
+          "motivo": "",
+          "timestamp": "2025-09-19T16:55:07.232Z"
+        },
+        {
+          "id": "imp_1758231156606_1758301545054",
+          "impedimento": true,
+          "motivo": "Senha passada não funcionou.",
+          "timestamp": "2025-09-19T17:05:45.054Z"
+        }
+      ],
+      "tempoTotalImpedimento": 1021
+    },
+    {
+      "id": 98335676761,
+      "titulo": "conectar banco de dados",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:32:42.041Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-18T23:55:52.834Z"
+        }
+      ],
+      "statusAtual": "fazendo",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:32:42.041Z",
+      "dataInicio": "2025-09-18T23:55:52.834Z",
+      "dataFim": null,
+      "ordem": 10,
+      "dataImpedimento": null,
+      "numeroMudancasPrioridade": 1,
+      "descricao": "",
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 30,
+      "complexidade": "simples"
+    },
+    {
+      "id": 108335676761,
+      "titulo": "Tarefa para Olhar as validações de cartão de crédito",
+      "descricao": "",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-19T15:51:57.453Z"
+        }
+      ],
+      "statusAtual": "a_fazer",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-19T15:51:57.453Z",
+      "dataInicio": null,
+      "dataFim": null,
+      "ordem": 11,
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 30,
+      "complexidade": "simples"
+    },
+    {
+      "id": 118335676761,
+      "titulo": "Daily",
+      "descricao": "",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-19T14:26:05.024Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-19T14:26:07.113Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-19T14:38:08.369Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-19T14:26:05.024Z",
+      "dataInicio": "2025-09-19T14:26:07.113Z",
+      "dataFim": "2025-09-19T14:38:08.369Z",
+      "ordem": 12,
+      "tags": [
+        "daily"
+      ],
+      "categoria": "reuniao",
+      "estimativaTempo": 30,
+      "complexidade": "simples"
+    },
+    {
+      "id": 128335676761,
+      "titulo": "Core Review [3490]",
+      "descricao": "",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-19T14:21:28.442Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-19T14:38:17.232Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-19T16:09:55.909Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-19T14:21:28.442Z",
+      "dataInicio": "2025-09-19T14:38:17.232Z",
+      "dataFim": "2025-09-19T16:09:55.909Z",
+      "ordem": 13,
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 30,
+      "complexidade": "simples"
+    },
+    {
+      "id": 138335676761,
+      "titulo": "Letra maiúscula vindo do front pay",
+      "descricao": "",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-19T02:13:19.196Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-19T02:13:21.839Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-19T03:07:53.555Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "alta",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-19T02:13:19.196Z",
+      "dataInicio": "2025-09-19T02:13:21.839Z",
+      "dataFim": "2025-09-19T03:07:53.555Z",
+      "ordem": 14,
+      "tags": [
+        "motta",
+        "tiago",
+        "igor"
+      ],
+      "categoria": "reuniao",
+      "estimativaTempo": 60,
+      "complexidade": "media"
+    },
+    {
+      "id": 148335676761,
+      "titulo": "ressincronizar pasta \"Projetos\"",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:32:54.189Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-18T21:36:44.847Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-19T06:20:27.581Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:32:54.189Z",
+      "dataInicio": "2025-09-18T21:36:44.847Z",
+      "dataFim": "2025-09-19T06:20:27.581Z",
+      "ordem": 15,
+      "dataImpedimento": null,
+      "descricao": "",
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 600,
+      "complexidade": "media"
+    },
+    {
+      "id": 158335676761,
+      "titulo": "projeto gaiaban",
+      "descricao": "",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T22:44:09.566Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-18T22:44:11.595Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-19T07:42:51.769Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "baixa",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-18T22:44:09.566Z",
+      "dataInicio": "2025-09-18T22:44:11.595Z",
+      "dataFim": "2025-09-19T07:42:51.769Z",
+      "ordem": 16,
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 240,
+      "complexidade": "complexa"
+    },
+    {
+      "id": 168335676761,
+      "titulo": "[derick] - conversa sobre a estrutura do checkout",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:34:57.467Z"
+        }
+      ],
+      "statusAtual": "a_fazer",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:34:57.467Z",
+      "dataInicio": null,
+      "dataFim": null,
+      "ordem": 17,
+      "descricao": "## 💡 Feature Request\n\n### Descrição\nDescreva a funcionalidade que você gostaria de ver implementada.\n\n### Problema\nQual problema esta feature resolveria?\n\n### Solução Proposta\nDescreva como você gostaria que funcionasse.\n\n### Alternativas Consideradas\nDescreva outras soluções ou funcionalidades que você considerou.\n\n### Benefícios\n- Benefício 1\n- Benefício 2\n- Benefício 3\n\n### Critérios de Aceitação\n- [ ] Critério 1\n- [ ] Critério 2\n- [ ] Critério 3\n\n### Prioridade\n- [ ] Baixa\n- [ ] Normal\n- [ ] Alta\n- [ ] Crítica",
+      "dataImpedimento": null,
+      "tags": [],
+      "categoria": "reuniao",
+      "estimativaTempo": 30,
+      "complexidade": "simples"
+    },
+    {
+      "id": 178335676761,
+      "titulo": "[derick] ajuda no front pixel",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:34:51.484Z"
+        }
+      ],
+      "statusAtual": "a_fazer",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:34:51.484Z",
+      "dataInicio": null,
+      "dataFim": null,
+      "ordem": 18,
+      "descricao": "",
+      "dataImpedimento": null,
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 60,
+      "complexidade": "simples"
+    },
+    {
+      "id": 188335676761,
+      "titulo": "[derick] - organizar os componentes nas pastas",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:34:44.618Z"
+        }
+      ],
+      "statusAtual": "a_fazer",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:34:44.618Z",
+      "dataInicio": null,
+      "dataFim": null,
+      "ordem": 19,
+      "dataImpedimento": null,
+      "descricao": "## Teste Completo\n   \n   Gaiaban: #1758235449566\n\n   Ressincronizar [#1758231174189]\n- [x] Checkbox 1\n- [x] Checkbox 2",
+      "tags": [
+        "derick"
+      ],
+      "categoria": "reuniao",
+      "estimativaTempo": 30,
+      "complexidade": "simples"
+    },
+    {
+      "id": 198335676761,
+      "titulo": "[derick] - ver o customer (classe testavel customer com regras de negocio)",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:34:24.383Z"
+        }
+      ],
+      "statusAtual": "a_fazer",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:34:24.383Z",
+      "dataInicio": null,
+      "dataFim": null,
+      "ordem": 20,
+      "dataImpedimento": null,
+      "descricao": "",
+      "tags": [],
+      "categoria": "reuniao",
+      "estimativaTempo": 30,
+      "complexidade": "simples"
+    },
+    {
+      "id": 208335676761,
+      "titulo": "fazer o projeto da rosana",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:34:05.833Z"
+        }
+      ],
+      "statusAtual": "a_fazer",
+      "prioridade": "baixa",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:34:05.833Z",
+      "dataInicio": null,
+      "dataFim": null,
+      "ordem": 21,
+      "dataImpedimento": null,
+      "descricao": "# Estudo Inicial",
+      "tags": [],
+      "categoria": "documentacao",
+      "estimativaTempo": 120,
+      "complexidade": "simples"
+    },
+    {
+      "id": 218335676761,
+      "titulo": "fazer o projeto de agendamentos",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:34:00.553Z"
+        }
+      ],
+      "statusAtual": "a_fazer",
+      "prioridade": "baixa",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:34:00.553Z",
+      "dataInicio": null,
+      "dataFim": null,
+      "ordem": 22,
+      "dataImpedimento": null,
+      "descricao": "Estudo Inicial",
+      "tags": [],
+      "categoria": "documentacao",
+      "estimativaTempo": 120,
+      "complexidade": "simples"
+    },
+    {
+      "id": 228335676761,
+      "titulo": "fazer o projeto life in weeks",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:33:55.071Z"
+        }
+      ],
+      "statusAtual": "a_fazer",
+      "prioridade": "baixa",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:33:55.071Z",
+      "dataInicio": null,
+      "dataFim": null,
+      "ordem": 23,
+      "dataImpedimento": null,
+      "descricao": "Estudo Inicial",
+      "tags": [],
+      "categoria": "documentacao",
+      "estimativaTempo": 120,
+      "complexidade": "simples"
+    },
+    {
+      "id": 238335676761,
+      "titulo": "ligar para a claro para cancelar a net",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:33:49.562Z"
+        }
+      ],
+      "statusAtual": "a_fazer",
+      "prioridade": "media",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:33:49.562Z",
+      "dataInicio": null,
+      "dataFim": null,
+      "ordem": 24,
+      "dataImpedimento": null,
+      "descricao": "",
+      "tags": [],
+      "categoria": "reuniao",
+      "estimativaTempo": 60,
+      "complexidade": "media"
+    },
+    {
+      "id": 248335676761,
+      "titulo": "contestar multa",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:33:43.133Z"
+        }
+      ],
+      "statusAtual": "a_fazer",
+      "prioridade": "media",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:33:43.133Z",
+      "dataInicio": null,
+      "dataFim": null,
+      "ordem": 25,
+      "dataImpedimento": null,
+      "descricao": "",
+      "tags": [],
+      "categoria": "reuniao",
+      "estimativaTempo": 240,
+      "complexidade": "media"
+    },
+    {
+      "id": 258335676761,
+      "titulo": "tarefa back oneclick",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:33:31.191Z"
+        }
+      ],
+      "statusAtual": "a_fazer",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:33:31.191Z",
+      "dataInicio": null,
+      "dataFim": null,
+      "ordem": 26,
+      "dataImpedimento": null,
+      "descricao": "",
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 300,
+      "complexidade": "media"
+    },
+    {
+      "id": 268335676761,
+      "titulo": "fazer o suggest na loja do nuzap",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:33:14.310Z"
+        }
+      ],
+      "statusAtual": "a_fazer",
+      "prioridade": "baixa",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:33:14.310Z",
+      "dataInicio": null,
+      "dataFim": null,
+      "ordem": 27,
+      "dataImpedimento": null,
+      "descricao": "",
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 240,
+      "complexidade": "media"
+    },
+    {
+      "id": 278335676761,
+      "titulo": "integrar super frete",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:33:06.746Z"
+        }
+      ],
+      "statusAtual": "a_fazer",
+      "prioridade": "baixa",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:33:06.746Z",
+      "dataInicio": null,
+      "dataFim": null,
+      "ordem": 28,
+      "dataImpedimento": null,
+      "descricao": "https://web.superfrete.com/?utm_source=conteudo&utm_medium=site-page&utm_campaign=site-page-botao-menu&source_caller=ui&shortlink=2dvhz6cl&c=site-page&pid=conteudo&af_click_lookback=15d&af_xp=custom&af_channel=conteudo&af_adset=site-page-botao-menu#/integrations\n\nhttps://superfrete.readme.io/reference/adicionar-frete-carrinho",
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 240,
+      "complexidade": "media"
+    },
+    {
+      "id": 288335676761,
+      "titulo": "ressincronizar pasta \"Estudo\"",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:33:00.947Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-18T21:36:46.463Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-18T22:04:55.298Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:33:00.947Z",
+      "dataInicio": "2025-09-18T21:36:46.463Z",
+      "dataFim": "2025-09-18T22:04:55.298Z",
+      "ordem": 29,
+      "dataImpedimento": null,
+      "descricao": "",
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 480,
+      "complexidade": "media"
+    },
+    {
+      "id": 298335676761,
+      "titulo": "pagar impostos",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:32:29.288Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-18T21:36:35.284Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-18T22:04:23.965Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:32:29.288Z",
+      "dataInicio": "2025-09-18T21:36:35.284Z",
+      "dataFim": "2025-09-18T22:04:23.965Z",
+      "ordem": 30,
+      "dataImpedimento": null,
+      "descricao": "",
+      "tags": [],
+      "categoria": "reuniao",
+      "estimativaTempo": 30,
+      "complexidade": "simples"
+    },
+    {
+      "id": 308335676761,
+      "titulo": "adicionar a atualização da yuno",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:32:23.833Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-18T21:36:28.769Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-18T22:04:27.690Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:32:23.833Z",
+      "dataInicio": "2025-09-18T21:36:28.769Z",
+      "dataFim": "2025-09-18T22:04:27.690Z",
+      "ordem": 31,
+      "dataImpedimento": null,
+      "descricao": "",
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 30,
+      "complexidade": "simples"
+    },
+    {
+      "id": 318335676761,
+      "titulo": "acessar vpn pelo mac",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-18T21:32:17.388Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-18T21:36:21.465Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-18T21:36:24.408Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "baixa",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "dataCadastro": "2025-09-18T21:32:17.388Z",
+      "dataInicio": "2025-09-18T21:36:21.465Z",
+      "dataFim": "2025-09-18T21:36:24.408Z",
+      "ordem": 32,
+      "dataImpedimento": null,
+      "descricao": "",
+      "tags": [],
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 60,
+      "complexidade": "media"
+    }
+  ],
+  "metadata": {
+    "exportDate": "2025-09-20T21:22:30.308Z",
+    "version": "1.0",
+    "totalTasks": 33,
+    "tasksByStatus": {
+      "a_fazer": 13,
+      "fazendo": 8,
+      "concluido": 12
+    },
+    "tasksByPriority": {
+      "baixa": 11,
+      "normal": 15,
+      "media": 4,
+      "alta": 3
+    },
+    "impediments": 1
+  }
+}
