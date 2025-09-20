@@ -11,7 +11,7 @@ type TaskAction =
   | { type: 'ADD_TASK_FULL'; payload: { task: Task } }
   | { type: 'UPDATE_STATUS'; payload: { id: number; status: TaskStatus } }
   | { type: 'UPDATE_PRIORITY'; payload: { id: number; prioridade: TaskPriority } }
-  | { type: 'UPDATE_TASK'; payload: { id: number; updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade' | 'tags' | 'categoria' | 'estimativaTempo' | 'complexidade' | 'numeroMudancasPrioridade' | 'tempoTotalImpedimento' | 'foiRetrabalho'>> } }
+  | { type: 'UPDATE_TASK'; payload: { id: number; updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade' | 'tags' | 'categoria' | 'estimativaTempo' | 'complexidade' | 'numeroMudancasPrioridade' | 'tempoTotalImpedimento' | 'foiRetrabalho' | 'referenced_task_id' | 'parent_id'>> } }
   | { type: 'SET_IMPEDIMENT'; payload: { id: number; motivo: string } }
   | { type: 'REMOVE_IMPEDIMENT'; payload: { id: number } }
   | { type: 'SET_FILTER'; payload: { filter: FilterType } }

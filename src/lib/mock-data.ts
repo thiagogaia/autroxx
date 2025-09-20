@@ -75,7 +75,9 @@ export const TAREFAS_EXEMPLO: Task[] = [
     complexidade: "media",
     numeroMudancasPrioridade: 1,
     tempoTotalImpedimento: 0,
-    foiRetrabalho: false
+    foiRetrabalho: false,
+    referenced_task_id: null,
+    parent_id: null
   },
   {
     id: 2,
@@ -101,7 +103,9 @@ export const TAREFAS_EXEMPLO: Task[] = [
     complexidade: "simples",
     numeroMudancasPrioridade: 0,
     tempoTotalImpedimento: 0,
-    foiRetrabalho: false
+    foiRetrabalho: false,
+    referenced_task_id: null,
+    parent_id: null
   },
   {
     id: 3,
@@ -132,7 +136,9 @@ export const TAREFAS_EXEMPLO: Task[] = [
     complexidade: "media",
     numeroMudancasPrioridade: 2,
     tempoTotalImpedimento: 120, // 2 horas de impedimento
-    foiRetrabalho: false
+    foiRetrabalho: false,
+    referenced_task_id: null,
+    parent_id: null
   },
   {
     id: 4,
@@ -157,7 +163,9 @@ export const TAREFAS_EXEMPLO: Task[] = [
     complexidade: "complexa",
     numeroMudancasPrioridade: 0,
     tempoTotalImpedimento: 0,
-    foiRetrabalho: false
+    foiRetrabalho: false,
+    referenced_task_id: null,
+    parent_id: null
   },
   {
     id: 5,
@@ -182,7 +190,9 @@ export const TAREFAS_EXEMPLO: Task[] = [
     complexidade: "simples",
     numeroMudancasPrioridade: 0,
     tempoTotalImpedimento: 0,
-    foiRetrabalho: false
+    foiRetrabalho: false,
+    referenced_task_id: null,
+    parent_id: null
   },
   {
     id: 6,
@@ -220,7 +230,9 @@ export const TAREFAS_EXEMPLO: Task[] = [
     complexidade: "media",
     numeroMudancasPrioridade: 3,
     tempoTotalImpedimento: 30, // 30 minutos de impedimento
-    foiRetrabalho: true
+    foiRetrabalho: true,
+    referenced_task_id: "#2",
+    parent_id: null
   },
   {
     id: 7,
@@ -244,6 +256,35 @@ export const TAREFAS_EXEMPLO: Task[] = [
     complexidade: "simples",
     numeroMudancasPrioridade: 0,
     tempoTotalImpedimento: 0,
-    foiRetrabalho: false
+    foiRetrabalho: false,
+    referenced_task_id: null,
+    parent_id: null
+  },
+  {
+    id: 8,
+    titulo: "Refatorar validação de login",
+    descricao: "Melhorar validação de login baseado no feedback da tarefa #2. Implementar validação mais robusta e melhor UX.",
+    statusHistorico: [
+      { status: "a_fazer", timestamp: new Date('2025-09-19T09:00:00') },
+      { status: "fazendo", timestamp: new Date('2025-09-19T10:30:00') }
+    ],
+    statusAtual: "fazendo",
+    prioridade: "normal",
+    impedimento: false,
+    impedimentoMotivo: "",
+    impedimentoHistorico: [],
+    dataImpedimento: null,
+    dataCadastro: new Date('2025-09-19T09:00:00'),
+    dataInicio: new Date('2025-09-19T10:30:00'),
+    dataFim: null,
+    tags: ["refactor", "login", "validation"],
+    categoria: "desenvolvimento",
+    estimativaTempo: 180, // 3 horas
+    complexidade: "media",
+    numeroMudancasPrioridade: 0,
+    tempoTotalImpedimento: 0,
+    foiRetrabalho: true,
+    referenced_task_id: "#2",
+    parent_id: null
   }
 ];

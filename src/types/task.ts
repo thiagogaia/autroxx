@@ -38,6 +38,8 @@ export interface Task {
   numeroMudancasPrioridade?: number; // Número de mudanças de prioridade
   tempoTotalImpedimento?: number; // Tempo total de impedimento em minutos
   foiRetrabalho?: boolean; // Se foi retrabalho
+  referenced_task_id?: string | null; // Referência cruzada (bugs, retrabalhos, dependências)
+  parent_id?: string | null; // Árvore de tarefas (para feature futura)
   is_active?: boolean; // Visível na listagem? -> não
   rsync?: boolean; // Visível na listagem? -> não
   id_rsync?: number | null; // Visível na listagem? -> não
@@ -65,7 +67,7 @@ export interface TaskContextType {
   addTaskFull: (task: Task) => void;
   updateTaskStatus: (id: number, status: TaskStatus) => void;
   updateTaskPriority: (id: number, prioridade: TaskPriority) => void;
-  updateTask: (id: number, updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade' | 'tags' | 'categoria' | 'estimativaTempo' | 'complexidade' | 'numeroMudancasPrioridade' | 'tempoTotalImpedimento' | 'foiRetrabalho'>>) => void;
+  updateTask: (id: number, updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade' | 'tags' | 'categoria' | 'estimativaTempo' | 'complexidade' | 'numeroMudancasPrioridade' | 'tempoTotalImpedimento' | 'foiRetrabalho' | 'referenced_task_id' | 'parent_id'>>) => void;
   setImpediment: (id: number, motivo: string) => void;
   removeImpediment: (id: number) => void;
   deleteTask: (id: number) => void;

@@ -37,6 +37,7 @@ export function EditTaskSheet({ task, isOpen, onClose, stackLevel = 0 }: EditTas
   const [estimativaTempoString, setEstimativaTempoString] = useState('');
   const [complexidade, setComplexidade] = useState<TaskComplexity | undefined>(undefined);
   const [foiRetrabalho, setFoiRetrabalho] = useState<boolean>(false);
+  const [referencedTaskId, setReferencedTaskId] = useState<string>('');
   const [nestedSheetOpen, setNestedSheetOpen] = useState(false);
   const [nestedTask, setNestedTask] = useState<Task | null>(null);
 
@@ -51,6 +52,7 @@ export function EditTaskSheet({ task, isOpen, onClose, stackLevel = 0 }: EditTas
       setEstimativaTempoString(task.estimativaTempo ? formatMinutesToString(task.estimativaTempo) : '');
       setComplexidade(task.complexidade);
       setFoiRetrabalho(task.foiRetrabalho || false);
+      setReferencedTaskId(task.referenced_task_id || '');
     }
   }, [task]);
 
@@ -58,7 +60,6 @@ export function EditTaskSheet({ task, isOpen, onClose, stackLevel = 0 }: EditTas
   const handleTaskLinkClick = useCallback((taskId: number) => {
     const targetTask = tasks.find((t: Task) => t.id === taskId);
     if (targetTask) {
-      setSelectedTaskId(taskId);
       console.log('Abrindo tarefa referenciada:', targetTask);
       setNestedTask(targetTask);
       setNestedSheetOpen(true);
@@ -84,7 +85,8 @@ export function EditTaskSheet({ task, isOpen, onClose, stackLevel = 0 }: EditTas
       categoria,
       estimativaTempo,
       complexidade,
-      foiRetrabalho: foiRetrabalho || undefined
+      foiRetrabalho: foiRetrabalho || undefined,
+      referenced_task_id: referencedTaskId.trim() || null
     });
 
     onClose();
@@ -101,6 +103,7 @@ export function EditTaskSheet({ task, isOpen, onClose, stackLevel = 0 }: EditTas
       setEstimativaTempoString(task.estimativaTempo ? formatMinutesToString(task.estimativaTempo) : '');
       setComplexidade(task.complexidade);
       setFoiRetrabalho(task.foiRetrabalho || false);
+      setReferencedTaskId(task.referenced_task_id || '');
     }
     onClose();
   };
@@ -362,6 +365,23 @@ export function EditTaskSheet({ task, isOpen, onClose, stackLevel = 0 }: EditTas
                  <label htmlFor="foiRetrabalho" className="text-sm font-medium">
                    Foi retrabalho
                  </label>
+               </div>
+
+               {/* Referência Cruzada */}
+               <div className="grid gap-2">
+                 <label htmlFor="referencedTaskId" className="text-sm font-medium">
+                   Referência Cruzada
+                 </label>
+                 <Input
+                   id="referencedTaskId"
+                   value={referencedTaskId}
+                   onChange={(e) => setReferencedTaskId(e.target.value)}
+                   placeholder="ID da tarefa referenciada (ex: #123)"
+                   className="w-full"
+                 />
+                 <p className="text-xs text-muted-foreground">
+                   Referencie a tarefa que gerou esta tarefa (bugs, retrabalhos, dependências).
+                 </p>
                </div>
              </div>
 
