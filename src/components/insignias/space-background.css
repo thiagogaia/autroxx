@@ -1,0 +1,35 @@
+.space-background {
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(ellipse at center, #0d1b2a 0%, #1b263b 30%, #415a77 60%, #0d1b2a 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Campo de estrelas animado */
+.starfield {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #ffffff, transparent),
+    radial-gradient(2px 2px at 40px 70px, #ffffff, transparent),
+    radial-gradient(1px 1px at 90px 40px, #ffffff, transparent),
+    radial-gradient(1px 1px at 130px 80px, #ffffff, transparent),
+    radial-gradient(2px 2px at 160px 30px, #ffffff, transparent),
+    radial-gradient(1px 1px at 200px 90px, #ffffff, transparent);
+  background-repeat: repeat;
+  background-size: 250px 150px;
+  animation: starMove 25s linear infinite;
+  opacity: 0.8;
+}
+
+@keyframes starMove {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-150px); }
+}

@@ -1,0 +1,585 @@
+.nft-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nft-container {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  border: 2px solid var(--nft-primary, #00ffff);
+  border-radius: 20px;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 0 30px var(--nft-glow, rgba(0, 255, 255, 0.3)),
+    inset 0 0 30px var(--nft-accent, rgba(0, 255, 255, 0.1));
+}
+
+.nft-container:hover {
+  transform: scale(1.05) rotateY(5deg);
+  box-shadow: 
+    0 0 50px var(--nft-glow, rgba(0, 255, 255, 0.6)),
+    inset 0 0 50px var(--nft-accent, rgba(0, 255, 255, 0.2));
+  border-color: var(--nft-primary, #00ffff);
+  filter: brightness(1.1) contrast(1.05);
+}
+
+.grid-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(var(--nft-primary, rgba(0, 255, 255, 0.1)) 1px, transparent 1px),
+    linear-gradient(90deg, var(--nft-primary, rgba(0, 255, 255, 0.1)) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(20px, 20px); }
+}
+
+.central-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  border: 3px solid var(--nft-primary, #00ffff);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: 
+    radial-gradient(circle at 30% 30%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle, #001122 0%, #000033 70%, #000000 100%);
+  animation: rotate 10s linear infinite, pulse 2s ease-in-out infinite alternate, aiGlow 4s ease-in-out infinite;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes rotate {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 20px var(--nft-glow, rgba(0, 255, 255, 0.5)); }
+  100% { box-shadow: 0 0 40px var(--nft-glow, rgba(0, 255, 255, 0.8)); }
+}
+
+@keyframes aiGlow {
+  0%, 100% { 
+    filter: brightness(1) contrast(1);
+    border-color: var(--nft-primary, #00ffff);
+  }
+  50% { 
+    filter: brightness(1.2) contrast(1.1);
+    border-color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+.neural-network {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  filter: drop-shadow(0 0 10px var(--nft-glow, rgba(0, 255, 255, 0.3)));
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.node {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, var(--nft-primary, #00ffff) 0%, rgba(0, 255, 255, 0.3) 70%, transparent 100%);
+  border-radius: 50%;
+  animation: nodeGlow 3s ease-in-out infinite, nodePulse 2s ease-in-out infinite alternate;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 0 8px var(--nft-glow, rgba(0, 255, 255, 0.4)),
+    inset 0 0 4px rgba(255, 255, 255, 0.2);
+}
+
+.node:nth-child(1) { top: 20px; left: 20px; animation-delay: 0s; }
+.node:nth-child(2) { top: 20px; right: 20px; animation-delay: 0.5s; }
+.node:nth-child(3) { bottom: 20px; left: 20px; animation-delay: 1s; }
+.node:nth-child(4) { bottom: 20px; right: 20px; animation-delay: 1.5s; }
+.node:nth-child(5) { top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: 2s; }
+
+.node-center {
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 12px !important;
+  height: 12px !important;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, var(--nft-primary, #00ffff) 30%, rgba(0, 255, 255, 0.3) 70%, transparent 100%) !important;
+  animation: nodeGlow 2s ease-in-out infinite, nodeCenterPulse 1.5s ease-in-out infinite alternate !important;
+  box-shadow: 
+    0 0 12px var(--nft-glow, rgba(0, 255, 255, 0.6)),
+    inset 0 0 6px rgba(255, 255, 255, 0.3) !important;
+}
+
+@keyframes nodeGlow {
+  0%, 100% { 
+    box-shadow: 
+      0 0 8px var(--nft-glow, rgba(0, 255, 255, 0.4)),
+      inset 0 0 4px rgba(255, 255, 255, 0.2);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 
+      0 0 20px var(--nft-glow, rgba(0, 255, 255, 1)),
+      inset 0 0 8px rgba(255, 255, 255, 0.4);
+    transform: scale(1.3);
+  }
+}
+
+@keyframes nodeCenterPulse {
+  0% { 
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 
+      0 0 12px var(--nft-glow, rgba(0, 255, 255, 0.6)),
+      inset 0 0 6px rgba(255, 255, 255, 0.3);
+  }
+  100% { 
+    transform: translate(-50%, -50%) scale(1.4);
+    box-shadow: 
+      0 0 20px var(--nft-glow, rgba(0, 255, 255, 1)),
+      inset 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+}
+
+.connection {
+  position: absolute;
+  height: 3px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--nft-primary, #00ffff) 20%, 
+    rgba(255, 255, 255, 0.8) 50%, 
+    var(--nft-primary, #00ffff) 80%, 
+    transparent 100%);
+  animation: dataFlow 2s linear infinite, connectionPulse 3s ease-in-out infinite;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 2px;
+  box-shadow: 0 0 6px var(--nft-glow, rgba(0, 255, 255, 0.3));
+}
+
+.connection:nth-child(6) { 
+  top: 24px; left: 28px; width: 64px; 
+  transform: rotate(0deg);
+}
+.connection:nth-child(7) { 
+  top: 46px; left: 25px; width: 70px; 
+  transform: rotate(70deg);
+}
+.connection:nth-child(8) { 
+  top: 46px; right: 25px; width: 70px; 
+  transform: rotate(-70deg);
+}
+
+.connection-diagonal-1 {
+  top: 24px !important;
+  left: 28px !important;
+  width: 70px !important;
+  transform: rotate(45deg) !important;
+  animation-delay: 0.5s !important;
+}
+
+.connection-diagonal-2 {
+  top: 24px !important;
+  right: 28px !important;
+  width: 70px !important;
+  transform: rotate(-45deg) !important;
+  animation-delay: 1s !important;
+}
+
+.connection-diagonal-3 {
+  bottom: 24px !important;
+  left: 28px !important;
+  width: 70px !important;
+  transform: rotate(-45deg) !important;
+  animation-delay: 1.5s !important;
+}
+
+.connection-diagonal-4 {
+  bottom: 24px !important;
+  right: 28px !important;
+  width: 70px !important;
+  transform: rotate(45deg) !important;
+  animation-delay: 2s !important;
+}
+
+@keyframes dataFlow {
+  0% { 
+    background-position: -100% 0;
+    opacity: 0.6;
+  }
+  50% { 
+    opacity: 1;
+  }
+  100% { 
+    background-position: 100% 0;
+    opacity: 0.6;
+  }
+}
+
+.ai-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.ai-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--nft-primary, #00ffff);
+  border-radius: 50%;
+  animation: aiPulse 2s ease-in-out infinite;
+}
+
+.ai-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 50%;
+  animation: aiRingRotate 3s linear infinite;
+}
+
+@keyframes aiPulse {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+    box-shadow: 0 0 10px var(--nft-glow, rgba(0, 255, 255, 0.4));
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.4;
+    box-shadow: 0 0 20px var(--nft-glow, rgba(0, 255, 255, 0.8));
+  }
+}
+
+@keyframes aiRingRotate {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.corner-elements {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--nft-primary, #00ffff);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px var(--nft-glow, rgba(0, 255, 255, 0.2));
+}
+
+.corner-tl {
+  top: 10px;
+  left: 10px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.corner-tr {
+  top: 10px;
+  right: 10px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.corner-bl {
+  bottom: 10px;
+  left: 10px;
+  border-right: none;
+  border-top: none;
+}
+
+.corner-br {
+  bottom: 10px;
+  right: 10px;
+  border-left: none;
+  border-top: none;
+}
+
+.tech-text {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--nft-primary, #00ffff);
+  font-size: 12px;
+  text-align: center;
+  opacity: 0.8;
+  text-shadow: 0 0 10px var(--nft-glow, rgba(0, 255, 255, 0.5));
+  animation: textGlow 3s ease-in-out infinite;
+}
+
+@keyframes textGlow {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; text-shadow: 0 0 20px var(--nft-glow, rgba(0, 255, 255, 1)); }
+}
+
+.blockchain-elements {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--nft-primary, #00ffff) 0%, transparent 50%, var(--nft-primary, #00ffff) 100%);
+  animation: blockchainFlow 3s linear infinite;
+}
+
+@keyframes blockchainFlow {
+  0% { transform: scaleX(0); }
+  50% { transform: scaleX(1); }
+  100% { transform: scaleX(0); }
+}
+
+.data-particles {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: radial-gradient(circle, var(--nft-primary, #00ffff) 0%, rgba(0, 255, 255, 0.3) 70%, transparent 100%);
+  border-radius: 50%;
+  animation: particleFloat 5s linear infinite, particleGlow 2s ease-in-out infinite alternate;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px var(--nft-glow, rgba(0, 255, 255, 0.4));
+}
+
+.particle-1 { top: 30%; left: 10%; animation-delay: 0s; }
+.particle-2 { top: 70%; right: 15%; animation-delay: 1s; }
+.particle-3 { top: 20%; right: 30%; animation-delay: 2s; }
+.particle-4 { bottom: 30%; left: 25%; animation-delay: 3s; }
+.particle-5 { top: 50%; left: 5%; animation-delay: 4s; }
+.particle-6 { bottom: 20%; right: 5%; animation-delay: 5s; }
+
+@keyframes particleFloat {
+  0% { 
+    opacity: 0; 
+    transform: translateY(0px) scale(0.5);
+  }
+  25% { 
+    opacity: 0.8; 
+    transform: translateY(-10px) scale(0.8);
+  }
+  50% { 
+    opacity: 1; 
+    transform: translateY(-20px) scale(1);
+  }
+  75% { 
+    opacity: 0.8; 
+    transform: translateY(-30px) scale(0.8);
+  }
+  100% { 
+    opacity: 0; 
+    transform: translateY(-40px) scale(0.5);
+  }
+}
+
+.ai-data-streams {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.data-stream {
+  position: absolute;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--nft-primary, #00ffff) 20%, 
+    rgba(255, 255, 255, 0.8) 50%, 
+    var(--nft-primary, #00ffff) 80%, 
+    transparent 100%);
+  border-radius: 2px;
+  animation: dataStreamFlow 3s linear infinite;
+  box-shadow: 0 0 8px var(--nft-glow, rgba(0, 255, 255, 0.3));
+}
+
+.stream-1 {
+  top: 15%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  animation-delay: 0s;
+}
+
+.stream-2 {
+  top: 85%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  animation-delay: 1s;
+}
+
+.stream-3 {
+  top: 0;
+  left: 15%;
+  width: 2px;
+  height: 100%;
+  animation-delay: 2s;
+}
+
+@keyframes dataStreamFlow {
+  0% { 
+    background-position: -100% 0;
+    opacity: 0.4;
+  }
+  50% { 
+    opacity: 0.8;
+  }
+  100% { 
+    background-position: 100% 0;
+    opacity: 0.4;
+  }
+}
+
+.hologram-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    var(--nft-accent, rgba(0, 255, 255, 0.1)) 50%,
+    transparent 70%
+  );
+  animation: hologramSweep 4s linear infinite, hologramFlicker 6s ease-in-out infinite;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes hologramSweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes hologramFlicker {
+  0%, 100% { opacity: 0.3; }
+  25% { opacity: 0.6; }
+  50% { opacity: 0.4; }
+  75% { opacity: 0.7; }
+}
+
+.info-panel {
+  position: absolute;
+  bottom: -60px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: var(--nft-primary, #00ffff);
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.info-panel .title {
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.info-panel .subtitle {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+/* Efeitos interativos melhorados */
+.nft-container:hover .central-logo {
+  animation-duration: 1.5s;
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+.nft-container:hover .data-particles {
+  animation-duration: 1.5s;
+  transform: scale(1.2);
+}
+
+.nft-container:hover .hologram-effect {
+  animation-duration: 2s;
+  opacity: 0.8;
+}
+
+.nft-container:hover .neural-network {
+  filter: drop-shadow(0 0 20px var(--nft-glow, rgba(0, 255, 255, 0.6)));
+  transform: scale(1.1);
+}
+
+.nft-container:hover .node {
+  animation-duration: 1s;
+  transform: scale(1.5);
+}
+
+.nft-container:hover .connection {
+  animation-duration: 1s;
+  height: 4px;
+}
+
+.nft-container:hover .corner-elements {
+  box-shadow: 0 0 16px var(--nft-glow, rgba(0, 255, 255, 0.4));
+  transform: scale(1.1);
+}
+
+.nft-container:hover .ai-core {
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+.nft-container:hover .ai-pulse {
+  animation-duration: 1s;
+}
+
+.nft-container:hover .ai-ring {
+  animation-duration: 1.5s;
+}
+
+.nft-container:hover .data-stream {
+  animation-duration: 1.5s;
+  opacity: 1;
+}
+
+/* Efeito de mint melhorado */
+@keyframes mintEffect {
+  0% { 
+    transform: scale(1) rotateY(0deg); 
+    filter: brightness(1) contrast(1);
+  }
+  25% { 
+    transform: scale(1.05) rotateY(45deg); 
+    filter: brightness(1.2) contrast(1.1);
+  }
+  50% { 
+    transform: scale(1.1) rotateY(180deg); 
+    filter: brightness(1.5) contrast(1.2);
+  }
+  75% { 
+    transform: scale(1.05) rotateY(315deg); 
+    filter: brightness(1.2) contrast(1.1);
+  }
+  100% { 
+    transform: scale(1) rotateY(360deg); 
+    filter: brightness(1) contrast(1);
+  }
+}

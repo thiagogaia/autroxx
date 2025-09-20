@@ -1,0 +1,11 @@
+.nft-background {
+  margin: 0;
+  padding: 20px;
+  background: radial-gradient(circle at 20% 50%, #0a0a0a 0%, #1a0033 30%, #000011 100%);
+  font-family: 'Courier New', monospace;
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

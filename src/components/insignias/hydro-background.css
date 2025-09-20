@@ -1,0 +1,35 @@
+.hydro-background {
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(ellipse at center, #001122 0%, #003344 30%, #001a2e 70%, #000d1a 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Ondas de fundo oceânico */
+.ocean-waves {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(ellipse at 20% 50%, rgba(0, 150, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 30%, rgba(0, 200, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 80%, rgba(100, 200, 255, 0.06) 0%, transparent 50%);
+  animation: oceanFlow 20s ease-in-out infinite;
+}
+
+@keyframes oceanFlow {
+  0%, 100% { 
+    opacity: 0.3;
+    transform: translateX(0) scale(1);
+  }
+  50% { 
+    opacity: 0.6;
+    transform: translateX(20px) scale(1.1);
+  }
+}

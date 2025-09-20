@@ -1,0 +1,292 @@
+.badge-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Badge principal estilo Discord */
+.discord-badge {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  background: linear-gradient(135deg, #7289da 0%, #5865f2 100%);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 
+    0 8px 24px rgba(88, 101, 242, 0.4),
+    0 4px 12px rgba(88, 101, 242, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.discord-badge:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 
+    0 12px 32px rgba(88, 101, 242, 0.5),
+    0 6px 16px rgba(88, 101, 242, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.discord-badge.clicked {
+  animation: discordPulse 0.6s ease-out;
+}
+
+/* Efeito de onda Discord */
+.discord-wave {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle, 
+    rgba(255, 255, 255, 0.2) 0%, 
+    rgba(255, 255, 255, 0.1) 40%, 
+    transparent 70%);
+  transform: scale(0);
+  animation: waveRipple 2s ease-out infinite;
+}
+
+/* Logo Discord SVG */
+.discord-logo {
+  width: 70px;
+  height: 70px;
+  z-index: 15;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.discord-badge:hover .discord-logo {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Anel orbital Discord */
+.discord-ring {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border: 3px solid transparent;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(114, 137, 218, 0.3), rgba(88, 101, 242, 0.2)) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: subtract;
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  animation: ringRotate 8s linear infinite;
+  z-index: 8;
+}
+
+/* Partículas de status Discord */
+.status-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.status-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.status-online {
+  background: #43b581;
+  box-shadow: 0 0 12px rgba(67, 181, 129, 0.6);
+}
+
+.status-idle {
+  background: #faa61a;
+  box-shadow: 0 0 12px rgba(250, 166, 26, 0.6);
+}
+
+.status-dnd {
+  background: #f04747;
+  box-shadow: 0 0 12px rgba(240, 71, 71, 0.6);
+}
+
+.status-offline {
+  background: #747f8d;
+  box-shadow: 0 0 12px rgba(116, 127, 141, 0.6);
+}
+
+.status-dot.active {
+  animation: statusFloat 3s ease-in-out infinite;
+}
+
+/* Notificação Discord */
+.discord-notification {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 24px;
+  height: 24px;
+  background: #f04747;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(240, 71, 71, 0.4);
+  animation: notificationPulse 2s ease-in-out infinite;
+  z-index: 20;
+  transition: all 0.2s ease;
+}
+
+/* Texto badge Discord */
+.badge-text {
+  position: absolute;
+  bottom: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #b9bbbe;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.badge-container:hover .badge-text {
+  color: #ffffff;
+  transform: translateX(-50%) translateY(-3px);
+}
+
+/* Indicador de boost */
+.boost-indicator {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(135deg, #ff73fa 0%, #f570ea 100%);
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: boostShine 3s ease-in-out infinite;
+  z-index: 20;
+}
+
+/* Efeito de typing Discord */
+.typing-indicator {
+  position: absolute;
+  bottom: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  color: #72767d;
+  font-size: 12px;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.typing-dots {
+  display: flex;
+  margin-left: 8px;
+}
+
+.typing-dot {
+  width: 4px;
+  height: 4px;
+  background: #72767d;
+  border-radius: 50%;
+  margin: 0 1px;
+  animation: typingBounce 1.4s ease-in-out infinite both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+.typing-dot:nth-child(3) { animation-delay: 0s; }
+
+/* Animações Discord */
+@keyframes discordPulse {
+  0% { 
+    transform: scale(1) translateY(0px); 
+    box-shadow: 0 8px 24px rgba(88, 101, 242, 0.4);
+  }
+  50% { 
+    transform: scale(1.1) translateY(-4px); 
+    box-shadow: 0 16px 48px rgba(88, 101, 242, 0.6);
+  }
+  100% { 
+    transform: scale(1) translateY(0px); 
+    box-shadow: 0 8px 24px rgba(88, 101, 242, 0.4);
+  }
+}
+
+@keyframes waveRipple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes ringRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes statusFloat {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.2);
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes notificationPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(240, 71, 71, 0.4);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 4px 16px rgba(240, 71, 71, 0.6);
+  }
+}
+
+@keyframes boostShine {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+@keyframes typingBounce {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+.badge-container:hover .typing-indicator {
+  opacity: 1;
+}

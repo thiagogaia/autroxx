@@ -1,0 +1,231 @@
+.badge-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Badge principal elétrico */
+.thunder-badge {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(ellipse at 30% 30%, 
+    rgba(255, 255, 0, 0.4) 0%,
+    rgba(255, 165, 0, 0.3) 30%,
+    rgba(138, 43, 226, 0.4) 60%,
+    rgba(75, 0, 130, 0.6) 100%);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 
+    0 0 40px rgba(255, 255, 0, 0.5),
+    0 0 80px rgba(138, 43, 226, 0.3),
+    inset 0 0 30px rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  border: 3px solid rgba(255, 255, 0, 0.6);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.thunder-badge:hover {
+  transform: scale(1.05) translateY(-3px);
+  box-shadow: 
+    0 0 60px rgba(255, 255, 0, 0.7),
+    0 0 120px rgba(138, 43, 226, 0.4),
+    inset 0 0 40px rgba(255, 255, 255, 0.3);
+}
+
+.thunder-badge.clicked {
+  animation: thunderStrike 0.8s ease-out;
+}
+
+/* Raio SVG principal */
+.thunder-symbol {
+  width: 100px;
+  height: 100px;
+  z-index: 50;
+  transition: all 0.4s ease;
+  filter: drop-shadow(0 0 15px rgba(255, 255, 0, 0.8));
+  animation: electricPulse 3s ease-in-out infinite;
+}
+
+.thunder-badge:hover .thunder-symbol {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 25px rgba(255, 255, 0, 1));
+  animation-duration: 1.5s;
+}
+
+/* Anel elétrico */
+.electric-ring {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: conic-gradient(
+    rgba(255, 255, 0, 0.4) 0deg,
+    rgba(255, 165, 0, 0.3) 90deg,
+    rgba(138, 43, 226, 0.4) 180deg,
+    rgba(75, 0, 130, 0.3) 270deg,
+    rgba(255, 255, 0, 0.4) 360deg
+  );
+  animation: electricRotate 6s linear infinite;
+  filter: blur(12px);
+  opacity: 0.7;
+  z-index: 8;
+}
+
+.badge-container:hover .electric-ring {
+  opacity: 1;
+  animation-duration: 3s;
+}
+
+/* Faíscas elétricas */
+.electric-sparks {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.spark {
+  position: absolute;
+  width: 3px;
+  height: 8px;
+  background: linear-gradient(to bottom, 
+    rgba(255, 255, 0, 1) 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    transparent 100%);
+  border-radius: 50%;
+  opacity: 0;
+  animation: sparkFly 2s ease-out infinite;
+  box-shadow: 0 0 8px rgba(255, 255, 0, 0.8);
+}
+
+/* Ondas de choque elétricas */
+.shock-waves {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.shock-wave {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 0, 0.6);
+  animation: shockExpand 2s ease-out forwards;
+  z-index: 5;
+}
+
+/* Texto da insígnia */
+.badge-text {
+  position: absolute;
+  bottom: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ffff00;
+  font-weight: bold;
+  font-size: 18px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 
+    0 0 15px rgba(255, 255, 0, 0.8),
+    0 0 30px rgba(138, 43, 226, 0.4);
+  transition: all 0.3s ease;
+  animation: textGlow 4s ease-in-out infinite alternate;
+}
+
+.badge-container:hover .badge-text {
+  color: #ffffff;
+  text-shadow: 
+    0 0 20px rgba(255, 255, 0, 1),
+    0 0 40px rgba(138, 43, 226, 0.6),
+    0 0 60px rgba(255, 165, 0, 0.3);
+  transform: translateX(-50%) translateY(-5px);
+}
+
+/* Animações elétricas */
+@keyframes thunderStrike {
+  0% { 
+    transform: scale(1) translateY(0px); 
+    box-shadow: 0 0 40px rgba(255, 255, 0, 0.5);
+  }
+  20% { 
+    transform: scale(1.2) translateY(-8px); 
+    box-shadow: 0 0 100px rgba(255, 255, 0, 0.9);
+  }
+  40% { 
+    transform: scale(0.95) translateY(-3px); 
+    box-shadow: 0 0 80px rgba(255, 255, 0, 0.7);
+  }
+  100% { 
+    transform: scale(1) translateY(0px); 
+    box-shadow: 0 0 40px rgba(255, 255, 0, 0.5);
+  }
+}
+
+@keyframes electricPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 15px rgba(255, 255, 0, 0.8));
+  }
+  50% {
+    transform: scale(1.03);
+    filter: drop-shadow(0 0 25px rgba(255, 255, 0, 1));
+  }
+}
+
+@keyframes electricRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes sparkFly {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) scale(1);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-25px) translateX(10px) scale(1.5);
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes shockExpand {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+@keyframes textGlow {
+  0% {
+    text-shadow: 
+      0 0 15px rgba(255, 255, 0, 0.8),
+      0 0 30px rgba(138, 43, 226, 0.4);
+  }
+  100% {
+    text-shadow: 
+      0 0 25px rgba(255, 255, 0, 1),
+      0 0 50px rgba(138, 43, 226, 0.6),
+      0 0 70px rgba(255, 165, 0, 0.4);
+  }
+}

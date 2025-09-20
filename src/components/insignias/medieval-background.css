@@ -1,0 +1,11 @@
+.medieval-background {
+  margin: 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #0a0a23, #1a1a3a);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Cinzel', serif;
+  overflow: hidden;
+}

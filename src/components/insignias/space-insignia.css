@@ -1,0 +1,301 @@
+.badge-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  /* Tamanho será definido via style inline */
+}
+
+/* Badge principal espacial */
+.space-badge {
+  position: relative;
+  /* Tamanho será definido via style inline */
+  background: radial-gradient(ellipse at 30% 30%, 
+    rgba(255, 165, 0, 0.8) 0%,
+    rgba(255, 69, 0, 0.7) 30%,
+    rgba(139, 69, 19, 0.6) 60%,
+    rgba(25, 25, 112, 0.8) 100%);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 
+    0 0 50px rgba(255, 165, 0, 0.6),
+    0 0 100px rgba(255, 69, 0, 0.3),
+    inset 0 0 30px rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  border: 3px solid rgba(255, 165, 0, 0.5);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.space-badge:hover {
+  transform: scale(1.08) translateY(-5px);
+  box-shadow: 
+    0 0 80px rgba(255, 165, 0, 0.8),
+    0 0 150px rgba(255, 69, 0, 0.4),
+    inset 0 0 40px rgba(255, 255, 255, 0.3);
+}
+
+.space-badge.clicked {
+  animation: rocketLaunch 1s ease-out;
+}
+
+/* Foguete SVG principal */
+.rocket-symbol {
+  /* Tamanho será definido via style inline */
+  z-index: 50;
+  transition: all 0.4s ease;
+  filter: drop-shadow(0 0 20px rgba(255, 165, 0, 0.8));
+  transform: rotate(20deg);
+  animation: rocketOrbitalMove 8s ease-in-out infinite;
+}
+
+.space-badge:hover .rocket-symbol {
+  transform: rotate(20deg) scale(1.1) translateY(-3px);
+  filter: drop-shadow(0 0 30px rgba(255, 165, 0, 1));
+  animation-duration: 4s;
+}
+
+/* Anel orbital */
+.orbital-ring {
+  position: absolute;
+  /* Tamanho será definido via style inline */
+  border-radius: 50%;
+  background: conic-gradient(
+    rgba(255, 165, 0, 0.3) 0deg,
+    rgba(255, 69, 0, 0.4) 90deg,
+    rgba(255, 140, 0, 0.3) 180deg,
+    rgba(255, 99, 71, 0.4) 270deg,
+    rgba(255, 165, 0, 0.3) 360deg
+  );
+  animation: orbitRotate 15s linear infinite;
+  filter: blur(15px);
+  opacity: 0.6;
+  z-index: 8;
+}
+
+.badge-container:hover .orbital-ring {
+  opacity: 0.9;
+  animation-duration: 8s;
+}
+
+/* Partículas de combustível */
+.fuel-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.fuel-particle {
+  position: absolute;
+  width: 6px;
+  height: 8px;
+  background: radial-gradient(ellipse at center, 
+    rgba(255, 165, 0, 0.9) 0%,
+    rgba(255, 69, 0, 0.7) 50%,
+    transparent 100%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  opacity: 0;
+  animation: fuelBurn 2s ease-out infinite;
+  box-shadow: 0 0 8px rgba(255, 165, 0, 0.6);
+}
+
+/* Trilha de vapor */
+.vapor-trail {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.vapor {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, rgba(200, 200, 255, 0.8) 0%, transparent 70%);
+  border-radius: 50%;
+  opacity: 0;
+  animation: vaporRise 4s ease-out infinite;
+}
+
+/* Planetas de fundo */
+.planets {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.planet {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: planetFloat 20s ease-in-out infinite;
+}
+
+.planet-1 {
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(ellipse at 30% 30%, #ff6b6b, #c44569);
+  top: 20%;
+  left: 10%;
+  animation: planetFloat 12s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.planet-2 {
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(ellipse at 30% 30%, #4834d4, #686de0);
+  top: 60%;
+  right: 15%;
+  animation: planetFloat 15s ease-in-out infinite;
+  animation-delay: 3s;
+}
+
+.planet-3 {
+  width: 25px;
+  height: 25px;
+  background: radial-gradient(ellipse at 30% 30%, #00d2d3, #01a3a4);
+  bottom: 30%;
+  left: 20%;
+  animation: planetFloat 18s ease-in-out infinite;
+  animation-delay: 6s;
+}
+
+/* Texto da insígnia */
+.badge-text {
+  position: absolute;
+  bottom: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ffa500;
+  font-weight: bold;
+  font-size: 18px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 
+    0 0 15px rgba(255, 165, 0, 0.8),
+    0 0 30px rgba(255, 69, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.badge-container:hover .badge-text {
+  color: #ffffff;
+  text-shadow: 
+    0 0 20px rgba(255, 165, 0, 1),
+    0 0 40px rgba(255, 69, 0, 0.6),
+    0 0 60px rgba(255, 140, 0, 0.3);
+  transform: translateX(-50%) translateY(-5px);
+}
+
+/* Ondas de propulsão */
+.propulsion-wave {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 165, 0, 0.6);
+  animation: propulsionExpand 1.5s ease-out forwards;
+  z-index: 5;
+}
+
+/* Animações espaciais */
+@keyframes rocketLaunch {
+  0% { 
+    transform: scale(1) translateY(0px) rotate(20deg); 
+    box-shadow: 0 0 50px rgba(255, 165, 0, 0.6);
+  }
+  30% { 
+    transform: scale(1.15) translateY(-10px) rotate(25deg); 
+    box-shadow: 0 0 100px rgba(255, 165, 0, 0.9);
+  }
+  100% { 
+    transform: scale(1) translateY(0px) rotate(20deg); 
+    box-shadow: 0 0 50px rgba(255, 165, 0, 0.6);
+  }
+}
+
+@keyframes orbitRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fuelBurn {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-25px) scale(1.5);
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes vaporRise {
+  0% {
+    transform: translateY(0px) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-80px) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes rocketOrbitalMove {
+  0% {
+    transform: rotate(20deg) translateX(0px) translateY(0px);
+  }
+  25% {
+    transform: rotate(25deg) translateX(6px) translateY(-4px);
+  }
+  50% {
+    transform: rotate(20deg) translateX(10px) translateY(-7px);
+  }
+  75% {
+    transform: rotate(15deg) translateX(3px) translateY(-2px);
+  }
+  100% {
+    transform: rotate(20deg) translateX(0px) translateY(0px);
+  }
+}
+
+@keyframes planetFloat {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) scale(1);
+    opacity: 0.4;
+  }
+  33% {
+    transform: translateY(-25px) translateX(15px) scale(1.1);
+    opacity: 0.7;
+  }
+  66% {
+    transform: translateY(-10px) translateX(-10px) scale(0.9);
+    opacity: 0.6;
+  }
+}
+
+@keyframes propulsionExpand {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}

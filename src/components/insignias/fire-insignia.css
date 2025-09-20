@@ -1,0 +1,466 @@
+.fire-badge {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Aura de calor externa - campo térmico difuso */
+.heat-aura {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(
+    ellipse at 50% 70%,
+    rgba(255, 69, 0, 0.15) 0%,
+    rgba(255, 140, 0, 0.1) 20%,
+    rgba(255, 165, 0, 0.08) 35%,
+    rgba(255, 69, 0, 0.05) 50%,
+    rgba(139, 69, 19, 0.03) 65%,
+    rgba(0, 0, 0, 0.02) 80%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  animation: heatPulse 4s ease-in-out infinite;
+  filter: blur(15px);
+}
+
+/* Chama externa - contorno principal */
+.flame-outer {
+  position: absolute;
+  width: 200px;
+  height: 280px;
+  background: radial-gradient(
+    ellipse at 50% 80%,
+    var(--fire-primary, rgba(255, 69, 0, 0.9)) 0%,
+    var(--fire-secondary, rgba(255, 140, 0, 0.8)) 15%,
+    rgba(255, 165, 0, 0.7) 30%,
+    rgba(255, 69, 0, 0.6) 45%,
+    rgba(139, 69, 19, 0.4) 60%,
+    rgba(139, 69, 19, 0.2) 75%,
+    transparent 100%
+  );
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: flameDance 3s ease-in-out infinite;
+  filter: blur(8px);
+}
+
+/* Chama média - camada intermediária */
+.flame-middle {
+  position: absolute;
+  width: 150px;
+  height: 220px;
+  background: radial-gradient(
+    ellipse at 50% 85%,
+    var(--fire-accent, rgba(255, 255, 255, 0.3)) 0%,
+    rgba(255, 255, 0, 0.8) 10%,
+    rgba(255, 165, 0, 0.9) 25%,
+    rgba(255, 69, 0, 0.8) 40%,
+    rgba(255, 140, 0, 0.6) 55%,
+    rgba(139, 69, 19, 0.4) 70%,
+    transparent 85%
+  );
+  border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+  animation: flameFlicker 2.5s ease-in-out infinite;
+  filter: blur(4px);
+}
+
+/* Núcleo interno - zona de combustão */
+.flame-core {
+  position: absolute;
+  width: 100px;
+  height: 160px;
+  background: radial-gradient(
+    ellipse at 50% 90%,
+    var(--fire-core, rgba(255, 255, 255, 0.9)) 0%,
+    rgba(255, 255, 255, 0.7) 8%,
+    rgba(255, 255, 0, 0.9) 20%,
+    rgba(255, 165, 0, 0.95) 35%,
+    rgba(255, 69, 0, 0.8) 50%,
+    rgba(255, 140, 0, 0.6) 65%,
+    transparent 80%
+  );
+  border-radius: 50% 50% 50% 50% / 70% 70% 30% 30%;
+  animation: coreIntensity 2s ease-in-out infinite;
+  filter: blur(2px);
+}
+
+/* Núcleo super quente - centro branco incandescente */
+.flame-hotcore {
+  position: absolute;
+  width: 50px;
+  height: 100px;
+  background: radial-gradient(
+    ellipse at 50% 95%,
+    var(--fire-core, rgba(255, 255, 255, 1)) 0%,
+    rgba(255, 255, 255, 0.95) 15%,
+    rgba(255, 255, 0, 0.9) 30%,
+    rgba(255, 255, 255, 0.8) 45%,
+    rgba(255, 165, 0, 0.7) 60%,
+    rgba(255, 69, 0, 0.5) 75%,
+    transparent 90%
+  );
+  border-radius: 50% 50% 50% 50% / 75% 75% 25% 25%;
+  animation: hotcoreGlow 1.5s ease-in-out infinite;
+  filter: blur(1px);
+}
+
+/* Container para brasas */
+.ember-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Brasas flutuantes */
+.ember {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, 
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 0, 0.9) 20%,
+    rgba(255, 165, 0, 0.8) 50%,
+    rgba(255, 69, 0, 0.6) 80%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  filter: blur(0.5px);
+}
+
+.ember1 {
+  left: 120px;
+  top: 80px;
+  animation: ember1Float 5s linear infinite;
+}
+
+.ember2 {
+  left: 180px;
+  top: 100px;
+  animation: ember2Float 4.5s linear infinite;
+}
+
+.ember3 {
+  left: 90px;
+  top: 70px;
+  animation: ember3Float 5.5s linear infinite;
+}
+
+.ember4 {
+  left: 210px;
+  top: 110px;
+  animation: ember4Float 4.8s linear infinite;
+}
+
+.ember5 {
+  left: 150px;
+  top: 60px;
+  animation: ember5Float 5.2s linear infinite;
+}
+
+/* Pontos de calor branco puro */
+.heat-point {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(255, 255, 255, 1);
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+}
+
+.heat-point1 {
+  left: 140px;
+  top: 180px;
+  animation: heatSparkle1 3s ease-in-out infinite;
+}
+
+.heat-point2 {
+  left: 160px;
+  top: 170px;
+  animation: heatSparkle2 2.8s ease-in-out infinite 0.5s;
+}
+
+.heat-point3 {
+  left: 130px;
+  top: 190px;
+  animation: heatSparkle3 3.2s ease-in-out infinite 1s;
+}
+
+.heat-point4 {
+  left: 170px;
+  top: 185px;
+  animation: heatSparkle4 2.9s ease-in-out infinite 1.5s;
+}
+
+/* Badge base */
+.badge-base {
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle at center,
+    rgba(139, 69, 19, 0.3) 0%,
+    rgba(139, 69, 19, 0.2) 40%,
+    rgba(0, 0, 0, 0.8) 70%,
+    rgba(0, 0, 0, 0.9) 100%
+  );
+  border-radius: 50%;
+  border: 3px solid rgba(255, 140, 0, 0.6);
+  box-shadow: 
+    0 0 20px rgba(255, 69, 0, 0.4),
+    inset 0 0 30px rgba(0, 0, 0, 0.7);
+  z-index: -1;
+}
+
+/* Texto da insígnia */
+.badge-text {
+  position: absolute;
+  bottom: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ff4500;
+  font-weight: bold;
+  font-size: 18px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 
+    0 0 15px rgba(255, 69, 0, 0.8),
+    0 0 30px rgba(255, 140, 0, 0.4);
+  transition: all 0.3s ease;
+  animation: textGlow 4s ease-in-out infinite alternate;
+  z-index: 10;
+}
+
+.fire-badge:hover .badge-text {
+  color: #ffffff;
+  text-shadow: 
+    0 0 20px rgba(255, 69, 0, 1),
+    0 0 40px rgba(255, 140, 0, 0.6),
+    0 0 60px rgba(255, 165, 0, 0.3);
+  transform: translateX(-50%) translateY(-5px);
+}
+
+/* Animações */
+@keyframes heatPulse {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+  16% { transform: scale(1.05) rotate(2deg); opacity: 0.9; }
+  33% { transform: scale(0.98) rotate(-1deg); opacity: 0.85; }
+  50% { transform: scale(1.08) rotate(1.5deg); opacity: 0.95; }
+  66% { transform: scale(0.95) rotate(-2deg); opacity: 0.8; }
+  83% { transform: scale(1.03) rotate(0.5deg); opacity: 0.9; }
+}
+
+@keyframes flameDance {
+  0%, 100% { 
+    transform: scale(1) rotate(0deg) skewX(0deg); 
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  }
+  16% { 
+    transform: scale(1.02) rotate(-1deg) skewX(2deg);
+    border-radius: 48% 52% 48% 52% / 58% 62% 38% 42%;
+  }
+  33% { 
+    transform: scale(0.98) rotate(1.5deg) skewX(-1deg);
+    border-radius: 52% 48% 52% 48% / 62% 58% 42% 38%;
+  }
+  50% { 
+    transform: scale(1.05) rotate(-0.5deg) skewX(1.5deg);
+    border-radius: 49% 51% 49% 51% / 59% 61% 39% 41%;
+  }
+  66% { 
+    transform: scale(0.96) rotate(2deg) skewX(-2deg);
+    border-radius: 51% 49% 51% 49% / 61% 59% 41% 39%;
+  }
+  83% { 
+    transform: scale(1.01) rotate(-1.5deg) skewX(1deg);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  }
+}
+
+@keyframes flameFlicker {
+  0%, 100% { 
+    transform: scale(1) rotate(0deg) translateY(0px);
+    border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
+  }
+  20% { 
+    transform: scale(1.03) rotate(-1deg) translateY(-2px);
+    border-radius: 47% 53% 47% 53% / 63% 67% 33% 37%;
+  }
+  40% { 
+    transform: scale(0.97) rotate(1.2deg) translateY(1px);
+    border-radius: 53% 47% 53% 47% / 67% 63% 37% 33%;
+  }
+  60% { 
+    transform: scale(1.04) rotate(-0.8deg) translateY(-1px);
+    border-radius: 48% 52% 48% 52% / 64% 66% 34% 36%;
+  }
+  80% { 
+    transform: scale(0.99) rotate(1.5deg) translateY(1px);
+    border-radius: 52% 48% 52% 48% / 66% 64% 36% 34%;
+  }
+}
+
+@keyframes coreIntensity {
+  0%, 100% { 
+    transform: scale(1) translateY(0px);
+    opacity: 1;
+  }
+  25% { 
+    transform: scale(1.02) translateY(-1px);
+    opacity: 0.95;
+  }
+  50% { 
+    transform: scale(0.98) translateY(1px);
+    opacity: 1;
+  }
+  75% { 
+    transform: scale(1.01) translateY(-0.5px);
+    opacity: 0.98;
+  }
+}
+
+@keyframes hotcoreGlow {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 1;
+    filter: blur(1px) brightness(1);
+  }
+  33% { 
+    transform: scale(1.05);
+    opacity: 0.95;
+    filter: blur(0.8px) brightness(1.1);
+  }
+  66% { 
+    transform: scale(0.96);
+    opacity: 1;
+    filter: blur(1.2px) brightness(0.95);
+  }
+}
+
+@keyframes ember1Float {
+  0% { transform: translate(0px, 0px) scale(1); opacity: 0; }
+  10% { opacity: 1; }
+  25% { transform: translate(-10px, -30px) scale(0.8); }
+  50% { transform: translate(15px, -60px) scale(1.1); }
+  75% { transform: translate(-5px, -90px) scale(0.6); }
+  90% { opacity: 0.5; }
+  100% { transform: translate(20px, -120px) scale(0.3); opacity: 0; }
+}
+
+@keyframes ember2Float {
+  0% { transform: translate(0px, 0px) scale(1); opacity: 0; }
+  15% { opacity: 1; }
+  30% { transform: translate(12px, -25px) scale(0.9); }
+  55% { transform: translate(-8px, -55px) scale(1.2); }
+  80% { transform: translate(18px, -85px) scale(0.5); }
+  95% { opacity: 0.3; }
+  100% { transform: translate(-15px, -115px) scale(0.2); opacity: 0; }
+}
+
+@keyframes ember3Float {
+  0% { transform: translate(0px, 0px) scale(1); opacity: 0; }
+  12% { opacity: 1; }
+  28% { transform: translate(-15px, -28px) scale(0.7); }
+  52% { transform: translate(8px, -58px) scale(1.3); }
+  78% { transform: translate(-12px, -88px) scale(0.4); }
+  92% { opacity: 0.4; }
+  100% { transform: translate(25px, -118px) scale(0.1); opacity: 0; }
+}
+
+@keyframes ember4Float {
+  0% { transform: translate(0px, 0px) scale(1); opacity: 0; }
+  18% { opacity: 1; }
+  32% { transform: translate(10px, -32px) scale(0.85); }
+  58% { transform: translate(-18px, -62px) scale(1.15); }
+  82% { transform: translate(5px, -92px) scale(0.55); }
+  94% { opacity: 0.35; }
+  100% { transform: translate(-20px, -122px) scale(0.25); opacity: 0; }
+}
+
+@keyframes ember5Float {
+  0% { transform: translate(0px, 0px) scale(1); opacity: 0; }
+  14% { opacity: 1; }
+  26% { transform: translate(-8px, -26px) scale(0.75); }
+  54% { transform: translate(20px, -56px) scale(1.25); }
+  76% { transform: translate(-10px, -86px) scale(0.45); }
+  88% { opacity: 0.45; }
+  100% { transform: translate(12px, -116px) scale(0.15); opacity: 0; }
+}
+
+@keyframes heatSparkle1 {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  20% { opacity: 1; transform: scale(1.2); }
+  40% { opacity: 0.7; transform: scale(0.8); }
+  60% { opacity: 1; transform: scale(1.5); }
+  80% { opacity: 0.5; transform: scale(0.6); }
+}
+
+@keyframes heatSparkle2 {
+  0%, 100% { opacity: 0; transform: scale(0.3); }
+  15% { opacity: 0.8; transform: scale(1); }
+  35% { opacity: 1; transform: scale(1.3); }
+  65% { opacity: 0.6; transform: scale(0.7); }
+  85% { opacity: 0.9; transform: scale(1.1); }
+}
+
+@keyframes heatSparkle3 {
+  0%, 100% { opacity: 0; transform: scale(0.4); }
+  25% { opacity: 1; transform: scale(1.4); }
+  45% { opacity: 0.5; transform: scale(0.9); }
+  70% { opacity: 0.8; transform: scale(1); }
+  90% { opacity: 0.3; transform: scale(0.5); }
+}
+
+@keyframes heatSparkle4 {
+  0%, 100% { opacity: 0; transform: scale(0.6); }
+  18% { opacity: 0.9; transform: scale(1.1); }
+  38% { opacity: 0.4; transform: scale(0.7); }
+  68% { opacity: 1; transform: scale(1.6); }
+  88% { opacity: 0.2; transform: scale(0.4); }
+}
+
+@keyframes textGlow {
+  0% {
+    text-shadow: 
+      0 0 15px rgba(255, 69, 0, 0.8),
+      0 0 30px rgba(255, 140, 0, 0.4);
+  }
+  100% {
+    text-shadow: 
+      0 0 25px rgba(255, 69, 0, 1),
+      0 0 50px rgba(255, 140, 0, 0.6),
+      0 0 70px rgba(255, 165, 0, 0.4);
+  }
+}
+
+/* Efeito de cintilação das bordas */
+.flame-outer::after,
+.flame-middle::after,
+.flame-core::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.1) 25%, 
+    transparent 50%, 
+    rgba(255, 255, 255, 0.1) 75%, 
+    transparent 100%
+  );
+  border-radius: inherit;
+  animation: borderShimmer 4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes borderShimmer {
+  0% { transform: rotate(0deg); opacity: 0.5; }
+  25% { opacity: 0.8; }
+  50% { transform: rotate(180deg); opacity: 0.3; }
+  75% { opacity: 0.9; }
+  100% { transform: rotate(360deg); opacity: 0.5; }
+}

@@ -20,9 +20,11 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  X
+  X,
+  ZapIcon
 } from 'lucide-react';
 import { useState } from 'react';
+import { DiscordInsignia, FireInsignia, HydroInsignia, SpaceInsignia, ThunderInsignia, TrophyInsignia } from './insignias';
 
 export function GamificationDashboard() {
   const { 
@@ -311,17 +313,110 @@ export function GamificationDashboard() {
           {userStats.achievements.map((achievement) => (
             <Card key={achievement.id} className={achievement.unlocked ? 'ring-2 ring-yellow-500' : ''}>
               <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="text-2xl">{achievement.icon}</span>
-                  <div className="flex-1">
-                    <h3 className="font-medium">{achievement.name}</h3>
-                    <p className="text-sm text-muted-foreground">{achievement.description}</p>
+                <div className="flex flex-col items-center gap-3 mb-3">
+                  <span className="text-2xl">
+                    {achievement.unlocked ? (
+                      <>
+                        {achievement.id === 'first_task' ? (
+                          <SpaceInsignia 
+                            rocketType="explorer"
+                            showText={false}
+                            size="large"
+                          />
+                        ) : (
+                          <>
+                            {achievement.id === 'speed_of_light' ? (
+                              <DiscordInsignia
+                                badgeType="nitro"
+                                showText={false}
+                                text="Nitro"
+                                showTyping={false}
+                              />
+                            ) : achievement.id === 'streak_master' ? (
+                              <FireInsignia
+                                fireType="inferno"
+                                showText={false}
+                              />
+                            ) : achievement.id === 'task_master' ? (
+                              <TrophyInsignia
+                                trophyType="legendary"
+                                showText={false}
+                              />
+                            ) : achievement.id === 'impediment_zero' ? (
+                              <DiscordInsignia
+                                badgeType="partner"
+                                showText={false}
+                                text="Partner"
+                                showTyping={false}
+                              />
+                            ) : achievement.id === 'perfectionist' ? (
+                              <DiscordInsignia
+                                badgeType="partner"
+                                showText={false}
+                                text="Partner"
+                                showTyping={false}
+                              />
+                            ) : achievement.id === 'organizer' ? (
+                              <HydroInsignia
+                                waterType="hydro"
+                                showText={false}
+                              />
+                            ) : achievement.id === 'efficiency_master' ? (
+                              <DiscordInsignia
+                                badgeType="partner"
+                                showText={false}
+                                text="Developer"
+                                showTyping={false}
+                              />
+                            ) : achievement.id === 'quick_draw' ? (
+                              <DiscordInsignia
+                                badgeType="moderator"
+                                showText={false}
+                                text="Developer"
+                                showTyping={false}
+                              />
+                            ) : achievement.id === 'bug_hunter' ? (
+                              <DiscordInsignia
+                                badgeType="developer"
+                                showText={false}
+                                text="Developer"
+                                showTyping={false}
+                              />
+                            ) : achievement.id === 'documentation_guru' ? (
+                              <DiscordInsignia
+                                badgeType="developer"
+                                showText={false}
+                                text="Developer"
+                                showTyping={false}
+                              />
+                            ) : achievement.id === 'development_wizard' || true ? (
+                              <ThunderInsignia
+                                thunderType="storm"
+                                showText={false}
+                              />
+                            ) : (
+                              <span style={{ fontSize: '227px' }}>{achievement.icon}</span>
+                            )}
+                            
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <span style={{ fontSize: '227px' }}>{achievement.icon}</span>
+                    )}
+                    
+                  </span>
+                  <div className="flex w-full flex-start justify-between items-center gap-3">
+                    <div className="flex-1">
+                      <h3 className="font-medium">{achievement.name}</h3>
+                      <p className="text-sm text-muted-foreground">{achievement.description}</p>
+                    </div>
+                    {achievement.unlocked && (
+                      <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                        Desbloqueada
+                      </Badge>
+                    )}
                   </div>
-                  {achievement.unlocked && (
-                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                      Desbloqueada
-                    </Badge>
-                  )}
                 </div>
                 
                 <div className="space-y-2">
