@@ -16,6 +16,7 @@ export function TaskFilter() {
       <Tabs value={filtroAtivo} onValueChange={handleFilterChange}>
         <TabsList>
           <TabsTrigger value="tudo">Tudo</TabsTrigger>
+          <TabsTrigger value="a_fazer">A Fazer</TabsTrigger>
           <TabsTrigger value="fazendo">Fazendo</TabsTrigger>
           <TabsTrigger value="normal">Normal</TabsTrigger>
           <TabsTrigger value="urgente">Urgente</TabsTrigger>

@@ -1,6 +1,6 @@
 export type TaskStatus = 'a_fazer' | 'fazendo' | 'concluido';
 export type TaskPriority = 'baixa' | 'normal' | 'media' | 'alta';
-export type FilterType = 'tudo' | 'fazendo' | 'normal' | 'urgente';
+export type FilterType = 'tudo' | 'a_fazer' | 'fazendo' | 'normal' | 'urgente';
 export type TaskCategory = 'desenvolvimento' | 'reuniao' | 'bug' | 'documentacao' | 'sem_categoria';
 export type TaskComplexity = 'simples' | 'media' | 'complexa';
 

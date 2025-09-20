@@ -46,6 +46,7 @@ export function TaskList() {
   // Filtrar tarefas baseado na aba ativa
   const tarefasFiltradas = tasks.filter(tarefa => {
     if (filtroAtivo === 'tudo') return true;
+    if (filtroAtivo === 'a_fazer') return tarefa.statusAtual === 'a_fazer';
     if (filtroAtivo === 'fazendo') return tarefa.statusAtual === 'fazendo';
     if (filtroAtivo === 'normal') return tarefa.prioridade === 'normal'  && tarefa.statusAtual !== 'concluido';
     if (filtroAtivo === 'urgente') return tarefa.prioridade === 'alta' && tarefa.statusAtual !== 'concluido';
@@ -84,6 +85,7 @@ export function TaskList() {
       // Se estamos filtrando, precisamos mesclar com as tarefas não filtradas
       if (filtroAtivo !== 'tudo') {
         const nonFilteredTasks = tasks.filter(tarefa => {
+          if (filtroAtivo === 'a_fazer') return tarefa.statusAtual !== 'a_fazer';
           if (filtroAtivo === 'fazendo') return tarefa.statusAtual !== 'fazendo';
           if (filtroAtivo === 'normal') return tarefa.prioridade !== 'normal';
           if (filtroAtivo === 'urgente') return tarefa.prioridade !== 'alta';
