@@ -80,7 +80,7 @@ export function TaskItem({ task }: TaskItemProps) {
   return (
     <>
       <tr className={`hover:bg-muted/50 transition-colors ${
-        isAltaPrioridade ? 'bg-red-50/50 border-l-4 border-l-red-500 animate-pulse' : 
+        isAltaPrioridade ? 'bg-red-50/50 border-l-4 border-l-red-500 task-priority-pulse' : 
         isMediaPrioridade ? 'bg-yellow-50/50 border-l-4 border-l-yellow-500' : ''
       }`}>
         {/* Status Atual */}
@@ -136,7 +136,7 @@ export function TaskItem({ task }: TaskItemProps) {
             <div className="flex flex-col items-start flex-1">
               <span className={`font-medium ${
                 task.statusAtual === 'concluido' ? 'line-through text-muted-foreground' : ''
-              } ${isAltaPrioridade ? 'animate-pulse' : ''}`}>
+              } ${isAltaPrioridade ? 'task-priority-pulse' : ''}`}>
                 {task.titulo}
               </span>
               

@@ -150,7 +150,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
         ref={setNodeRef} 
         style={style}
         className={`hover:bg-muted/50 transition-colors ${
-          isAltaPrioridade ? 'bg-red-50/50 dark:bg-red-950/20 border-l-4 border-l-red-500 dark:border-l-red-400 animate-pulse' : 
+          isAltaPrioridade ? 'bg-red-50/50 dark:bg-red-950/20 border-l-4 border-l-red-500 dark:border-l-red-400 task-priority-pulse' : 
           isMediaPrioridade ? 'bg-yellow-50/50 dark:bg-yellow-950/20 border-l-4 border-l-yellow-500 dark:border-l-yellow-400' : ''
         } ${isDragging ? 'bg-muted shadow-lg' : ''}`}
         {...attributes}
@@ -216,7 +216,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
             <div className="flex flex-col items-start flex-1">
               <span className={`font-medium ${
                 task.statusAtual === 'concluido' ? 'line-through text-muted-foreground' : ''
-              } ${isAltaPrioridade ? 'animate-pulse' : ''}`}>
+              } ${isAltaPrioridade ? 'task-priority-pulse' : ''}`}>
                 {task.titulo}
               </span>
               

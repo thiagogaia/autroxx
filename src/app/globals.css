@@ -131,4 +131,18 @@
   .animate-shake {
     animation: shake 0.5s ease-in-out;
   }
+
+  /* Animação específica para prioridade de tarefas - isolada para evitar conflitos */
+  @keyframes task-priority-pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+  
+  .task-priority-pulse {
+    animation: task-priority-pulse 2s ease-in-out infinite;
+  }
 }
