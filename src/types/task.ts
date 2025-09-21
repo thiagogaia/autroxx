@@ -134,6 +134,7 @@ export interface TaskContextType {
   setAdvancedFilters: (filters: Partial<TaskFilters>) => void;
   setPagination: (params: Partial<PaginationParams>) => void;
   resetFilters: () => void;
+  clearAllData: () => Promise<void>;
 }
 
 // Re-exportar tipos do novo padrão para compatibilidade

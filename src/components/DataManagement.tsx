@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, Upload, Trash2, RefreshCw } from 'lucide-react';
 import { migrateTaskData, generateUniqueTaskId } from '@/lib/utils';
-import { deserializeTasks, STORAGE_KEYS } from '@/lib/storage';
+import { deserializeTasks } from '@/lib/storage';
 import { useTaskContext } from '@/contexts/TaskContextV2';
 import { Task } from '@/types/task';
 import {
@@ -25,7 +25,7 @@ interface ImportedData {
 }
 
 export function DataManagement() {
-  const { tasks, addTaskFull } = useTaskContext();
+  const { tasks, addTaskFull, clearAllData } = useTaskContext();
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const [doubleConfirmDialogOpen, setDoubleConfirmDialogOpen] = useState(false);
@@ -232,20 +232,24 @@ export function DataManagement() {
   };
 
   // Limpar todos os dados
-  const clearAllData = () => {
-    setClearDialogOpen(true);
-  };
+  // const clearAllData = () => {
+  //   setClearDialogOpen(true);
+  // };
 
   const handleClearConfirm = () => {
     setClearDialogOpen(false);
     setDoubleConfirmDialogOpen(true);
   };
 
-  const handleDoubleConfirm = () => {
-    localStorage.removeItem(STORAGE_KEYS.TASKS);
-    localStorage.removeItem(STORAGE_KEYS.FILTER);
-    setDoubleConfirmDialogOpen(false);
-    window.location.reload(); // Recarrega a página para limpar o estado
+  const handleDoubleConfirm = async () => {
+    try {
+      await clearAllData();
+      setDoubleConfirmDialogOpen(false);
+      setSuccessMessage('Todos os dados foram excluídos com sucesso!');
+    } catch (error) {
+      console.error('Erro ao limpar dados:', error);
+      setErrorMessage('Erro ao excluir dados. Tente novamente.');
+    }
   };
 
   // Adicionar tarefas de exemplo
@@ -482,7 +486,7 @@ export function DataManagement() {
             <p><strong>Exportar:</strong> Baixa um arquivo JSON com todas as tarefas</p>
             <p><strong>Importar:</strong> Carrega tarefas de um arquivo JSON</p>
             <p><strong>Exemplos:</strong> Adiciona tarefas de demonstração</p>
-            <p><strong>Limpar:</strong> Remove todos os dados do localStorage</p>
+            <p><strong>Limpar:</strong> Remove todos os dados do banco de dados</p>
           </div>
           
           {/* Feedback Messages */}

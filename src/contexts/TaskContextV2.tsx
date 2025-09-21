@@ -578,6 +578,16 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'RESET_FILTERS' });
   };
 
+  const clearAllData = async () => {
+    try {
+      await indexedDBRepository.clearAllData();
+      dispatch({ type: 'LOAD_TASKS', payload: { tasks: [], totalTasks: 0 } });
+    } catch (error) {
+      console.error('Error clearing all data:', error);
+      throw error;
+    }
+  };
+
   return (
     <TaskContext.Provider value={{
       tasks: state.tasks,
@@ -601,7 +611,8 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       setFilter,
       setAdvancedFilters,
       setPagination,
-      resetFilters
+      resetFilters,
+      clearAllData
     }}>
       {children}
     </TaskContext.Provider>
