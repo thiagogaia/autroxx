@@ -325,6 +325,7 @@ export const WEEKLY_CHALLENGES: WeeklyChallenge[] = [
 export class GamificationEngine {
   private userStats: UserStats;
   private events: GamificationEvent[] = [];
+  private nextEventId: number = 1; // ✅ Contador para IDs numéricos
 
   constructor(initialStats?: Partial<UserStats>) {
     this.userStats = {
@@ -458,7 +459,7 @@ export class GamificationEngine {
 
     if (oldLevel !== this.userStats.currentLevel) {
       this.addEvent({
-        id: `level_up_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: this.nextEventId++,
         type: 'level_up',
         message: `Parabéns! Você subiu para o nível ${this.userStats.currentLevel}!`,
         icon: '🎉',
@@ -596,7 +597,7 @@ export class GamificationEngine {
         unlockedAchievements.push(achievement);
         
         this.addEvent({
-          id: `achievement_${achievement.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          id: this.nextEventId++,
           type: 'achievement_unlock',
           message: `Conquista desbloqueada: ${achievement.name}!`,
           value: achievement.xpReward,
@@ -793,7 +794,7 @@ export class GamificationEngine {
         completedChallenges.push(challenge);
         
         this.addEvent({
-          id: `challenge_${challenge.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          id: this.nextEventId++,
           type: 'challenge_complete',
           message: `Desafio concluído: ${challenge.name}!`,
           value: challenge.xpReward,
@@ -900,6 +901,39 @@ export class GamificationEngine {
     challenges: WeeklyChallenge[];
     levelUp: boolean;
   } {
+    // ✅ Verificar se a tarefa já foi pontuada (apenas eventos relacionados a tarefas)
+    const existingXPEvent = this.events.find(event => 
+      event.taskId === task.id && event.type === 'xp_gain'
+    );
+    
+    const existingQPEvent = this.events.find(event => 
+      event.taskId === task.id && event.type === 'qp_gain'
+    );
+    
+    // Se já existe evento de XP para esta tarefa, não processar novamente
+    if (existingXPEvent) {
+      console.log(`Tarefa ${task.id} já foi pontuada com XP anteriormente`);
+      return {
+        xpGained: 0,
+        qpGained: 0,
+        achievements: [],
+        challenges: [],
+        levelUp: false
+      };
+    }
+
+    // Se já existe evento de QP para esta tarefa, não processar novamente
+    if (existingQPEvent) {
+      console.log(`Tarefa ${task.id} já foi pontuada com QP anteriormente`);
+      return {
+        xpGained: 0,
+        qpGained: 0,
+        achievements: [],
+        challenges: [],
+        levelUp: false
+      };
+    }
+
     const xpGained = this.calculateTaskXP(task);
     const qpGained = this.calculateQualityPoints(allTasks);
     
@@ -914,25 +948,27 @@ export class GamificationEngine {
     
     // Adicionar evento de ganho de XP
     this.addEvent({
-      id: `xp_gain_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: this.nextEventId++,
       type: 'xp_gain',
       message: `+${xpGained} XP por completar "${task.titulo}"`,
       value: xpGained,
       icon: '⭐',
       timestamp: new Date(),
-      dismissed: false
+      dismissed: false,
+      taskId: task.id
     });
 
     // Adicionar evento de ganho de QP se houver
     if (qpGained > 0) {
       this.addEvent({
-        id: `qp_gain_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: this.nextEventId++,
         type: 'qp_gain',
         message: `+${qpGained} QP por qualidade`,
         value: qpGained,
         icon: '💎',
         timestamp: new Date(),
-        dismissed: false
+        dismissed: false,
+        taskId: task.id
       });
     }
 
@@ -943,6 +979,35 @@ export class GamificationEngine {
       challenges,
       levelUp
     };
+  }
+
+  // Recalcular estatísticas baseado em eventos existentes
+  recalculateStatsFromEvents(): void {
+    // Resetar estatísticas
+    this.userStats.totalXP = 0;
+    this.userStats.totalQP = 0;
+    
+    // Somar XP e QP dos eventos válidos
+    this.events.forEach(event => {
+      if (event.type === 'xp_gain' && event.value) {
+        this.userStats.totalXP += event.value;
+      } else if (event.type === 'qp_gain' && event.value) {
+        this.userStats.totalQP += event.value;
+      }
+    });
+    
+    // Atualizar nível baseado no XP recalculado
+    this.updateLevel();
+  }
+
+  // Inicializar nextEventId baseado nos eventos existentes
+  initializeEventId(): void {
+    if (this.events.length > 0) {
+      const maxId = Math.max(...this.events.map(event => event.id));
+      this.nextEventId = maxId + 1;
+    } else {
+      this.nextEventId = 1;
+    }
   }
 
   // Obter estatísticas do usuário
@@ -972,7 +1037,7 @@ export class GamificationEngine {
       powerUp.activeUntil = new Date(Date.now() + powerUp.duration * 60 * 1000);
       
       this.addEvent({
-        id: `power_up_${powerUpId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: this.nextEventId++,
         type: 'power_up_activate',
         message: `Power-up ativado: ${powerUp.name}`,
         icon: powerUp.icon,
@@ -1005,7 +1070,7 @@ export class GamificationEngine {
                type === 'speed' ? this.userStats.averageCompletionTime :
                this.userStats.impedimentFreeWeeks,
         level: this.userStats.currentLevel,
-        rank: this.userStats.currentRank
+        userRank: this.userStats.currentRank
       },
       {
         rank: 2,
@@ -1015,7 +1080,7 @@ export class GamificationEngine {
                type === 'speed' ? 180 :
                3,
         level: 'mestre',
-        rank: 'estimador'
+        userRank: 'estimador'
       },
       {
         rank: 3,
@@ -1025,7 +1090,7 @@ export class GamificationEngine {
                type === 'speed' ? 240 :
                2,
         level: 'especialista',
-        rank: 'speed_demon'
+        userRank: 'speed_demon'
       }
     ];
 

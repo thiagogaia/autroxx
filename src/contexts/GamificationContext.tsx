@@ -75,6 +75,12 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
           event.timestamp = new Date(event.timestamp);
         });
         setEvents(parsedEvents);
+        
+        // Recalcular estatísticas baseado nos eventos carregados
+        engine.events = parsedEvents;
+        engine.initializeEventId(); // ✅ Inicializar nextEventId
+        engine.recalculateStatsFromEvents();
+        setUserStats(engine.getUserStats());
       } catch (error) {
         console.error('Erro ao carregar eventos de gamificação:', error);
       }

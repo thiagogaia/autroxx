@@ -59,13 +59,14 @@ export interface UserStats {
 }
 
 export interface GamificationEvent {
-  id: string;
+  id: number; // ✅ Mudado para numérico para futura implementação de autoincrement
   type: 'xp_gain' | 'qp_gain' | 'level_up' | 'achievement_unlock' | 'challenge_complete' | 'power_up_activate';
   message: string;
   value?: number;
   icon: string;
   timestamp: Date;
   dismissed: boolean;
+  taskId?: number; // Referência à tarefa que gerou o evento
 }
 
 export interface LeaderboardEntry {
@@ -73,7 +74,7 @@ export interface LeaderboardEntry {
   name: string;
   value: number;
   level: UserLevel;
-  rank: UserRank;
+  userRank: UserRank;
 }
 
 export interface GamificationConfig {
