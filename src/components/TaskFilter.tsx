@@ -1,7 +1,7 @@
 'use client';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useTaskContext } from '@/contexts/TaskContextV2';
+import { useTaskContext } from '@/contexts/TaskContextIndexedDB';
 import { FilterType } from '@/types/task';
 
 export function TaskFilter() {

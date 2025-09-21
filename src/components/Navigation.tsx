@@ -9,7 +9,8 @@ import {
   BarChart3, 
   Trophy, 
   Settings,
-  Sparkles
+  Sparkles,
+  Database
 } from 'lucide-react';
 import { useGamification } from '@/contexts/GamificationContext';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -23,6 +24,8 @@ export function Navigation() {
     { href: '/reports', label: 'Relatórios', icon: BarChart3 },
     { href: '/essencial', label: 'Essencial', icon: BarChart3 },
     { href: '/gamification', label: 'Forja XP', icon: Trophy },
+    { href: '/indexeddb-demo', label: 'IndexedDB Demo', icon: Database },
+    { href: '/settings', label: 'Configurações', icon: Settings },
   ];
 
   const isActive = (href: string) => {

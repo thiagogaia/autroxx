@@ -33,9 +33,9 @@ export class RepositoryFactory {
   
   static async getTaskRepository(): Promise<ITaskRepository> {
     if (!this.instance) {
-      // Usar SQLite OPFS (versão simplificada com IndexedDB)
-      const { SQLiteOPFSTaskRepository } = await import('./sqlite-opfs-repo-simple');
-      this.instance = new SQLiteOPFSTaskRepository();
+      // Usar IndexedDB exclusivamente
+      const { IndexedDBTaskRepository } = await import('./indexeddb-repo');
+      this.instance = new IndexedDBTaskRepository();
     }
     return this.instance;
   }

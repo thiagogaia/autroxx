@@ -75,7 +75,10 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
       };
 
     case 'LOAD_TASKS':
-      const tasksWithOrder = action.payload.tasks.map((task, index) => ({
+      if (!action.payload.tasks) {
+        return state;
+      }
+      const tasksWithOrder = action.payload.tasks && action.payload.tasks.map((task, index) => ({
         ...task,
         ordem: task.ordem !== undefined ? task.ordem : index
       }));

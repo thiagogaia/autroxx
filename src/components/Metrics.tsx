@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useTaskContext } from '@/contexts/TaskContextV2';
+import { useTaskContext } from '@/contexts/TaskContextIndexedDB';
 import { 
   CheckCircle, 
   Clock, 

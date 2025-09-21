@@ -24,7 +24,7 @@ import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components
 import { Card } from '@/components/ui/card';
 import { SortableTaskItem } from './SortableTaskItem';
 import { EmptyState } from './EmptyState';
-import { useTaskContext } from '@/contexts/TaskContextV2';
+import { useTaskContext } from '@/contexts/TaskContextIndexedDB';
 import { ArrowUpDown } from 'lucide-react';
 
 export function TaskList() {

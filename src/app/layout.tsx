@@ -4,6 +4,7 @@ import './drag-drop.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import { GamificationProvider } from '@/contexts/GamificationContext'
 import { TaskGamificationProvider } from '@/contexts/TaskGamificationIntegration'
+import { TaskProviderIndexedDB } from '@/contexts/TaskContextIndexedDB'
 import { Toaster } from '@/components/ui/sonner'
 import { GamificationNotifications } from '@/components/GamificationNotifications'
 
@@ -38,13 +39,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <GamificationProvider>
-            <TaskGamificationProvider>
-              {children}
-              <GamificationNotifications />
-              <Toaster />
-            </TaskGamificationProvider>
-          </GamificationProvider>
+          <TaskProviderIndexedDB>
+            <GamificationProvider>
+              <TaskGamificationProvider>
+                {children}
+                <GamificationNotifications />
+                <Toaster />
+              </TaskGamificationProvider>
+            </GamificationProvider>
+          </TaskProviderIndexedDB>
         </ThemeProvider>
       </body>
     </html>
