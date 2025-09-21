@@ -9,7 +9,7 @@ export default function GamificationPage() {
         <Navigation />
         <GamificationDashboard />
         {/* Gamificação */}
-        <GamificationWidget />
+        {/* <GamificationWidget /> */}
       </div>
     </div>
   );
