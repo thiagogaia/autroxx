@@ -165,7 +165,8 @@ export class IndexedDBTaskRepository {
     }
 
     // Aplicar paginação manualmente após ordenação
-    const start = pagination.offset;
+    // Calcular offset baseado na página atual
+    const start = (pagination.page - 1) * pagination.limit;
     const end = start + pagination.limit;
     const paginatedData = data.slice(start, end);
 

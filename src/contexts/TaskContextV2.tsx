@@ -315,7 +315,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     }
   }, [state.advancedFilters, state.pagination, state.loading]);
 
-  // Calcular tarefas paginadas
+  // Calcular tarefas paginadas - as tarefas já vêm paginadas do repositório
   const paginatedTasks = useMemo(() => {
     return state.tasks;
   }, [state.tasks]);
