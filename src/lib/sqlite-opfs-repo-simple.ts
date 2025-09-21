@@ -155,43 +155,98 @@ export class SQLiteOPFSTaskRepository implements ITaskRepository {
     if (!this.db) throw new Error('Database not initialized');
 
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(['tasks'], 'readonly');
-      const store = transaction.objectStore('tasks');
-      const request = store.getAll();
+      const transaction = this.db!.transaction(['tasks', 'status_history', 'impediment_history'], 'readonly');
+      const taskStore = transaction.objectStore('tasks');
+      const statusStore = transaction.objectStore('status_history');
+      const impedimentStore = transaction.objectStore('impediment_history');
       
-      request.onsuccess = () => {
-        const allTasks = request.result;
-        
-        // Aplicar filtros
-        let filteredTasks = allTasks.filter(task => this.matchesTask(task, query?.spec));
-        
-        // Aplicar ordenação
-        if (query?.page?.sort && query.page.sort.length > 0) {
-          filteredTasks = this.sortTasks(filteredTasks, query.page.sort);
-        } else {
-          filteredTasks = this.sortTasks(filteredTasks, [{ field: 'data_cadastro', dir: 'desc' }]);
+      const taskRequest = taskStore.getAll();
+      
+      taskRequest.onsuccess = async () => {
+        try {
+          const allTasks = taskRequest.result;
+          
+          // Aplicar filtros
+          let filteredTasks = allTasks.filter(task => this.matchesTask(task, query?.spec));
+          
+          // Aplicar ordenação
+          if (query?.page?.sort && query.page.sort.length > 0) {
+            filteredTasks = this.sortTasks(filteredTasks, query.page.sort);
+          } else {
+            filteredTasks = this.sortTasks(filteredTasks, [{ field: 'data_cadastro', dir: 'desc' }]);
+          }
+          
+          // Aplicar paginação
+          const page = query?.page?.page || 1;
+          const size = query?.page?.size || 10;
+          const start = (page - 1) * size;
+          const end = start + size;
+          
+          const paginatedTasks = filteredTasks.slice(start, end);
+          
+          // Buscar histórico para cada tarefa
+          const tasksWithHistory = await Promise.all(
+            paginatedTasks.map(async (task) => {
+              const statusHistory = await this.getStatusHistory(task.id, statusStore);
+              const impedimentHistory = await this.getImpedimentHistory(task.id, impedimentStore);
+              return this.mapRowToTask(task, statusHistory, impedimentHistory);
+            })
+          );
+          
+          resolve({
+            items: tasksWithHistory,
+            total: filteredTasks.length,
+            page,
+            size
+          });
+        } catch (error) {
+          reject(error);
         }
-        
-        // Aplicar paginação
-        const page = query?.page?.page || 1;
-        const size = query?.page?.size || 10;
-        const start = (page - 1) * size;
-        const end = start + size;
-        
-        const paginatedTasks = filteredTasks.slice(start, end);
-        
-        // Converter para Task objects
-        const tasks = paginatedTasks.map(task => this.mapRowToTask(task, [], []));
-        
-        resolve({
-          items: tasks,
-          total: filteredTasks.length,
-          page,
-          size
-        });
       };
       
-      request.onerror = () => reject(request.error);
+      taskRequest.onerror = () => reject(taskRequest.error);
+    });
+  }
+
+  /**
+   * Busca histórico de status para uma tarefa
+   */
+  private async getStatusHistory(taskId: ID, statusStore: IDBObjectStore): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      const statusIndex = statusStore.index('task_id');
+      const statusRequest = statusIndex.getAll(taskId);
+      
+      statusRequest.onsuccess = () => {
+        const statusHistory = statusRequest.result.map((entry: any) => ({
+          status: entry.status,
+          timestamp: new Date(entry.timestamp)
+        }));
+        resolve(statusHistory);
+      };
+      
+      statusRequest.onerror = () => reject(statusRequest.error);
+    });
+  }
+
+  /**
+   * Busca histórico de impedimentos para uma tarefa
+   */
+  private async getImpedimentHistory(taskId: ID, impedimentStore: IDBObjectStore): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      const impedimentIndex = impedimentStore.index('task_id');
+      const impedimentRequest = impedimentIndex.getAll(taskId);
+      
+      impedimentRequest.onsuccess = () => {
+        const impedimentHistory = impedimentRequest.result.map((entry: any) => ({
+          id: entry.id,
+          impedimento: entry.impedimento,
+          motivo: entry.motivo,
+          timestamp: new Date(entry.timestamp)
+        }));
+        resolve(impedimentHistory);
+      };
+      
+      impedimentRequest.onerror = () => reject(impedimentRequest.error);
     });
   }
 
@@ -244,29 +299,47 @@ export class SQLiteOPFSTaskRepository implements ITaskRepository {
    * Salva histórico de status e impedimentos
    */
   private saveHistory(entity: Task, statusStore: IDBObjectStore, impedimentStore: IDBObjectStore): void {
-    // Salvar histórico de status
-    if (entity.statusHistorico && entity.statusHistorico.length > 0) {
-      entity.statusHistorico.forEach(entry => {
-        statusStore.add({
-          task_id: entity.id,
-          status: entry.status,
-          timestamp: (entry.timestamp instanceof Date ? entry.timestamp : new Date(entry.timestamp)).toISOString()
-        });
+    // Limpar histórico anterior de status
+    const statusIndex = statusStore.index('task_id');
+    const statusRequest = statusIndex.getAll(entity.id);
+    statusRequest.onsuccess = () => {
+      statusRequest.result.forEach(entry => {
+        statusStore.delete(entry.id || entry.key);
       });
-    }
+      
+      // Salvar novo histórico de status
+      if (entity.statusHistorico && entity.statusHistorico.length > 0) {
+        entity.statusHistorico.forEach(entry => {
+          statusStore.add({
+            task_id: entity.id,
+            status: entry.status,
+            timestamp: (entry.timestamp instanceof Date ? entry.timestamp : new Date(entry.timestamp)).toISOString()
+          });
+        });
+      }
+    };
     
-    // Salvar histórico de impedimentos
-    if (entity.impedimentoHistorico && entity.impedimentoHistorico.length > 0) {
-      entity.impedimentoHistorico.forEach(entry => {
-        impedimentStore.add({
-          id: entry.id,
-          task_id: entity.id,
-          impedimento: entry.impedimento,
-          motivo: entry.motivo,
-          timestamp: (entry.timestamp instanceof Date ? entry.timestamp : new Date(entry.timestamp)).toISOString()
-        });
+    // Limpar histórico anterior de impedimentos
+    const impedimentIndex = impedimentStore.index('task_id');
+    const impedimentRequest = impedimentIndex.getAll(entity.id);
+    impedimentRequest.onsuccess = () => {
+      impedimentRequest.result.forEach(entry => {
+        impedimentStore.delete(entry.id);
       });
-    }
+      
+      // Salvar novo histórico de impedimentos
+      if (entity.impedimentoHistorico && entity.impedimentoHistorico.length > 0) {
+        entity.impedimentoHistorico.forEach(entry => {
+          impedimentStore.add({
+            id: entry.id,
+            task_id: entity.id,
+            impedimento: entry.impedimento,
+            motivo: entry.motivo,
+            timestamp: (entry.timestamp instanceof Date ? entry.timestamp : new Date(entry.timestamp)).toISOString()
+          });
+        });
+      }
+    };
   }
 
   /**
