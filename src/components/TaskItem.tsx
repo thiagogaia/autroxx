@@ -192,7 +192,7 @@ export function TaskItem({ task }: TaskItemProps) {
                   <AlertDialogCancel>Cancelar</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDeleteTask}
-                    className="bg-red-600 hover:bg-red-700"
+                    className=""
                   >
                     Excluir
                   </AlertDialogAction>
