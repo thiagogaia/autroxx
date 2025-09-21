@@ -24,12 +24,12 @@ export const deserializeTasks = (tasksJson: string): Task[] => {
   try {
     const parsed = JSON.parse(tasksJson);
     
-    return parsed.map((task: any) => ({
+    return parsed.map((task: Record<string, unknown>) => ({
       ...task,
-      dataCadastro: new Date(task.dataCadastro),
-      dataInicio: task.dataInicio ? new Date(task.dataInicio) : null,
-      dataFim: task.dataFim ? new Date(task.dataFim) : null,
-      dataImpedimento: task.dataImpedimento ? new Date(task.dataImpedimento) : null
+      dataCadastro: new Date(task.dataCadastro as string),
+      dataInicio: task.dataInicio ? new Date(task.dataInicio as string) : null,
+      dataFim: task.dataFim ? new Date(task.dataFim as string) : null,
+      dataImpedimento: task.dataImpedimento ? new Date(task.dataImpedimento as string) : null
     }));
   } catch (error) {
     console.warn('Erro ao deserializar tarefas:', error);

@@ -1,6 +1,10 @@
+// domain.ts — Contratos e tipos comuns para Specification/Query Object Pattern
+
+export type ID = string | number;
+
+// Tipos existentes do projeto
 export type TaskStatus = 'a_fazer' | 'fazendo' | 'concluido';
 export type TaskPriority = 'baixa' | 'normal' | 'media' | 'alta';
-export type FilterType = 'tudo' | 'a_fazer' | 'fazendo' | 'concluido' | 'normal' | 'urgente';
 export type TaskCategory = 'feature' | 'desenvolvimento' | 'qa' | 'devops' | 'bug' | 'atendimento' | 'comercial' | 'juridico' | 'design' | 'documentacao' | 'reuniao' | 'sem_categoria' | 'outro';
 export type TaskComplexity = 'simples' | 'media' | 'complexa';
 
@@ -16,35 +20,73 @@ export interface ImpedimentoHistoryEntry {
   timestamp: Date;
 }
 
+// Entidade Task principal
 export interface Task {
   id: number;
   titulo: string;
-  descricao: string; // Campo para detalhes/anotações da tarefa
+  descricao: string;
   statusHistorico: StatusHistoryEntry[];
   statusAtual: TaskStatus;
   prioridade: TaskPriority;
   impedimento: boolean;
   impedimentoMotivo: string;
-  impedimentoHistorico: ImpedimentoHistoryEntry[]; // Histórico de impedimentos
-  dataImpedimento: Date | null; // Data do impedimento (quando foi marcado)
-  dataCadastro: Date; // Data de cadastro da tarefa
-  dataInicio: Date | null; // Data de início (quando muda para "fazendo")
-  dataFim: Date | null; // Data de fim (quando muda para "concluido")
-  ordem?: number; // Novo campo para ordenação
-  tags?: string[]; // Tags para categorizar a tarefa
-  categoria?: TaskCategory; // Categoria da tarefa
-  estimativaTempo?: number; // Estimativa em minutos
-  complexidade?: TaskComplexity; // Complexidade da tarefa
-  numeroMudancasPrioridade?: number; // Número de mudanças de prioridade
-  tempoTotalImpedimento?: number; // Tempo total de impedimento em minutos
-  foiRetrabalho?: boolean; // Se foi retrabalho
-  referenced_task_id?: string | null; // Referência cruzada (bugs, retrabalhos, dependências)
-  parent_id?: string | null; // Árvore de tarefas (para feature futura)
-  is_active?: boolean; // Visível na listagem? -> não
-  rsync?: boolean; // Visível na listagem? -> não
-  id_rsync?: number | null; // Visível na listagem? -> não
+  impedimentoHistorico: ImpedimentoHistoryEntry[];
+  dataImpedimento: Date | null;
+  dataCadastro: Date;
+  dataInicio: Date | null;
+  dataFim: Date | null;
+  ordem?: number;
+  tags?: string[];
+  categoria?: TaskCategory;
+  estimativaTempo?: number;
+  complexidade?: TaskComplexity;
+  numeroMudancasPrioridade?: number;
+  tempoTotalImpedimento?: number;
+  foiRetrabalho?: boolean;
+  referenced_task_id?: string | null;
+  parent_id?: string | null;
+  is_active?: boolean;
+  rsync?: boolean;
+  id_rsync?: number | null;
 }
 
+// Tipos para ordenação
+export type SortDir = "asc" | "desc";
+export type Sort<T> = { field: keyof T; dir: SortDir };
+
+// Tipos para paginação
+export type PageRequest = { page: number; size: number; sort?: Sort<Task>[] };
+export type Page<T> = { items: T[]; total: number; page: number; size: number };
+
+// Tipos para filtros
+export type FilterOp = "eq" | "neq" | "gt" | "lt" | "gte" | "lte" | "contains" | "in" | "between" | "is_null" | "is_not_null";
+export type FilterRule<T> = { field: keyof T; op: FilterOp; value: unknown };
+
+// Specification (filtros compostos)
+export type Spec<T> = {
+  and?: Spec<T>[];
+  or?: Spec<T>[];
+  not?: Spec<T>;
+  where?: FilterRule<T>[];
+};
+
+// Query Object = Spec + paginação/ordenação
+export type Query<T> = { spec?: Spec<T>; page?: PageRequest };
+
+// Repository genérico
+export interface Repository<T extends { id: ID }> {
+  get(id: ID): Promise<T | null>;
+  search(query?: Query<T>): Promise<Page<T>>;
+  save(entity: T): Promise<T>;
+  update(id: ID, patch: Partial<T>): Promise<T>;
+  delete(id: ID): Promise<void>;
+  count(query?: Query<T>): Promise<number>;
+}
+
+// Tipos específicos para compatibilidade com o sistema atual
+export type FilterType = 'tudo' | 'a_fazer' | 'fazendo' | 'concluido' | 'normal' | 'urgente';
+
+// Configurações de status e prioridade (mantidas para compatibilidade)
 export interface StatusConfig {
   label: string;
   color: string;
@@ -60,7 +102,7 @@ export interface PriorityConfig {
   badge: string;
 }
 
-// Tipos para paginação (preparado para migração SQL)
+// Tipos para migração gradual (mantidos para compatibilidade)
 export interface PaginationParams {
   page: number;
   limit: number;
@@ -79,12 +121,8 @@ export interface PaginationResult<T> {
   };
 }
 
-// Tipos para filtros avançados (preparado para migração SQL)
 export interface TaskFilters {
-  // Filtros básicos (abas existentes)
   statusFilter: FilterType;
-  
-  // Filtros avançados
   titleSearch?: string;
   dateRange?: {
     start: Date | null;
@@ -93,24 +131,19 @@ export interface TaskFilters {
   priorityFilter?: TaskPriority[];
   categoryFilter?: TaskCategory[];
   tagsFilter?: string[];
-  impedimentFilter?: boolean | null; // null = todos, true = com impedimento, false = sem impedimento
+  impedimentFilter?: boolean | null;
   complexityFilter?: TaskComplexity[];
-  
-  // Ordenação
   sortBy?: 'dataCadastro' | 'titulo' | 'prioridade' | 'dataInicio' | 'dataFim';
   sortOrder?: 'asc' | 'desc';
 }
 
+// Contexto de Task (mantido para compatibilidade)
 export interface TaskContextType {
   tasks: Task[];
   filtroAtivo: FilterType;
-  
-  // Paginação
   pagination: PaginationParams;
   paginatedTasks: Task[];
   totalTasks: number;
-  
-  // Filtros avançados
   advancedFilters: TaskFilters;
   
   // Métodos básicos
@@ -130,6 +163,3 @@ export interface TaskContextType {
   setPagination: (params: Partial<PaginationParams>) => void;
   resetFilters: () => void;
 }
-
-// Re-exportar tipos do novo padrão para compatibilidade
-export * from './domain';
