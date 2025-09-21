@@ -81,11 +81,11 @@ export class IndexedDBTaskRepository {
   }
 
   // Métodos básicos CRUD
-  async create(task: Omit<Task, 'id'>): Promise<Task> {
+  async create(task: Omit<Task, 'id'> | Task): Promise<Task> {
     const now = new Date();
     const taskWithSync: TaskWithSync = {
       ...task,
-      id: await this.generateId(),
+      id: 'id' in task ? task.id : await this.generateId(),
       syncMetadata: {
         id: `sync_${Date.now()}_${Math.random()}`,
         lastModified: now,
