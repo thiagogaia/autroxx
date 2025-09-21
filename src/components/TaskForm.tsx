@@ -8,19 +8,19 @@ import { useTaskContext } from '@/contexts/TaskContextV2';
 import { TaskPriority } from '@/types/task';
 
 export function TaskForm() {
-  const { addTask, filtroAtivo } = useTaskContext();
+  const { addTask, filtroAtivo, isCreatingTask } = useTaskContext();
   const [novaTarefa, setNovaTarefa] = useState('');
   const [prioridadeNovaTarefa, setPrioridadeNovaTarefa] = useState<TaskPriority>('normal');
 
-  const handleSubmit = () => {
-    if (novaTarefa.trim()) {
+  const handleSubmit = async () => {
+    if (novaTarefa.trim() && !isCreatingTask) {
       // Determina a prioridade baseada na aba ativa
       let prioridade: TaskPriority = 'normal';
       if (filtroAtivo === 'urgente') prioridade = 'alta';
       else if (filtroAtivo === 'normal') prioridade = 'normal';
       else prioridade = prioridadeNovaTarefa; // Usa o select quando está na aba "tudo"
 
-      addTask(novaTarefa.trim(), prioridade);
+      await addTask(novaTarefa.trim(), prioridade);
       setNovaTarefa('');
       setPrioridadeNovaTarefa('normal');
     }
@@ -39,15 +39,20 @@ export function TaskForm() {
           type="text"
           value={novaTarefa}
           onChange={(e) => setNovaTarefa(e.target.value)}
-          placeholder="Digite uma nova tarefa..."
+          placeholder={isCreatingTask ? "Criando tarefa..." : "Digite uma nova tarefa..."}
           onKeyPress={handleKeyPress}
+          disabled={isCreatingTask}
         />
       </div>
       
       {/* Select de Prioridade - só aparece na aba "tudo" */}
       {filtroAtivo === 'tudo' && (
         <div>
-          <Select value={prioridadeNovaTarefa} onValueChange={(value: TaskPriority) => setPrioridadeNovaTarefa(value)}>
+          <Select 
+            value={prioridadeNovaTarefa} 
+            onValueChange={(value: TaskPriority) => setPrioridadeNovaTarefa(value)}
+            disabled={isCreatingTask}
+          >
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -61,8 +66,8 @@ export function TaskForm() {
         </div>
       )}
       
-      <Button onClick={handleSubmit}>
-        Adicionar
+      <Button onClick={handleSubmit} disabled={isCreatingTask}>
+        {isCreatingTask ? "Criando..." : "Adicionar"}
       </Button>
     </div>
   );

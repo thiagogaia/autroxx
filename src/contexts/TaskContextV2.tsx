@@ -19,7 +19,8 @@ type TaskAction =
   | { type: 'RESET_FILTERS' }
   | { type: 'LOAD_TASKS'; payload: { tasks: Task[]; totalTasks?: number } }
   | { type: 'DELETE_TASK'; payload: { id: number } }
-  | { type: 'REORDER_TASKS'; payload: { taskIds: number[] } };
+  | { type: 'REORDER_TASKS'; payload: { taskIds: number[] } }
+  | { type: 'SET_CREATING_TASK'; payload: { isCreating: boolean } };
 
 interface TaskState {
   tasks: Task[];
@@ -29,6 +30,7 @@ interface TaskState {
   loading: boolean;
   error: string | null;
   totalTasks: number;
+  isCreatingTask: boolean;
 }
 
 const initialPagination: PaginationParams = {
@@ -57,7 +59,8 @@ const initialState: TaskState = {
   advancedFilters: initialAdvancedFilters,
   loading: true,
   error: null,
-  totalTasks: 0
+  totalTasks: 0,
+  isCreatingTask: false
 };
 
 function taskReducer(state: TaskState, action: TaskAction): TaskState {
@@ -267,6 +270,12 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         filtroAtivo: 'tudo'
       };
 
+    case 'SET_CREATING_TASK':
+      return {
+        ...state,
+        isCreatingTask: action.payload.isCreating
+      };
+
     default:
       return state;
   }
@@ -322,9 +331,9 @@ export function TaskProvider({ children }: { children: ReactNode }) {
 
   // Funções do contexto
   const addTask = async (titulo: string, prioridade: TaskPriority = 'normal') => {
-    dispatch({ type: 'ADD_TASK', payload: { titulo, prioridade } });
+    // Iniciar loading
+    dispatch({ type: 'SET_CREATING_TASK', payload: { isCreating: true } });
     
-    // Salvar no IndexedDB
     try {
       const now = new Date();
       const newTask: Task = {
@@ -356,9 +365,20 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         id_rsync: null
       };
       
+      // Salvar no IndexedDB
       await indexedDBRepository.create(newTask);
+      
+      // Recarregar a listagem de tarefas para mostrar a nova tarefa
+      const result = await indexedDBRepository.search(state.advancedFilters, state.pagination);
+      const totalCount = await indexedDBRepository.count(state.advancedFilters);
+      dispatch({ type: 'LOAD_TASKS', payload: { tasks: result.data, totalTasks: totalCount } });
+      
     } catch (error) {
       console.error('Error saving task to IndexedDB:', error);
+      alert('Erro ao adicionar tarefa');
+    } finally {
+      // Finalizar loading
+      dispatch({ type: 'SET_CREATING_TASK', payload: { isCreating: false } });
     }
   };
 
@@ -539,6 +559,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       paginatedTasks,
       totalTasks: state.totalTasks,
       advancedFilters: state.advancedFilters,
+      isCreatingTask: state.isCreatingTask,
       addTask,
       addTaskFull,
       updateTaskStatus,

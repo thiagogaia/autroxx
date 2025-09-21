@@ -113,8 +113,11 @@ export interface TaskContextType {
   // Filtros avançados
   advancedFilters: TaskFilters;
   
+  // Estados de loading
+  isCreatingTask: boolean;
+  
   // Métodos básicos
-  addTask: (titulo: string, prioridade?: TaskPriority) => void;
+  addTask: (titulo: string, prioridade?: TaskPriority) => Promise<void>;
   addTaskFull: (task: Task) => void;
   updateTaskStatus: (id: number, status: TaskStatus) => void;
   updateTaskPriority: (id: number, prioridade: TaskPriority) => void;
