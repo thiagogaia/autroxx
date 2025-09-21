@@ -19,14 +19,7 @@ export function useTaskRepository() {
         setRepository(repo);
       } catch (error) {
         console.error('Erro ao inicializar repository:', error);
-        // Fallback para LocalStorage usando import dinâmico
-        try {
-          const { LocalStorageTaskRepository } = await import('@/lib/localstorage-repo');
-          const fallbackRepo = new LocalStorageTaskRepository();
-          setRepository(fallbackRepo);
-        } catch (fallbackError) {
-          console.error('Erro no fallback:', fallbackError);
-        }
+        // Não há mais fallback - usar apenas SQLite
       }
     };
     

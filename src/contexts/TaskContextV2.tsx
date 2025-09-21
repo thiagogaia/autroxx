@@ -2,8 +2,9 @@
 
 import React, { createContext, useContext, useReducer, useEffect, ReactNode, useMemo } from 'react';
 import { Task, TaskContextType, TaskStatus, TaskPriority, FilterType, ImpedimentoHistoryEntry, PaginationParams, TaskFilters } from '@/types/task';
-import { ITaskRepository, Query, PageRequest } from '@/types/domain';
-import { LocalStorageTaskRepository } from '@/lib/localstorage-repo';
+import { ITaskRepository } from '@/lib/repository';
+import { Query, PageRequest } from '@/types/domain';
+import { RepositoryFactory } from '@/lib/repository';
 import { taskFiltersToSpec, taskFiltersToPageRequest } from '@/lib/query-utils';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { STORAGE_KEYS } from '@/lib/storage';
@@ -60,7 +61,7 @@ const initialState: TaskState = {
   filtroAtivo: 'tudo',
   pagination: initialPagination,
   advancedFilters: initialAdvancedFilters,
-  repository: new LocalStorageTaskRepository(),
+  repository: null as any, // Será inicializado no useEffect
   loading: false,
   error: null
 };
@@ -323,9 +324,23 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(taskReducer, initialState);
   const [filtroAtivo, setFiltroAtivo, filterLoaded] = useLocalStorage<FilterType>(STORAGE_KEYS.FILTER, 'tudo');
 
+  // Inicializar repository usando RepositoryFactory
+  useEffect(() => {
+    const initRepository = async () => {
+      try {
+        const repository = await RepositoryFactory.getTaskRepository();
+        dispatch({ type: 'SET_REPOSITORY', payload: { repository } });
+      } catch (error) {
+        console.error('Erro ao inicializar repository:', error);
+      }
+    };
+    
+    initRepository();
+  }, []);
+
   // Converter filtros atuais para Specification/Query Object
   const currentQuery = useMemo((): Query<Task> => {
-    const spec = taskFiltersToSpec(state.advancedFilters);
+    const spec = taskFiltersToSpec(state.advancedFilters as unknown as Record<string, unknown>);
     const pageRequest: PageRequest = {
       page: state.pagination.page,
       size: state.pagination.limit,
@@ -335,11 +350,15 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       }] : undefined
     };
     
-    return { spec, page: pageRequest };
+    return { spec: spec as any, page: pageRequest };
   }, [state.advancedFilters, state.pagination]);
 
   // Buscar tarefas usando o repository
   const searchTasks = useMemo(async () => {
+    if (!state.repository) {
+      return { items: [], total: 0, page: 1, size: 10 };
+    }
+    
     try {
       const result = await state.repository.search(currentQuery);
       return result;
@@ -364,7 +383,11 @@ export function TaskProvider({ children }: { children: ReactNode }) {
 
   // Carregar tarefas do repository na inicialização
   useEffect(() => {
+    if (!state.repository) return; // Só executa quando repository estiver disponível
+    
     const loadTasks = async () => {
+      if (!state.repository) return; // Só executa quando repository estiver disponível
+      
       try {
         dispatch({ type: 'LOAD_TASKS', payload: { tasks: [] } }); // Reset loading
         const result = await state.repository.search({
@@ -388,6 +411,8 @@ export function TaskProvider({ children }: { children: ReactNode }) {
 
   // Salvar tarefas no repository sempre que mudarem
   useEffect(() => {
+    if (!state.repository) return; // Só executa quando repository estiver disponível
+    
     const saveTasks = async () => {
       if (state.tasks.length > 0) {
         try {

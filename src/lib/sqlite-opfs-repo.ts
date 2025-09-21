@@ -1,6 +1,7 @@
 // sqlite-opfs-repo.ts — Implementação SQLite real com OPFS usando wa-sqlite
 
-import { ITaskRepository, Task, Query, Page, ID } from '@/types/domain';
+import { ITaskRepository } from '@/lib/repository';
+import { Task, Query, Page, ID } from '@/types/domain';
 import { matches, paginate, sortArray } from '@/lib/query-utils';
 import { TaskStatus, TaskPriority, TaskCategory, TaskComplexity } from '@/types/domain';
 

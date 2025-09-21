@@ -211,38 +211,62 @@ export class SQLiteOPFSTaskRepository implements ITaskRepository {
       // Converter Task para formato do banco
       const dbTask = this.mapTaskToDb(entity);
       
-      const taskRequest = taskStore.add(dbTask);
+      // Verificar se já existe
+      const checkRequest = taskStore.get(entity.id);
       
-      taskRequest.onsuccess = () => {
-        // Salvar histórico de status
-        if (entity.statusHistorico && entity.statusHistorico.length > 0) {
-          entity.statusHistorico.forEach(entry => {
-            statusStore.add({
-              task_id: entity.id,
-              status: entry.status,
-              timestamp: (entry.timestamp instanceof Date ? entry.timestamp : new Date(entry.timestamp)).toISOString()
-            });
-          });
-        }
+      checkRequest.onsuccess = () => {
+        const existingTask = checkRequest.result;
         
-        // Salvar histórico de impedimentos
-        if (entity.impedimentoHistorico && entity.impedimentoHistorico.length > 0) {
-          entity.impedimentoHistorico.forEach(entry => {
-            impedimentStore.add({
-              id: entry.id,
-              task_id: entity.id,
-              impedimento: entry.impedimento,
-              motivo: entry.motivo,
-              timestamp: (entry.timestamp instanceof Date ? entry.timestamp : new Date(entry.timestamp)).toISOString()
-            });
-          });
+        if (existingTask) {
+          // Tarefa já existe - usar update
+          const updateRequest = taskStore.put(dbTask);
+          updateRequest.onsuccess = () => {
+            this.saveHistory(entity, statusStore, impedimentStore);
+            resolve(entity);
+          };
+          updateRequest.onerror = () => reject(updateRequest.error);
+        } else {
+          // Tarefa não existe - usar add
+          const addRequest = taskStore.add(dbTask);
+          addRequest.onsuccess = () => {
+            this.saveHistory(entity, statusStore, impedimentStore);
+            resolve(entity);
+          };
+          addRequest.onerror = () => reject(addRequest.error);
         }
-        
-        resolve(entity);
       };
       
-      taskRequest.onerror = () => reject(taskRequest.error);
+      checkRequest.onerror = () => reject(checkRequest.error);
     });
+  }
+
+  /**
+   * Salva histórico de status e impedimentos
+   */
+  private saveHistory(entity: Task, statusStore: IDBObjectStore, impedimentStore: IDBObjectStore): void {
+    // Salvar histórico de status
+    if (entity.statusHistorico && entity.statusHistorico.length > 0) {
+      entity.statusHistorico.forEach(entry => {
+        statusStore.add({
+          task_id: entity.id,
+          status: entry.status,
+          timestamp: (entry.timestamp instanceof Date ? entry.timestamp : new Date(entry.timestamp)).toISOString()
+        });
+      });
+    }
+    
+    // Salvar histórico de impedimentos
+    if (entity.impedimentoHistorico && entity.impedimentoHistorico.length > 0) {
+      entity.impedimentoHistorico.forEach(entry => {
+        impedimentStore.add({
+          id: entry.id,
+          task_id: entity.id,
+          impedimento: entry.impedimento,
+          motivo: entry.motivo,
+          timestamp: (entry.timestamp instanceof Date ? entry.timestamp : new Date(entry.timestamp)).toISOString()
+        });
+      });
+    }
   }
 
   /**

@@ -1,7 +1,6 @@
 // repository.ts — Interface Repository genérica
 
 import { Repository, Task, Query, Page, ID } from '@/types/domain';
-import { LocalStorageTaskRepository } from './localstorage-repo';
 
 /**
  * Interface Repository genérica para entidades com ID
@@ -34,16 +33,9 @@ export class RepositoryFactory {
   
   static async getTaskRepository(): Promise<ITaskRepository> {
     if (!this.instance) {
-      try {
-        // Usar SQLite OPFS como padrão principal (versão simplificada)
-        const { SQLiteOPFSTaskRepository } = await import('./sqlite-opfs-repo-simple');
-        this.instance = new SQLiteOPFSTaskRepository();
-        
-      } catch (error) {
-        console.warn('Erro ao inicializar SQLite OPFS, usando LocalStorage:', error);
-        const { LocalStorageTaskRepository } = await import('./localstorage-repo');
-        this.instance = new LocalStorageTaskRepository();
-      }
+      // Usar SQLite OPFS (versão simplificada com IndexedDB)
+      const { SQLiteOPFSTaskRepository } = await import('./sqlite-opfs-repo-simple');
+      this.instance = new SQLiteOPFSTaskRepository();
     }
     return this.instance;
   }
@@ -54,8 +46,10 @@ export class RepositoryFactory {
   
   /**
    * Força o uso do LocalStorage (útil para testes ou fallback)
+   * @deprecated Use apenas SQLite
    */
   static async useLocalStorage(): Promise<ITaskRepository> {
+    console.warn('useLocalStorage está deprecated. Use apenas SQLite.');
     const { LocalStorageTaskRepository } = await import('./localstorage-repo');
     this.instance = new LocalStorageTaskRepository();
     return this.instance;
@@ -63,11 +57,12 @@ export class RepositoryFactory {
   
   /**
    * Força o uso do SQLite OPFS
+   * @deprecated Migração automática removida - use apenas getTaskRepository()
    */
   static async useSQLite(): Promise<ITaskRepository> {
+    console.warn('useSQLite está deprecated. Use getTaskRepository() que já usa SQLite por padrão.');
     const { SQLiteOPFSTaskRepository } = await import('./sqlite-opfs-repo-simple');
     this.instance = new SQLiteOPFSTaskRepository();
-    await (this.instance as { migrateFromLocalStorage(): Promise<void> }).migrateFromLocalStorage();
     return this.instance;
   }
   
