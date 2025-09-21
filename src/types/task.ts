@@ -115,6 +115,8 @@ export interface TaskContextType {
   
   // Estados de loading
   isCreatingTask: boolean;
+  isLoadingTasks: boolean;
+  isSearching: boolean;
   
   // Métodos básicos
   addTask: (titulo: string, prioridade?: TaskPriority) => Promise<void>;

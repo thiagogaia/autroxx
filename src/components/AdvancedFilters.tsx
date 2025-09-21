@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -13,14 +13,26 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useTaskContext } from '@/contexts/TaskContextV2';
 import { TaskPriority, TaskCategory, TaskComplexity } from '@/types/task';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface AdvancedFiltersProps {
   className?: string;
 }
 
 export function AdvancedFilters({ className }: AdvancedFiltersProps) {
-  const { advancedFilters, setAdvancedFilters, resetFilters } = useTaskContext();
+  const { advancedFilters, setAdvancedFilters, resetFilters, isSearching } = useTaskContext();
   const [isOpen, setIsOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState(advancedFilters.titleSearch || '');
+  
+  // Debounce da busca por título (500ms)
+  const debouncedSearch = useDebounce(searchInput, 500);
+
+  // Aplicar debounce quando o valor mudar
+  useEffect(() => {
+    if (debouncedSearch !== advancedFilters.titleSearch) {
+      setAdvancedFilters({ titleSearch: debouncedSearch });
+    }
+  }, [debouncedSearch, advancedFilters.titleSearch, setAdvancedFilters]);
 
   const priorityOptions: { value: TaskPriority; label: string }[] = [
     { value: 'baixa', label: 'Baixa' },
@@ -104,10 +116,15 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar por título..."
-            value={advancedFilters.titleSearch || ''}
-            onChange={(e) => handleFilterChange('titleSearch', e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="pl-10"
           />
+          {isSearching && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+            </div>
+          )}
         </div>
 
         {/* Botão de filtros avançados */}

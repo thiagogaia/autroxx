@@ -24,11 +24,12 @@ import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components
 import { Card } from '@/components/ui/card';
 import { SortableTaskItem } from './SortableTaskItem';
 import { EmptyState } from './EmptyState';
+import { TaskListLoading } from './TaskListLoading';
 import { useTaskContext } from '@/contexts/TaskContextV2';
 import { ArrowUpDown } from 'lucide-react';
 
 export function TaskList() {
-  const { tasks, paginatedTasks, totalTasks, reorderTasks } = useTaskContext();
+  const { tasks, paginatedTasks, totalTasks, reorderTasks, isLoadingTasks } = useTaskContext();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -40,6 +41,11 @@ export function TaskList() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  // Mostrar loading durante carregamento
+  if (isLoadingTasks) {
+    return <TaskListLoading />;
+  }
 
   // Se não há tarefas, mostra o estado vazio
   if (tasks.length === 0) {

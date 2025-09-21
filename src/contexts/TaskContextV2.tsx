@@ -20,7 +20,9 @@ type TaskAction =
   | { type: 'LOAD_TASKS'; payload: { tasks: Task[]; totalTasks?: number } }
   | { type: 'DELETE_TASK'; payload: { id: number } }
   | { type: 'REORDER_TASKS'; payload: { taskIds: number[] } }
-  | { type: 'SET_CREATING_TASK'; payload: { isCreating: boolean } };
+  | { type: 'SET_CREATING_TASK'; payload: { isCreating: boolean } }
+  | { type: 'SET_LOADING_TASKS'; payload: { isLoading: boolean } }
+  | { type: 'SET_SEARCHING'; payload: { isSearching: boolean } };
 
 interface TaskState {
   tasks: Task[];
@@ -31,6 +33,8 @@ interface TaskState {
   error: string | null;
   totalTasks: number;
   isCreatingTask: boolean;
+  isLoadingTasks: boolean;
+  isSearching: boolean;
 }
 
 const initialPagination: PaginationParams = {
@@ -60,7 +64,9 @@ const initialState: TaskState = {
   loading: true,
   error: null,
   totalTasks: 0,
-  isCreatingTask: false
+  isCreatingTask: false,
+  isLoadingTasks: true,
+  isSearching: false
 };
 
 function taskReducer(state: TaskState, action: TaskAction): TaskState {
@@ -78,6 +84,7 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         tasks: tasksWithOrder.sort((a, b) => (a.ordem || 0) - (b.ordem || 0)),
         totalTasks: action.payload.totalTasks ?? action.payload.tasks.length,
         loading: false,
+        isLoadingTasks: false,
         error: null
       };
 
@@ -276,6 +283,18 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         isCreatingTask: action.payload.isCreating
       };
 
+    case 'SET_LOADING_TASKS':
+      return {
+        ...state,
+        isLoadingTasks: action.payload.isLoading
+      };
+
+    case 'SET_SEARCHING':
+      return {
+        ...state,
+        isSearching: action.payload.isSearching
+      };
+
     default:
       return state;
   }
@@ -290,6 +309,8 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadTasks = async () => {
       try {
+        dispatch({ type: 'SET_LOADING_TASKS', payload: { isLoading: true } });
+        
         // Buscar tarefas com filtros e paginação atuais
         const result = await indexedDBRepository.search(state.advancedFilters, state.pagination);
         
@@ -301,6 +322,8 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         console.error('Error loading tasks from IndexedDB:', error);
         dispatch({ type: 'LOAD_TASKS', payload: { tasks: [] } });
+      } finally {
+        dispatch({ type: 'SET_LOADING_TASKS', payload: { isLoading: false } });
       }
     };
 
@@ -311,11 +334,15 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const reloadTasks = async () => {
       try {
+        dispatch({ type: 'SET_LOADING_TASKS', payload: { isLoading: true } });
+        
         const result = await indexedDBRepository.search(state.advancedFilters, state.pagination);
         const totalCount = await indexedDBRepository.count(state.advancedFilters);
         dispatch({ type: 'LOAD_TASKS', payload: { tasks: result.data, totalTasks: totalCount } });
       } catch (error) {
         console.error('Error reloading tasks:', error);
+      } finally {
+        dispatch({ type: 'SET_LOADING_TASKS', payload: { isLoading: false } });
       }
     };
 
@@ -560,6 +587,8 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       totalTasks: state.totalTasks,
       advancedFilters: state.advancedFilters,
       isCreatingTask: state.isCreatingTask,
+      isLoadingTasks: state.isLoadingTasks,
+      isSearching: state.isSearching,
       addTask,
       addTaskFull,
       updateTaskStatus,
