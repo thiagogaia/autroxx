@@ -62,6 +62,10 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
   const prioridadeConfig = PRIORIDADE_CONFIG[task.prioridade];
 
   const handleStatusChange = (status: TaskStatus) => {
+    // Evitar cliques repetidos no mesmo status
+    if (task.statusAtual === status) {
+      return;
+    }
     updateTaskStatus(task.id, status);
   };
 
