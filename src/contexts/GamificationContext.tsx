@@ -19,7 +19,7 @@ interface GamificationContextType {
   unlockPowerUp: (powerUpId: string) => boolean;
   activatePowerUp: (powerUpId: string) => boolean;
   isPowerUpActive: (powerUpId: string) => boolean;
-  dismissEvent: (eventId: string) => void;
+  dismissEvent: (eventId: number) => void;
   getLeaderboard: (type: 'xp' | 'accuracy' | 'speed' | 'quality') => LeaderboardEntry[];
   refreshStats: (tasks: Task[]) => void;
 }
@@ -144,7 +144,7 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
     return engine.isPowerUpActive(powerUpId);
   };
 
-  const dismissEvent = useCallback((eventId: string) => {
+  const dismissEvent = useCallback((eventId: number) => {
     setEvents(prev => prev.map(event => 
       event.id === eventId ? { ...event, dismissed: true } : event
     ));

@@ -324,7 +324,7 @@ export const WEEKLY_CHALLENGES: WeeklyChallenge[] = [
 
 export class GamificationEngine {
   private userStats: UserStats;
-  private events: GamificationEvent[] = [];
+  public events: GamificationEvent[] = []; // ✅ Changed to public
   private nextEventId: number = 1; // ✅ Contador para IDs numéricos
 
   constructor(initialStats?: Partial<UserStats>) {
