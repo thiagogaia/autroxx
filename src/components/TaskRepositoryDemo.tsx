@@ -5,6 +5,8 @@
 import React, { useState, useEffect } from 'react';
 import { Task } from '@/types/domain';
 import { useTaskRepository, useTaskQueries, useAdvancedTaskFilters } from '@/hooks/useTaskRepository';
+import { useSyncService } from '@/hooks/useSyncService';
+import { SyncStatusWidget } from '@/components/SyncStatusWidget';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +22,7 @@ export function TaskRepositoryDemo() {
   const { searchTasks, updateTask, deleteTask } = useTaskRepository();
   const { getTasksByStatus, searchTasksByTitle, getUrgentIncompleteTasks } = useTaskQueries();
   const { applyAdvancedFilters } = useAdvancedTaskFilters();
+  const { status: syncStatus } = useSyncService();
 
   // Carregar tarefas iniciais
   useEffect(() => {
@@ -157,10 +160,12 @@ export function TaskRepositoryDemo() {
 
   return (
     <div className="p-6 space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Demonstração do Padrão Specification/Query Object</CardTitle>
-        </CardHeader>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Demonstração do Padrão Specification/Query Object</CardTitle>
+            </CardHeader>
         <CardContent className="space-y-4">
           {/* Controles de busca e filtro */}
           <div className="flex flex-wrap gap-4">
@@ -247,10 +252,10 @@ export function TaskRepositoryDemo() {
             Aplicar Filtros Avançados
           </Button>
         </CardContent>
-      </Card>
+          </Card>
 
-      {/* Lista de tarefas */}
-      <Card>
+          {/* Lista de tarefas */}
+          <Card>
         <CardHeader>
           <CardTitle>Tarefas ({tasks.length})</CardTitle>
         </CardHeader>
@@ -310,7 +315,30 @@ export function TaskRepositoryDemo() {
             </div>
           )}
         </CardContent>
-      </Card>
+          </Card>
+        </div>
+
+        {/* Sidebar com status de sincronização */}
+        <div className="space-y-6">
+          <SyncStatusWidget />
+          
+          {/* Informações sobre SQLite OPFS */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">SQLite OPFS</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-xs text-gray-600 space-y-2">
+                <p>✅ <strong>Banco de dados real</strong> no browser</p>
+                <p>✅ <strong>Índices otimizados</strong> para consultas rápidas</p>
+                <p>✅ <strong>Sincronização offline</strong> automática</p>
+                <p>✅ <strong>Migração automática</strong> do LocalStorage</p>
+                <p>✅ <strong>Performance O(log n)</strong> para filtros</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       {/* Informações sobre o padrão */}
       <Card>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useTaskContext } from '@/contexts/TaskContext';
+import { useTaskContext } from '@/contexts/TaskContextV2';
 import { useTaskGamificationIntegration } from '@/contexts/TaskGamificationIntegration';
 import { Task } from '@/types/task';
 

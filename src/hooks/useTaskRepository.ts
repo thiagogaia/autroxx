@@ -1,6 +1,6 @@
 // useTaskRepository.ts — Hook personalizado para usar o Repository Pattern
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { Task, Query, Page, ID } from '@/types/domain';
 import { ITaskRepository } from '@/lib/repository';
 import { RepositoryFactory } from '@/lib/repository';
@@ -10,10 +10,32 @@ import { RepositoryFactory } from '@/lib/repository';
  * Abstrai a complexidade do Specification/Query Object
  */
 export function useTaskRepository() {
-  const repository = useMemo(() => RepositoryFactory.getTaskRepository(), []);
+  const [repository, setRepository] = useState<ITaskRepository | null>(null);
+  
+  useEffect(() => {
+    const initRepository = async () => {
+      try {
+        const repo = await RepositoryFactory.getTaskRepository();
+        setRepository(repo);
+      } catch (error) {
+        console.error('Erro ao inicializar repository:', error);
+        // Fallback para LocalStorage usando import dinâmico
+        try {
+          const { LocalStorageTaskRepository } = await import('@/lib/localstorage-repo');
+          const fallbackRepo = new LocalStorageTaskRepository();
+          setRepository(fallbackRepo);
+        } catch (fallbackError) {
+          console.error('Erro no fallback:', fallbackError);
+        }
+      }
+    };
+    
+    initRepository();
+  }, []);
 
   // Métodos básicos CRUD
   const getTask = useCallback(async (id: ID): Promise<Task | null> => {
+    if (!repository) return null;
     try {
       return await repository.get(id);
     } catch (error) {
@@ -23,6 +45,7 @@ export function useTaskRepository() {
   }, [repository]);
 
   const saveTask = useCallback(async (task: Task): Promise<Task | null> => {
+    if (!repository) return null;
     try {
       return await repository.save(task);
     } catch (error) {
@@ -32,6 +55,7 @@ export function useTaskRepository() {
   }, [repository]);
 
   const updateTask = useCallback(async (id: ID, updates: Partial<Task>): Promise<Task | null> => {
+    if (!repository) return null;
     try {
       return await repository.update(id, updates);
     } catch (error) {
@@ -41,6 +65,7 @@ export function useTaskRepository() {
   }, [repository]);
 
   const deleteTask = useCallback(async (id: ID): Promise<boolean> => {
+    if (!repository) return false;
     try {
       await repository.delete(id);
       return true;
@@ -52,6 +77,7 @@ export function useTaskRepository() {
 
   // Métodos de busca
   const searchTasks = useCallback(async (query?: Query<Task>): Promise<Page<Task>> => {
+    if (!repository) return { items: [], total: 0, page: 1, size: 10 };
     try {
       return await repository.search(query);
     } catch (error) {
@@ -61,6 +87,7 @@ export function useTaskRepository() {
   }, [repository]);
 
   const countTasks = useCallback(async (query?: Query<Task>): Promise<number> => {
+    if (!repository) return 0;
     try {
       return await repository.count(query);
     } catch (error) {
@@ -71,6 +98,7 @@ export function useTaskRepository() {
 
   // Métodos específicos para Task
   const findByStatus = useCallback(async (status: string): Promise<Task[]> => {
+    if (!repository) return [];
     try {
       return await repository.findByStatus(status);
     } catch (error) {
@@ -80,6 +108,7 @@ export function useTaskRepository() {
   }, [repository]);
 
   const findByPriority = useCallback(async (priority: string): Promise<Task[]> => {
+    if (!repository) return [];
     try {
       return await repository.findByPriority(priority);
     } catch (error) {
@@ -89,6 +118,7 @@ export function useTaskRepository() {
   }, [repository]);
 
   const findWithImpediments = useCallback(async (): Promise<Task[]> => {
+    if (!repository) return [];
     try {
       return await repository.findWithImpediments();
     } catch (error) {

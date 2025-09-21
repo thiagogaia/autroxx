@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { useTaskContext } from '@/contexts/TaskContext';
+import { useTaskContext } from '@/contexts/TaskContextV2';
 import { Task, TaskCategory, TaskComplexity } from '@/types/task';
 import { formatMinutesToString } from '@/lib/time-converter';
 import { 

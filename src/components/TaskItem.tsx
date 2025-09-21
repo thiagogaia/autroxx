@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { ImpedimentDialog } from './ImpedimentDialog';
-import { useTaskContext } from '@/contexts/TaskContext';
+import { useTaskContext } from '@/contexts/TaskContextV2';
 import { Task, TaskStatus, TaskPriority } from '@/types/task';
 import { STATUS_CONFIG, PRIORIDADE_CONFIG } from '@/lib/mock-data';
 import { hasStatusInHistory } from '@/lib/utils';

@@ -16,7 +16,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { useTaskContext } from '@/contexts/TaskContext';
+import { useTaskContext } from '@/contexts/TaskContextV2';
 import { Task, TaskStatus, TaskPriority, TaskCategory, TaskComplexity } from '@/types/task';
 import { STATUS_CONFIG, PRIORIDADE_CONFIG } from '@/lib/mock-data';
 import { hasStatusInHistory } from '@/lib/utils';

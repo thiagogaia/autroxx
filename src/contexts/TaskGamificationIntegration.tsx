@@ -1,6 +1,6 @@
 'use client';
 
-import { TaskProvider } from './TaskContext';
+import { TaskProvider } from './TaskContextV2';
 import { useGamification } from './GamificationContext';
 import { TaskGamificationMonitor } from '@/components/TaskGamificationMonitor';
 import { Task } from '@/types/task';

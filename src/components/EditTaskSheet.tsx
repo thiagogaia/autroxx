@@ -12,7 +12,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { useTaskContext } from '@/contexts/TaskContext';
+import { useTaskContext } from '@/contexts/TaskContextV2';
 import { Task, TaskPriority, TaskCategory, TaskComplexity } from '@/types/task';
 import { PRIORIDADE_CONFIG } from '@/lib/mock-data';
 import { TagsInput } from './TagsInput';

@@ -30,12 +30,20 @@ export interface ITaskRepository extends IRepository<Task> {
  */
 export class RepositoryFactory {
   private static instance: ITaskRepository | null = null;
+  private static migrationCompleted = false;
   
-  static getTaskRepository(): ITaskRepository {
+  static async getTaskRepository(): Promise<ITaskRepository> {
     if (!this.instance) {
-      // Por enquanto, sempre usa LocalStorage
-      // No futuro, pode ser configurado via environment ou DI
-      this.instance = new LocalStorageTaskRepository();
+      try {
+        // Usar SQLite OPFS como padrão principal (versão simplificada)
+        const { SQLiteOPFSTaskRepository } = await import('./sqlite-opfs-repo-simple');
+        this.instance = new SQLiteOPFSTaskRepository();
+        
+      } catch (error) {
+        console.warn('Erro ao inicializar SQLite OPFS, usando LocalStorage:', error);
+        const { LocalStorageTaskRepository } = await import('./localstorage-repo');
+        this.instance = new LocalStorageTaskRepository();
+      }
     }
     return this.instance;
   }
@@ -43,6 +51,32 @@ export class RepositoryFactory {
   static setTaskRepository(repository: ITaskRepository): void {
     this.instance = repository;
   }
+  
+  /**
+   * Força o uso do LocalStorage (útil para testes ou fallback)
+   */
+  static async useLocalStorage(): Promise<ITaskRepository> {
+    const { LocalStorageTaskRepository } = await import('./localstorage-repo');
+    this.instance = new LocalStorageTaskRepository();
+    return this.instance;
+  }
+  
+  /**
+   * Força o uso do SQLite OPFS
+   */
+  static async useSQLite(): Promise<ITaskRepository> {
+    const { SQLiteOPFSTaskRepository } = await import('./sqlite-opfs-repo-simple');
+    this.instance = new SQLiteOPFSTaskRepository();
+    await (this.instance as { migrateFromLocalStorage(): Promise<void> }).migrateFromLocalStorage();
+    return this.instance;
+  }
+  
+  /**
+   * Verifica se está usando SQLite
+   */
+  static isUsingSQLite(): boolean {
+    return this.instance?.constructor.name === 'SQLiteOPFSTaskRepository';
+  }
 }
 
-// Import será feito dinamicamente para evitar dependência circular
+// Imports serão feitos dinamicamente para evitar dependência circular

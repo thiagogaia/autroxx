@@ -367,8 +367,10 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     const loadTasks = async () => {
       try {
         dispatch({ type: 'LOAD_TASKS', payload: { tasks: [] } }); // Reset loading
-        const tasks = await state.repository.findAll();
-        dispatch({ type: 'LOAD_TASKS', payload: { tasks } });
+        const result = await state.repository.search({
+          page: { page: 1, size: 1000 } // Carregar todas as tarefas
+        });
+        dispatch({ type: 'LOAD_TASKS', payload: { tasks: result.items } });
       } catch (error) {
         console.error('Erro ao carregar tarefas:', error);
       }
@@ -389,7 +391,10 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     const saveTasks = async () => {
       if (state.tasks.length > 0) {
         try {
-          await state.repository.import(state.tasks);
+          // Salvar cada tarefa individualmente
+          for (const task of state.tasks) {
+            await state.repository.save(task);
+          }
         } catch (error) {
           console.error('Erro ao salvar tarefas:', error);
         }
