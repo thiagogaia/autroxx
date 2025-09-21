@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useTaskContext } from '@/contexts/TaskContextIndexedDB';
+import { useTaskContext } from '@/contexts/TaskContextV2';
 import { formatMinutesToString } from '@/lib/time-converter';
 import { hasStatusInHistory } from '@/lib/utils';
 import { Task } from '@/types/task';

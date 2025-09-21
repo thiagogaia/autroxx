@@ -1,13 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useReducer, useEffect, ReactNode, useMemo } from 'react';
-import { Task, TaskContextType, TaskStatus, TaskPriority, FilterType, ImpedimentoHistoryEntry, PaginationParams, TaskFilters } from '@/types/task';
-import { ITaskRepository } from '@/lib/repository';
-import { Query, PageRequest } from '@/types/domain';
-import { RepositoryFactory } from '@/lib/repository';
-import { taskFiltersToSpec, taskFiltersToPageRequest } from '@/lib/query-utils';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { STORAGE_KEYS } from '@/lib/storage';
+import { Task, TaskContextType, TaskStatus, TaskPriority, FilterType, ImpedimentoHistoryEntry, StatusHistoryEntry, PaginationParams, TaskFilters } from '@/types/task';
+import { indexedDBRepository } from '@/lib/indexeddb-repo';
 import { generateUniqueTaskId } from '@/lib/utils';
 
 type TaskAction =
@@ -22,19 +17,18 @@ type TaskAction =
   | { type: 'SET_ADVANCED_FILTERS'; payload: { filters: Partial<TaskFilters> } }
   | { type: 'SET_PAGINATION'; payload: { params: Partial<PaginationParams> } }
   | { type: 'RESET_FILTERS' }
-  | { type: 'LOAD_TASKS'; payload: { tasks: Task[] } }
+  | { type: 'LOAD_TASKS'; payload: { tasks: Task[]; totalTasks?: number } }
   | { type: 'DELETE_TASK'; payload: { id: number } }
-  | { type: 'REORDER_TASKS'; payload: { taskIds: number[] } }
-  | { type: 'SET_REPOSITORY'; payload: { repository: ITaskRepository } };
+  | { type: 'REORDER_TASKS'; payload: { taskIds: number[] } };
 
 interface TaskState {
   tasks: Task[];
   filtroAtivo: FilterType;
   pagination: PaginationParams;
   advancedFilters: TaskFilters;
-  repository: ITaskRepository;
   loading: boolean;
   error: string | null;
+  totalTasks: number;
 }
 
 const initialPagination: PaginationParams = {
@@ -61,19 +55,13 @@ const initialState: TaskState = {
   filtroAtivo: 'tudo',
   pagination: initialPagination,
   advancedFilters: initialAdvancedFilters,
-  repository: null as any, // Será inicializado no useEffect
-  loading: false,
-  error: null
+  loading: true,
+  error: null,
+  totalTasks: 0
 };
 
 function taskReducer(state: TaskState, action: TaskAction): TaskState {
   switch (action.type) {
-    case 'SET_REPOSITORY':
-      return {
-        ...state,
-        repository: action.payload.repository
-      };
-
     case 'LOAD_TASKS':
       if (!action.payload.tasks) {
         return state;
@@ -85,6 +73,7 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
       return {
         ...state,
         tasks: tasksWithOrder.sort((a, b) => (a.ordem || 0) - (b.ordem || 0)),
+        totalTasks: action.payload.totalTasks ?? action.payload.tasks.length,
         loading: false,
         error: null
       };
@@ -108,6 +97,14 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         ordem: 0,
         tags: [],
         is_active: true,
+        categoria: 'sem_categoria',
+        estimativaTempo: undefined,
+        complexidade: 'media',
+        numeroMudancasPrioridade: 0,
+        tempoTotalImpedimento: 0,
+        foiRetrabalho: false,
+        referenced_task_id: null,
+        parent_id: null,
         rsync: false,
         id_rsync: null
       };
@@ -119,13 +116,15 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
       
       return {
         ...state,
-        tasks: [newTask, ...updatedTasks]
+        tasks: [newTask, ...updatedTasks],
+        totalTasks: state.totalTasks + 1
       };
 
     case 'ADD_TASK_FULL':
       return {
         ...state,
-        tasks: [...state.tasks, action.payload.task]
+        tasks: [...state.tasks, action.payload.task],
+        totalTasks: state.totalTasks + 1
       };
 
     case 'UPDATE_STATUS':
@@ -133,26 +132,16 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         ...state,
         tasks: state.tasks.map(task => {
           if (task.id === action.payload.id) {
-            const now = new Date();
-            const novoHistorico = [...task.statusHistorico];
-            
-            const statusJaExiste = novoHistorico.some(entry => entry.status === action.payload.status);
-            if (!statusJaExiste) {
-              novoHistorico.push({ status: action.payload.status, timestamp: now });
-            }
-            
-            const dataInicio = action.payload.status === 'fazendo' && !task.dataInicio 
-              ? now 
-              : task.dataInicio;
-            
-            const dataFim = action.payload.status === 'concluido' ? now : task.dataFim;
-            
+            const newStatusEntry: StatusHistoryEntry = {
+              status: action.payload.status,
+              timestamp: new Date()
+            };
             return {
               ...task,
               statusAtual: action.payload.status,
-              statusHistorico: novoHistorico,
-              dataInicio,
-              dataFim
+              statusHistorico: [...task.statusHistorico, newStatusEntry],
+              dataInicio: action.payload.status === 'fazendo' && !task.dataInicio ? new Date() : task.dataInicio,
+              dataFim: action.payload.status === 'concluido' ? new Date() : task.dataFim
             };
           }
           return task;
@@ -162,15 +151,16 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
     case 'UPDATE_PRIORITY':
       return {
         ...state,
-        tasks: state.tasks.map(task =>
-          task.id === action.payload.id
-            ? { 
-                ...task, 
-                prioridade: action.payload.prioridade,
-                numeroMudancasPrioridade: (task.numeroMudancasPrioridade || 0) + 1
-              }
-            : task
-        )
+        tasks: state.tasks.map(task => {
+          if (task.id === action.payload.id) {
+            return {
+              ...task,
+              prioridade: action.payload.prioridade,
+              numeroMudancasPrioridade: (task.numeroMudancasPrioridade || 0) + 1
+            };
+          }
+          return task;
+        })
       };
 
     case 'UPDATE_TASK':
@@ -178,15 +168,10 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         ...state,
         tasks: state.tasks.map(task => {
           if (task.id === action.payload.id) {
-            const updates = action.payload.updates;
-            if (updates.prioridade && updates.prioridade !== task.prioridade) {
-              return { 
-                ...task, 
-                ...updates,
-                numeroMudancasPrioridade: (task.numeroMudancasPrioridade || 0) + 1
-              };
-            }
-            return { ...task, ...updates };
+            return {
+              ...task,
+              ...action.payload.updates
+            };
           }
           return task;
         })
@@ -197,20 +182,18 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         ...state,
         tasks: state.tasks.map(task => {
           if (task.id === action.payload.id) {
-            const now = new Date();
-            const novoHistorico: ImpedimentoHistoryEntry = {
-              id: `imp_${task.id}_${now.getTime()}`,
+            const impedimentoEntry: ImpedimentoHistoryEntry = {
+              id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
               impedimento: true,
               motivo: action.payload.motivo,
-              timestamp: now
+              timestamp: new Date()
             };
-            
-            return { 
-              ...task, 
-              impedimento: true, 
+            return {
+              ...task,
+              impedimento: true,
               impedimentoMotivo: action.payload.motivo,
-              impedimentoHistorico: [...(task.impedimentoHistorico || []), novoHistorico],
-              dataImpedimento: now
+              impedimentoHistorico: [...task.impedimentoHistorico, impedimentoEntry],
+              dataImpedimento: new Date()
             };
           }
           return task;
@@ -222,28 +205,18 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         ...state,
         tasks: state.tasks.map(task => {
           if (task.id === action.payload.id) {
-            const now = new Date();
-            const novoHistorico: ImpedimentoHistoryEntry = {
-              id: `imp_${task.id}_${now.getTime()}`,
+            const impedimentoEntry: ImpedimentoHistoryEntry = {
+              id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
               impedimento: false,
               motivo: '',
-              timestamp: now
+              timestamp: new Date()
             };
-            
-            let tempoImpedimentoCalculado = task.tempoTotalImpedimento || 0;
-            if (task.dataImpedimento) {
-              const diferencaMs = now.getTime() - task.dataImpedimento.getTime();
-              const diferencaMinutos = Math.floor(diferencaMs / (1000 * 60));
-              tempoImpedimentoCalculado += diferencaMinutos;
-            }
-            
-            return { 
-              ...task, 
-              impedimento: false, 
+            return {
+              ...task,
+              impedimento: false,
               impedimentoMotivo: '',
-              impedimentoHistorico: [...(task.impedimentoHistorico || []), novoHistorico],
-              dataImpedimento: null,
-              tempoTotalImpedimento: tempoImpedimentoCalculado
+              impedimentoHistorico: [...task.impedimentoHistorico, impedimentoEntry],
+              dataImpedimento: null
             };
           }
           return task;
@@ -253,7 +226,8 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
     case 'DELETE_TASK':
       return {
         ...state,
-        tasks: state.tasks.filter(task => task.id !== action.payload.id)
+        tasks: state.tasks.filter(task => task.id !== action.payload.id),
+        totalTasks: Math.max(0, state.totalTasks - 1)
       };
 
     case 'REORDER_TASKS':
@@ -262,7 +236,6 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         ...taskMap.get(id)!,
         ordem: index
       }));
-      
       return {
         ...state,
         tasks: reorderedTasks
@@ -271,49 +244,27 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
     case 'SET_FILTER':
       return {
         ...state,
-        filtroAtivo: action.payload.filter,
-        advancedFilters: {
-          ...state.advancedFilters,
-          statusFilter: action.payload.filter
-        }
+        filtroAtivo: action.payload.filter
       };
 
     case 'SET_ADVANCED_FILTERS':
       return {
         ...state,
-        advancedFilters: {
-          ...state.advancedFilters,
-          ...action.payload.filters
-        },
-        pagination: {
-          ...state.pagination,
-          page: 1,
-          offset: 0
-        }
+        advancedFilters: { ...state.advancedFilters, ...action.payload.filters }
       };
 
     case 'SET_PAGINATION':
-      const newPage = action.payload.params.page || state.pagination.page;
-      const newLimit = action.payload.params.limit || state.pagination.limit;
       return {
         ...state,
-        pagination: {
-          page: newPage,
-          limit: newLimit,
-          offset: (newPage - 1) * newLimit
-        }
+        pagination: { ...state.pagination, ...action.payload.params }
       };
 
     case 'RESET_FILTERS':
       return {
         ...state,
-        filtroAtivo: 'tudo',
         advancedFilters: initialAdvancedFilters,
-        pagination: {
-          ...state.pagination,
-          page: 1,
-          offset: 0
-        }
+        pagination: initialPagination,
+        filtroAtivo: 'tudo'
       };
 
     default:
@@ -325,147 +276,247 @@ const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
 export function TaskProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(taskReducer, initialState);
-  const [filtroAtivo, setFiltroAtivo, filterLoaded] = useLocalStorage<FilterType>(STORAGE_KEYS.FILTER, 'tudo');
 
-  // Inicializar repository usando RepositoryFactory
+  // Carregar tarefas do IndexedDB na inicialização
   useEffect(() => {
-    const initRepository = async () => {
+    const loadTasks = async () => {
       try {
-        const repository = await RepositoryFactory.getTaskRepository();
-        dispatch({ type: 'SET_REPOSITORY', payload: { repository } });
+        // Buscar tarefas com filtros e paginação atuais
+        const result = await indexedDBRepository.search(state.advancedFilters, state.pagination);
+        
+        // Buscar total de tarefas que correspondem aos filtros
+        const totalCount = await indexedDBRepository.count(state.advancedFilters);
+        
+        dispatch({ type: 'LOAD_TASKS', payload: { tasks: result.data, totalTasks: totalCount } });
+        
       } catch (error) {
-        console.error('Erro ao inicializar repository:', error);
+        console.error('Error loading tasks from IndexedDB:', error);
+        dispatch({ type: 'LOAD_TASKS', payload: { tasks: [] } });
       }
     };
-    
-    initRepository();
+
+    loadTasks();
   }, []);
 
-  // Converter filtros atuais para Specification/Query Object
-  const currentQuery = useMemo((): Query<Task> => {
-    const spec = taskFiltersToSpec(state.advancedFilters as unknown as Record<string, unknown>);
-    const pageRequest: PageRequest = {
-      page: state.pagination.page,
-      size: state.pagination.limit,
-      sort: state.advancedFilters.sortBy ? [{
-        field: state.advancedFilters.sortBy as keyof Task,
-        dir: (state.advancedFilters.sortOrder || 'desc') as 'asc' | 'desc'
-      }] : undefined
+  // Recarregar tarefas quando filtros ou paginação mudarem
+  useEffect(() => {
+    const reloadTasks = async () => {
+      try {
+        const result = await indexedDBRepository.search(state.advancedFilters, state.pagination);
+        const totalCount = await indexedDBRepository.count(state.advancedFilters);
+        dispatch({ type: 'LOAD_TASKS', payload: { tasks: result.data, totalTasks: totalCount } });
+      } catch (error) {
+        console.error('Error reloading tasks:', error);
+      }
     };
-    
-    return { spec: spec as any, page: pageRequest };
-  }, [state.advancedFilters, state.pagination]);
 
-  // Buscar tarefas usando o repository
-  const searchTasks = useMemo(async () => {
-    if (!state.repository) {
-      return { items: [], total: 0, page: 1, size: 10 };
+    if (!state.loading) {
+      reloadTasks();
     }
-    
-    try {
-      const result = await state.repository.search(currentQuery);
-      return result;
-    } catch (error) {
-      console.error('Erro ao buscar tarefas:', error);
-      return { items: [], total: 0, page: 1, size: 10 };
-    }
-  }, [state.repository, currentQuery]);
+  }, [state.advancedFilters, state.pagination, state.loading]);
 
-  // Calcular tarefas filtradas e paginadas (fallback para compatibilidade)
-  const filteredTasks = useMemo(() => {
-    // Por enquanto, usa a lógica antiga para manter compatibilidade
-    // TODO: Migrar completamente para usar o repository
+  // Calcular tarefas paginadas
+  const paginatedTasks = useMemo(() => {
     return state.tasks;
   }, [state.tasks]);
 
-  const paginatedTasks = useMemo(() => {
-    const start = state.pagination.offset;
-    const end = start + state.pagination.limit;
-    return filteredTasks.slice(start, end);
-  }, [filteredTasks, state.pagination]);
-
-  // Carregar tarefas do repository na inicialização
-  useEffect(() => {
-    if (!state.repository) return; // Só executa quando repository estiver disponível
+  // Funções do contexto
+  const addTask = async (titulo: string, prioridade: TaskPriority = 'normal') => {
+    dispatch({ type: 'ADD_TASK', payload: { titulo, prioridade } });
     
-    const loadTasks = async () => {
-      if (!state.repository) return; // Só executa quando repository estiver disponível
+    // Salvar no IndexedDB
+    try {
+      const now = new Date();
+      const newTask: Task = {
+        id: generateUniqueTaskId(),
+        titulo,
+        descricao: '',
+        statusHistorico: [{ status: 'a_fazer', timestamp: now }],
+        statusAtual: 'a_fazer',
+        prioridade,
+        impedimento: false,
+        impedimentoMotivo: '',
+        impedimentoHistorico: [],
+        dataImpedimento: null,
+        dataCadastro: now,
+        dataInicio: null,
+        dataFim: null,
+        ordem: 0,
+        tags: [],
+        is_active: true,
+        categoria: 'sem_categoria',
+        estimativaTempo: undefined,
+        complexidade: 'media',
+        numeroMudancasPrioridade: 0,
+        tempoTotalImpedimento: 0,
+        foiRetrabalho: false,
+        referenced_task_id: null,
+        parent_id: null,
+        rsync: false,
+        id_rsync: null
+      };
       
-      try {
-        dispatch({ type: 'LOAD_TASKS', payload: { tasks: [] } }); // Reset loading
-        const result = await state.repository.search({
-          page: { page: 1, size: 1000 } // Carregar todas as tarefas
-        });
-        dispatch({ type: 'LOAD_TASKS', payload: { tasks: result.items } });
-      } catch (error) {
-        console.error('Erro ao carregar tarefas:', error);
-      }
-    };
-    
-    loadTasks();
-  }, [state.repository]);
-
-  // Sincronizar filtro com localStorage
-  useEffect(() => {
-    if (filterLoaded) {
-      dispatch({ type: 'SET_FILTER', payload: { filter: filtroAtivo } });
+      await indexedDBRepository.create(newTask);
+    } catch (error) {
+      console.error('Error saving task to IndexedDB:', error);
     }
-  }, [filtroAtivo, filterLoaded]);
+  };
 
-  // Salvar tarefas no repository sempre que mudarem
-  useEffect(() => {
-    if (!state.repository) return; // Só executa quando repository estiver disponível
+  const addTaskFull = async (task: Task) => {
+    dispatch({ type: 'ADD_TASK_FULL', payload: { task } });
     
-    const saveTasks = async () => {
-      if (state.tasks.length > 0) {
-        try {
-          // Salvar cada tarefa individualmente
-          for (const task of state.tasks) {
-            await state.repository.save(task);
-          }
-        } catch (error) {
-          console.error('Erro ao salvar tarefas:', error);
+    try {
+      await indexedDBRepository.create(task);
+    } catch (error) {
+      console.error('Error saving task to IndexedDB:', error);
+    }
+  };
+
+  const updateTaskStatus = async (id: number, status: TaskStatus) => {
+    dispatch({ type: 'UPDATE_STATUS', payload: { id, status } });
+    
+    try {
+      const task = state.tasks.find(t => t.id === id);
+      if (task) {
+        const updatedTask = {
+          ...task,
+          statusAtual: status,
+          dataInicio: status === 'fazendo' && !task.dataInicio ? new Date() : task.dataInicio,
+          dataFim: status === 'concluido' ? new Date() : task.dataFim
+        };
+        await indexedDBRepository.update(id, updatedTask);
+      }
+    } catch (error) {
+      console.error('Error updating task status in IndexedDB:', error);
+    }
+  };
+
+  const updateTaskPriority = async (id: number, prioridade: TaskPriority) => {
+    dispatch({ type: 'UPDATE_PRIORITY', payload: { id, prioridade } });
+    
+    try {
+      const task = state.tasks.find(t => t.id === id);
+      if (task) {
+        const updatedTask = {
+          ...task,
+          prioridade,
+          numeroMudancasPrioridade: (task.numeroMudancasPrioridade || 0) + 1
+        };
+        await indexedDBRepository.update(id, updatedTask);
+      }
+    } catch (error) {
+      console.error('Error updating task priority in IndexedDB:', error);
+    }
+  };
+
+  const updateTask = async (id: number, updates: Partial<Task>) => {
+    dispatch({ type: 'UPDATE_TASK', payload: { id, updates } });
+    
+    try {
+      const task = state.tasks.find(t => t.id === id);
+      if (task) {
+        const updatedTask = { ...task, ...updates };
+        await indexedDBRepository.update(id, updatedTask);
+      }
+    } catch (error) {
+      console.error('Error updating task in IndexedDB:', error);
+    }
+  };
+
+  const setImpediment = async (id: number, motivo: string) => {
+    dispatch({ type: 'SET_IMPEDIMENT', payload: { id, motivo } });
+    
+    try {
+      const task = state.tasks.find(t => t.id === id);
+      if (task) {
+        const updatedTask = {
+          ...task,
+          impedimento: true,
+          impedimentoMotivo: motivo,
+          dataImpedimento: new Date()
+        };
+        await indexedDBRepository.update(id, updatedTask);
+      }
+    } catch (error) {
+      console.error('Error setting impediment in IndexedDB:', error);
+    }
+  };
+
+  const removeImpediment = async (id: number) => {
+    dispatch({ type: 'REMOVE_IMPEDIMENT', payload: { id } });
+    
+    try {
+      const task = state.tasks.find(t => t.id === id);
+      if (task) {
+        const updatedTask = {
+          ...task,
+          impedimento: false,
+          impedimentoMotivo: '',
+          dataImpedimento: null
+        };
+        await indexedDBRepository.update(id, updatedTask);
+      }
+    } catch (error) {
+      console.error('Error removing impediment in IndexedDB:', error);
+    }
+  };
+
+  const deleteTask = async (id: number) => {
+    dispatch({ type: 'DELETE_TASK', payload: { id } });
+    
+    try {
+      await indexedDBRepository.delete(id);
+    } catch (error) {
+      console.error('Error deleting task from IndexedDB:', error);
+    }
+  };
+
+  const reorderTasks = async (taskIds: number[]) => {
+    dispatch({ type: 'REORDER_TASKS', payload: { taskIds } });
+    
+    try {
+      // Atualizar ordem no IndexedDB
+      for (let i = 0; i < taskIds.length; i++) {
+        const task = state.tasks.find(t => t.id === taskIds[i]);
+        if (task) {
+          const updatedTask = { ...task, ordem: i };
+          await indexedDBRepository.update(taskIds[i], updatedTask);
         }
       }
-    };
-    
-    saveTasks();
-  }, [state.tasks, state.repository]);
-
-  const addTask = (titulo: string, prioridade: TaskPriority = 'normal') => {
-    dispatch({ type: 'ADD_TASK', payload: { titulo, prioridade } });
-  };
-
-  const addTaskFull = (task: Task) => {
-    dispatch({ type: 'ADD_TASK_FULL', payload: { task } });
-  };
-
-  const updateTaskStatus = (id: number, status: TaskStatus) => {
-    dispatch({ type: 'UPDATE_STATUS', payload: { id, status } });
-  };
-
-  const updateTaskPriority = (id: number, prioridade: TaskPriority) => {
-    dispatch({ type: 'UPDATE_PRIORITY', payload: { id, prioridade } });
-  };
-
-  const updateTask = (id: number, updates: Partial<Pick<Task, 'titulo' | 'descricao' | 'prioridade' | 'tags' | 'categoria' | 'estimativaTempo' | 'complexidade' | 'numeroMudancasPrioridade' | 'tempoTotalImpedimento' | 'foiRetrabalho'>>) => {
-    dispatch({ type: 'UPDATE_TASK', payload: { id, updates } });
-  };
-
-  const setImpediment = (id: number, motivo: string) => {
-    dispatch({ type: 'SET_IMPEDIMENT', payload: { id, motivo } });
-  };
-
-  const removeImpediment = (id: number) => {
-    dispatch({ type: 'REMOVE_IMPEDIMENT', payload: { id } });
-  };
-
-  const deleteTask = (id: number) => {
-    dispatch({ type: 'DELETE_TASK', payload: { id } });
+    } catch (error) {
+      console.error('Error reordering tasks in IndexedDB:', error);
+    }
   };
 
   const setFilter = (filter: FilterType) => {
-    setFiltroAtivo(filter);
+    dispatch({ type: 'SET_FILTER', payload: { filter } });
+    
+    // Converter filtro simples para advancedFilters
+    let statusFilter: string = 'tudo';
+    let priorityFilter: TaskPriority[] = [];
+    
+    if (filter === 'a_fazer') {
+      statusFilter = 'a_fazer';
+    } else if (filter === 'fazendo') {
+      statusFilter = 'fazendo';
+    } else if (filter === 'concluido') {
+      statusFilter = 'concluido';
+    } else if (filter === 'normal') {
+      statusFilter = 'normal';
+    } else if (filter === 'urgente') {
+      statusFilter = 'urgente';
+    }
+    
+    // Atualizar advancedFilters para disparar o reload
+    dispatch({ 
+      type: 'SET_ADVANCED_FILTERS', 
+      payload: { 
+        filters: { 
+          statusFilter: statusFilter as any,
+          priorityFilter: priorityFilter
+        } 
+      } 
+    });
   };
 
   const setAdvancedFilters = (filters: Partial<TaskFilters>) => {
@@ -480,22 +531,13 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'RESET_FILTERS' });
   };
 
-  const reorderTasks = (taskIds: number[]) => {
-    dispatch({ type: 'REORDER_TASKS', payload: { taskIds } });
-  };
-
-  // Método para trocar o repository (útil para migração)
-  const setRepository = (repository: ITaskRepository) => {
-    dispatch({ type: 'SET_REPOSITORY', payload: { repository } });
-  };
-
   return (
     <TaskContext.Provider value={{
       tasks: state.tasks,
       filtroAtivo: state.filtroAtivo,
       pagination: state.pagination,
       paginatedTasks,
-      totalTasks: filteredTasks.length,
+      totalTasks: state.totalTasks,
       advancedFilters: state.advancedFilters,
       addTask,
       addTaskFull,
@@ -509,11 +551,8 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       setFilter,
       setAdvancedFilters,
       setPagination,
-      resetFilters,
-      // Métodos adicionais para o novo padrão
-      repository: state.repository,
-      setRepository
-    } as TaskContextType & { repository: ITaskRepository; setRepository: (repo: ITaskRepository) => void }}>
+      resetFilters
+    }}>
       {children}
     </TaskContext.Provider>
   );

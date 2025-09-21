@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, Upload, Trash2, RefreshCw } from 'lucide-react';
 import { migrateTaskData, generateUniqueTaskId } from '@/lib/utils';
 import { deserializeTasks, STORAGE_KEYS } from '@/lib/storage';
-import { useTaskContext } from '@/contexts/TaskContextIndexedDB';
+import { useTaskContext } from '@/contexts/TaskContextV2';
 import { Task } from '@/types/task';
 import {
   AlertDialog,

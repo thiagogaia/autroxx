@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
-import { useTaskContext } from '@/contexts/TaskContextIndexedDB';
+import { useTaskContext } from '@/contexts/TaskContextV2';
 
 interface PaginationProps {
   className?: string;

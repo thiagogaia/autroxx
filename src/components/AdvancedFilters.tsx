@@ -11,7 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon, Search, Filter, RotateCcw } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { useTaskContext } from '@/contexts/TaskContextIndexedDB';
+import { useTaskContext } from '@/contexts/TaskContextV2';
 import { TaskPriority, TaskCategory, TaskComplexity } from '@/types/task';
 
 interface AdvancedFiltersProps {

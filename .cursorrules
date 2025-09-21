@@ -1,0 +1,214 @@
+# Task Manager MVP - Cursor Rules
+
+## 🎯 Visão Geral do Projeto
+Este é um sistema de gerenciamento de tarefas (Task Manager) desenvolvido em Next.js com foco em:
+- **Offline-first**: Funciona sem conexão com internet
+- **Gamificação**: Sistema de pontuação, conquistas e níveis
+- **IndexedDB**: Armazenamento local robusto com sincronização posterior
+- **Filtros Avançados**: Sistema completo de filtros, paginação e ordenação
+
+## 🏗️ Arquitetura e Padrões
+
+### Repository Pattern
+- **SEMPRE** use o padrão Repository para acesso a dados
+- **NUNCA** acesse IndexedDB diretamente nos componentes
+- Use `IndexedDBTaskRepository` como implementação principal
+- Mantenha compatibilidade com `ITaskRepository` interface
+
+### Specification/Query Object Pattern
+- Use `TaskFilters` para filtros complexos
+- Implemente `PaginationParams` para paginação
+- Mantenha separação entre lógica de consulta e implementação
+
+## 📋 Regras de Negócio - Task (Tarefa)
+
+### Status da Tarefa
+```typescript
+type TaskStatus = 'a_fazer' | 'fazendo' | 'concluido';
+```
+
+**REGRAS CRÍTICAS:**
+- ✅ **dataInicio**: Definida APENAS quando status muda para 'fazendo' (se ainda não foi definida)
+- ✅ **dataFim**: Definida APENAS quando status muda para 'concluido'
+- ✅ **statusHistorico**: SEMPRE adicionar entrada quando status muda
+- ✅ **NUNCA** altere status automaticamente ao marcar/desmarcar impedimento
+
+### Prioridade da Tarefa
+```typescript
+type TaskPriority = 'baixa' | 'normal' | 'media' | 'alta';
+```
+
+**REGRAS CRÍTICAS:**
+- ✅ **numeroMudancasPrioridade**: Incrementar SEMPRE que prioridade muda
+- ✅ **NUNCA** permita prioridade undefined - use 'normal' como padrão
+
+### Impedimentos
+```typescript
+interface ImpedimentoHistoryEntry {
+  id: string;           // ID único (timestamp + random)
+  impedimento: boolean;  // true = marcado, false = desmarcado
+  motivo: string;        // Motivo do impedimento
+  timestamp: Date;       // Quando foi marcado/desmarcado
+}
+```
+
+**REGRAS CRÍTICAS:**
+- ✅ **NUNCA** altere statusAtual quando marca/desmarca impedimento
+- ✅ **NUNCA** adicione entrada ao statusHistorico para impedimentos
+- ✅ **SEMPRE** use impedimentoHistorico para histórico de impedimentos
+- ✅ **dataImpedimento**: Definida quando impede=true, null quando impede=false
+
+### Campos Opcionais
+```typescript
+// Campos que podem ser undefined - SEMPRE tratar
+estimativaTempo?: number;           // Use undefined, não null
+categoria?: TaskCategory;          // Use 'sem_categoria' como padrão
+numeroMudancasPrioridade?: number; // Use || 0 para cálculos
+tempoTotalImpedimento?: number;    // Use || 0 para cálculos
+```
+
+## 🎮 Sistema de Gamificação
+
+### Pontuação XP (Experience Points)
+- ✅ **Base**: 100 XP por tarefa concluída
+- ✅ **Complexidade**: Simples (+0), Média (+50), Complexa (+100)
+- ✅ **Categoria**: Desenvolvimento (+25), Bug (+75), Documentação (+50)
+- ✅ **Eficiência**: Dentro da estimativa (+100), 20% abaixo (+150)
+- ✅ **Streak**: +25 XP por dia consecutivo
+
+### Pontos de Qualidade (QP)
+- ✅ **Zero impedimentos/semana**: +200 QP
+- ✅ **Estimativas precisas (90-110%)**: +100 QP
+- ✅ **Sem mudanças de prioridade**: +50 QP
+- ✅ **Tempo de fila < 1 dia**: +75 QP
+
+### Níveis
+```typescript
+type UserLevel = 'novato' | 'desenvolvedor' | 'especialista' | 'mestre' | 'lenda';
+```
+- 🥉 **Novato**: 0-1,000 XP
+- 🥈 **Desenvolvedor**: 1,001-5,000 XP
+- 🥇 **Especialista**: 5,001-15,000 XP
+- 💎 **Mestre**: 15,001-30,000 XP
+- 🏆 **Lenda**: 30,001+ XP
+
+## 🔍 Sistema de Filtros
+
+### Filtros Básicos (FilterType)
+```typescript
+type FilterType = 'tudo' | 'a_fazer' | 'fazendo' | 'concluido' | 'normal' | 'urgente';
+```
+
+**REGRAS CRÍTICAS:**
+- ✅ **'normal'**: Filtra por prioridade='normal' AND statusAtual!='concluido'
+- ✅ **'urgente'**: Filtra por prioridade='alta' AND statusAtual!='concluido'
+- ✅ **Outros**: Filtram diretamente por statusAtual
+
+### Filtros Avançados (TaskFilters)
+```typescript
+interface TaskFilters {
+  statusFilter: FilterType;
+  titleSearch?: string;
+  dateRange?: { start: Date | null; end: Date | null };
+  priorityFilter?: TaskPriority[];
+  categoryFilter?: TaskCategory[];
+  tagsFilter?: string[];
+  impedimentFilter?: boolean | null; // null=todos, true=com impedimento, false=sem impedimento
+  complexityFilter?: TaskComplexity[];
+  sortBy?: 'dataCadastro' | 'titulo' | 'prioridade' | 'dataInicio' | 'dataFim';
+  sortOrder?: 'asc' | 'desc';
+}
+```
+
+## 💾 Armazenamento e Sincronização
+
+### IndexedDB (Principal)
+- ✅ **SEMPRE** use IndexedDB como storage principal
+- ✅ **NUNCA** mantenha compatibilidade com localStorage
+- ✅ **Offline-first**: Todas as operações funcionam offline
+- ✅ **Sync posterior**: Sincronização quando online
+
+### Metadados de Sincronização
+```typescript
+interface SyncMetadata {
+  id: string;
+  lastModified: Date;
+  isSynced: boolean;
+  syncVersion: number;
+  conflictResolution?: 'local' | 'remote' | 'manual';
+}
+```
+
+### Fila de Sincronização
+- ✅ **Operações**: 'create' | 'update' | 'delete'
+- ✅ **Retry**: Máximo 3 tentativas com backoff exponencial
+- ✅ **Timestamp**: Para resolução de conflitos
+
+## 🚫 Regras de Proibição
+
+### NUNCA FAÇA:
+- ❌ Alterar statusAtual ao marcar/desmarcar impedimento
+- ❌ Adicionar entrada ao statusHistorico para impedimentos
+- ❌ Usar localStorage (apenas IndexedDB)
+- ❌ Criar regras de negócio não documentadas
+- ❌ Misturar tipos de histórico (status vs impedimento)
+- ❌ Usar null para campos opcionais (use undefined)
+- ❌ Sobrescrever regras de gamificação existentes
+- ❌ Criar novos tipos sem atualizar este arquivo
+
+### SEMPRE FAÇA:
+- ✅ Use `TaskContextV2` como contexto principal
+- ✅ Implemente validações de tipo TypeScript
+- ✅ Mantenha separação entre status e impedimentos
+- ✅ Use IDs únicos para histórico (timestamp + random)
+- ✅ Trate campos opcionais com valores padrão
+- ✅ Implemente retry para operações de sincronização
+- ✅ Mantenha logs para debugging (remova em produção)
+
+## 🔧 Padrões de Código
+
+### Context e Reducer
+```typescript
+// SEMPRE use este padrão para actions
+type TaskAction = 
+  | { type: 'UPDATE_STATUS'; payload: { id: number; status: TaskStatus } }
+  | { type: 'SET_IMPEDIMENT'; payload: { id: number; motivo: string } }
+  | { type: 'REMOVE_IMPEDIMENT'; payload: { id: number } };
+```
+
+### Tratamento de Erros
+```typescript
+// SEMPRE trate erros de IndexedDB
+try {
+  await indexedDBRepository.update(id, task);
+} catch (error) {
+  console.error('Error updating task:', error);
+  // Implementar fallback ou notificar usuário
+}
+```
+
+### Validação de Tipos
+```typescript
+// SEMPRE valide tipos antes de usar
+const task = tasks.find(t => t.id === id);
+if (!task) {
+  throw new Error(`Task with id ${id} not found`);
+}
+```
+
+## 📚 Documentação
+- ✅ **SEMPRE** atualize este arquivo quando adicionar novas regras
+- ✅ **SEMPRE** documente novos tipos e interfaces
+- ✅ **SEMPRE** explique regras de negócio complexas
+- ✅ **SEMPRE** mantenha exemplos de código atualizados
+
+## 🎯 Objetivos do Sistema
+1. **Produtividade**: Facilitar gestão eficiente de tarefas
+2. **Gamificação**: Motivar através de conquistas e níveis
+3. **Offline-first**: Funcionar sem conexão
+4. **Escalabilidade**: Suportar grandes volumes de dados
+5. **Manutenibilidade**: Código limpo e bem documentado
+
+---
+**Última atualização**: $(date)
+**Versão**: 1.0.0

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useTaskContext } from '@/contexts/TaskContextIndexedDB';
+import { useTaskContext } from '@/contexts/TaskContextV2';
 import { TaskPriority } from '@/types/task';
 
 export function TaskForm() {
