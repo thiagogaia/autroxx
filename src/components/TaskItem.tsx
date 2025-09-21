@@ -9,7 +9,6 @@ import { ImpedimentDialog } from './ImpedimentDialog';
 import { useTaskContext } from '@/contexts/TaskContextV2';
 import { Task, TaskStatus, TaskPriority } from '@/types/task';
 import { STATUS_CONFIG, PRIORIDADE_CONFIG } from '@/lib/mock-data';
-import { hasStatusInHistory } from '@/lib/utils';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -115,7 +114,7 @@ export function TaskItem({ task }: TaskItemProps) {
         {/* Checkbox Fazendo */}
         <td className="text-center p-4">
           <Checkbox
-            checked={hasStatusInHistory(task, 'fazendo')}
+            checked={task.statusAtual === 'fazendo'}
             onCheckedChange={() => handleStatusChange('fazendo')}
             className="mx-auto"
           />
@@ -124,7 +123,7 @@ export function TaskItem({ task }: TaskItemProps) {
         {/* Checkbox Concluído */}
         <td className="text-center p-4">
           <Checkbox
-            checked={hasStatusInHistory(task, 'concluido')}
+            checked={task.statusAtual === 'concluido'}
             onCheckedChange={() => handleStatusChange('concluido')}
             className="mx-auto"
           />

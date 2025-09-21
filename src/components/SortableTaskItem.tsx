@@ -19,7 +19,6 @@ import {
 import { useTaskContext } from '@/contexts/TaskContextV2';
 import { Task, TaskStatus, TaskPriority, TaskCategory, TaskComplexity } from '@/types/task';
 import { STATUS_CONFIG, PRIORIDADE_CONFIG } from '@/lib/mock-data';
-import { hasStatusInHistory } from '@/lib/utils';
 import { formatMinutesToString } from '@/lib/time-converter';
 import {
   AlertDialog,
@@ -213,7 +212,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
         {/* Checkbox Fazendo */}
         <td className="text-center p-4">
           <Checkbox
-            checked={hasStatusInHistory(task, 'fazendo')}
+            checked={task.statusAtual === 'fazendo'}
             onCheckedChange={() => handleStatusChange('fazendo')}
             className="mx-auto cursor-pointer"
           />
@@ -222,7 +221,7 @@ export function SortableTaskItem({ task }: SortableTaskItemProps) {
         {/* Checkbox Concluído */}
         <td className="text-center p-4">
           <Checkbox
-            checked={hasStatusInHistory(task, 'concluido')}
+            checked={task.statusAtual === 'concluido'}
             onCheckedChange={() => handleStatusChange('concluido')}
             className="mx-auto cursor-pointer"
           />
