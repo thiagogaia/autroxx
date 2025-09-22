@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Download, Upload, Trash2, RefreshCw } from 'lucide-react';
+import { Download, Upload, Trash2, RefreshCw, Hammer } from 'lucide-react';
 import { migrateTaskData, generateUniqueTaskId } from '@/lib/utils';
 import { deserializeTasks } from '@/lib/storage';
 import { useTaskContext } from '@/contexts/TaskContextV2';
+import { useGamificationRepository } from '@/hooks/useGamificationRepository';
+import { GamificationEngine } from '@/lib/gamification';
 import { Task } from '@/types/task';
 import {
   AlertDialog,
@@ -26,14 +28,17 @@ interface ImportedData {
 
 export function DataManagement() {
   const { tasks, addTaskFull, clearAllData } = useTaskContext();
+  const gamificationRepo = useGamificationRepository();
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const [doubleConfirmDialogOpen, setDoubleConfirmDialogOpen] = useState(false);
   const [sampleDialogOpen, setSampleDialogOpen] = useState(false);
+  const [forgeXPDialogOpen, setForgeXPDialogOpen] = useState(false);
   const [tasksToImport, setTasksToImport] = useState<Task[]>([]);
   const [importErrors, setImportErrors] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [isForgingXP, setIsForgingXP] = useState(false);
 
   // Validar estrutura de dados importados
   const validateImportedData = (data: unknown): { isValid: boolean; errors: string[] } => {
@@ -257,6 +262,74 @@ export function DataManagement() {
     setSampleDialogOpen(true);
   };
 
+  // Forjar XP - Recalcular todas as pontuações baseadas nas tarefas existentes
+  const forgeXP = async () => {
+    try {
+      setIsForgingXP(true);
+      setForgeXPDialogOpen(false);
+
+      // 1. Limpar todos os dados de gamificação existentes
+      await gamificationRepo.clearAllData();
+
+      // 2. Criar nova instância do engine de gamificação
+      const gamificationEngine = new GamificationEngine();
+
+      // 3. Processar todas as tarefas concluídas para recalcular XP
+      const completedTasks = tasks.filter(task => task.statusAtual === 'concluido');
+      
+      let totalXPGained = 0;
+      let totalQPGained = 0;
+      let achievementsUnlocked = 0;
+      let challengesCompleted = 0;
+
+      // Processar cada tarefa concluída
+      for (const task of completedTasks) {
+        const result = gamificationEngine.processTaskCompletion(task, tasks);
+        totalXPGained += result.xpGained;
+        totalQPGained += result.qpGained;
+        achievementsUnlocked += result.achievements.length;
+        challengesCompleted += result.challenges.length;
+      }
+
+      // 4. Salvar as estatísticas recalculadas
+      const userStats = gamificationEngine.getUserStats();
+      await gamificationRepo.saveUserStats(userStats);
+
+      // 5. Salvar todos os eventos gerados
+      const events = gamificationEngine.getRecentEvents(1000);
+      for (const event of events) {
+        await gamificationRepo.addEvent(event);
+      }
+
+      // 6. Salvar conquistas atualizadas
+      for (const achievement of userStats.achievements) {
+        await gamificationRepo.updateAchievement(achievement.id, achievement);
+      }
+
+      // 7. Salvar power-ups atualizados
+      for (const powerUp of userStats.powerUps) {
+        await gamificationRepo.updatePowerUp(powerUp.id, powerUp);
+      }
+
+      // 8. Salvar desafios semanais atualizados
+      for (const challenge of userStats.weeklyChallenges) {
+        await gamificationRepo.updateWeeklyChallenge(challenge.id, challenge);
+      }
+
+      setSuccessMessage(
+        `XP Forjado com sucesso! ` +
+        `Ganhou ${totalXPGained} XP e ${totalQPGained} QP. ` +
+        `Desbloqueou ${achievementsUnlocked} conquistas e completou ${challengesCompleted} desafios.`
+      );
+
+    } catch (error) {
+      console.error('Erro ao forjar XP:', error);
+      setErrorMessage('Erro ao forjar XP. Verifique o console para mais detalhes.');
+    } finally {
+      setIsForgingXP(false);
+    }
+  };
+
   const handleSampleConfirm = () => {
     const sampleTasks: Task[] = [
       {
@@ -406,7 +479,7 @@ export function DataManagement() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             <Button
               onClick={exportData}
               variant="outline"
@@ -451,6 +524,34 @@ export function DataManagement() {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+
+            <AlertDialog open={forgeXPDialogOpen} onOpenChange={setForgeXPDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2"
+                  disabled={tasks.length === 0 || isForgingXP}
+                >
+                  <Hammer className="h-4 w-4" />
+                  {isForgingXP ? 'Forjando...' : 'Forjar XP'}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Forjar XP</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Isso irá recalcular todas as pontuações de gamificação baseadas nas suas tarefas existentes. 
+                    Todos os dados de gamificação atuais serão apagados e recalculados do zero. Deseja continuar?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={forgeXP} disabled={isForgingXP}>
+                    {isForgingXP ? 'Forjando...' : 'Forjar XP'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             
             <AlertDialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
               <AlertDialogTrigger asChild>
@@ -486,6 +587,7 @@ export function DataManagement() {
             <p><strong>Exportar:</strong> Baixa um arquivo JSON com todas as tarefas</p>
             <p><strong>Importar:</strong> Carrega tarefas de um arquivo JSON</p>
             <p><strong>Exemplos:</strong> Adiciona tarefas de demonstração</p>
+            <p><strong>Forjar XP:</strong> Recalcula todas as pontuações de gamificação</p>
             <p><strong>Limpar:</strong> Remove todos os dados do banco de dados</p>
           </div>
           

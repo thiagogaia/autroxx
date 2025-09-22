@@ -239,10 +239,13 @@ export class IndexedDBGamificationRepository implements IGamificationRepository 
       }
     };
 
-    await gamificationDB.userStats.update(existingStats.id, updatedStats);
+    await gamificationDB.userStats.update(existingStats.syncMetadata.id, {
+      ...updates,
+      syncMetadata: updatedStats.syncMetadata
+    });
 
     if (!this.isOnline) {
-      await this.addToSyncQueue('update', 'userStats', { id: existingStats.id, ...updates });
+      await this.addToSyncQueue('update', 'userStats', { id: existingStats.syncMetadata.id, ...updates });
     }
 
     return this.removeSyncMetadata(updatedStats);
@@ -327,11 +330,11 @@ export class IndexedDBGamificationRepository implements IGamificationRepository 
     const events = await gamificationDB.events
       .where('type')
       .equals(type)
-      .orderBy('timestamp')
-      .reverse()
       .toArray();
     
-    return events.map(event => this.removeSyncMetadata(event));
+    return events
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      .map((event: GamificationEventWithSync) => this.removeSyncMetadata(event));
   }
 
   async getRecentEvents(limit: number): Promise<GamificationEvent[]> {
@@ -548,15 +551,15 @@ export class IndexedDBGamificationRepository implements IGamificationRepository 
     // Implementação específica para cada tabela
     switch (table) {
       case 'userStats':
-        return await gamificationDB.userStats.where('syncMetadata.isSynced').equals(false).toArray();
+        return await gamificationDB.userStats.filter(item => !item.syncMetadata.isSynced).toArray();
       case 'events':
-        return await gamificationDB.events.where('syncMetadata.isSynced').equals(false).toArray();
+        return await gamificationDB.events.filter(item => !item.syncMetadata.isSynced).toArray();
       case 'achievements':
-        return await gamificationDB.achievements.where('syncMetadata.isSynced').equals(false).toArray();
+        return await gamificationDB.achievements.filter(item => !item.syncMetadata.isSynced).toArray();
       case 'powerUps':
-        return await gamificationDB.powerUps.where('syncMetadata.isSynced').equals(false).toArray();
+        return await gamificationDB.powerUps.filter(item => !item.syncMetadata.isSynced).toArray();
       case 'weeklyChallenges':
-        return await gamificationDB.weeklyChallenges.where('syncMetadata.isSynced').equals(false).toArray();
+        return await gamificationDB.weeklyChallenges.filter(item => !item.syncMetadata.isSynced).toArray();
       default:
         return [];
     }
@@ -635,11 +638,11 @@ export class IndexedDBGamificationRepository implements IGamificationRepository 
     const totalItems = statsCount + eventsCount + achievementsCount + powerUpsCount + weeklyChallengesCount;
 
     // Contar itens não sincronizados
-    const unsyncedStats = await gamificationDB.userStats.where('syncMetadata.isSynced').equals(false).count();
-    const unsyncedEvents = await gamificationDB.events.where('syncMetadata.isSynced').equals(false).count();
-    const unsyncedAchievements = await gamificationDB.achievements.where('syncMetadata.isSynced').equals(false).count();
-    const unsyncedPowerUps = await gamificationDB.powerUps.where('syncMetadata.isSynced').equals(false).count();
-    const unsyncedWeeklyChallenges = await gamificationDB.weeklyChallenges.where('syncMetadata.isSynced').equals(false).count();
+    const unsyncedStats = await gamificationDB.userStats.filter(item => !item.syncMetadata.isSynced).count();
+    const unsyncedEvents = await gamificationDB.events.filter(item => !item.syncMetadata.isSynced).count();
+    const unsyncedAchievements = await gamificationDB.achievements.filter(item => !item.syncMetadata.isSynced).count();
+    const unsyncedPowerUps = await gamificationDB.powerUps.filter(item => !item.syncMetadata.isSynced).count();
+    const unsyncedWeeklyChallenges = await gamificationDB.weeklyChallenges.filter(item => !item.syncMetadata.isSynced).count();
 
     const unsyncedItems = unsyncedStats + unsyncedEvents + unsyncedAchievements + unsyncedPowerUps + unsyncedWeeklyChallenges;
 
@@ -803,11 +806,11 @@ export class IndexedDBGamificationRepository implements IGamificationRepository 
     const syncQueueCount = await gamificationDB.syncQueue.count();
 
     // Contar itens não sincronizados
-    const unsyncedStats = await gamificationDB.userStats.where('syncMetadata.isSynced').equals(false).count();
-    const unsyncedEvents = await gamificationDB.events.where('syncMetadata.isSynced').equals(false).count();
-    const unsyncedAchievements = await gamificationDB.achievements.where('syncMetadata.isSynced').equals(false).count();
-    const unsyncedPowerUps = await gamificationDB.powerUps.where('syncMetadata.isSynced').equals(false).count();
-    const unsyncedWeeklyChallenges = await gamificationDB.weeklyChallenges.where('syncMetadata.isSynced').equals(false).count();
+    const unsyncedStats = await gamificationDB.userStats.filter(item => !item.syncMetadata.isSynced).count();
+    const unsyncedEvents = await gamificationDB.events.filter(item => !item.syncMetadata.isSynced).count();
+    const unsyncedAchievements = await gamificationDB.achievements.filter(item => !item.syncMetadata.isSynced).count();
+    const unsyncedPowerUps = await gamificationDB.powerUps.filter(item => !item.syncMetadata.isSynced).count();
+    const unsyncedWeeklyChallenges = await gamificationDB.weeklyChallenges.filter(item => !item.syncMetadata.isSynced).count();
 
     const unsyncedCount = unsyncedStats + unsyncedEvents + unsyncedAchievements + unsyncedPowerUps + unsyncedWeeklyChallenges;
 
