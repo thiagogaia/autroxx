@@ -8,8 +8,7 @@ import { migrateTaskData, generateUniqueTaskId } from '@/lib/utils';
 import { deserializeTasks } from '@/lib/storage';
 import { useTaskContext } from '@/contexts/TaskContextV2';
 import { useGamificationRepository } from '@/hooks/useGamificationRepository';
-import { GamificationEngine } from '@/lib/gamification';
-import { gamificationDB } from '@/lib/gamification-indexeddb-repo';
+import { useTaskGamificationIntegration } from '@/contexts/TaskGamificationIntegration';
 import { Task } from '@/types/task';
 import {
   AlertDialog,
@@ -30,6 +29,7 @@ interface ImportedData {
 export function DataManagement() {
   const { tasks, addTaskFull, clearAllData } = useTaskContext();
   const gamificationRepo = useGamificationRepository();
+  const { processTaskCompletion, refreshGamificationStats } = useTaskGamificationIntegration();
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const [doubleConfirmDialogOpen, setDoubleConfirmDialogOpen] = useState(false);
@@ -267,89 +267,97 @@ export function DataManagement() {
       setIsForgingXP(true);
       setForgeXPDialogOpen(false);
 
+      console.log('🔥 Iniciando processo de Forjar XP...');
+
       // 1. Limpar todos os dados de gamificação existentes
+      console.log('📊 Limpando dados de gamificação existentes...');
       await gamificationRepo.clearAllData();
+      // alert('apaguei zeh')
+      // return;
+      console.log('✅ Dados de gamificação limpos com sucesso');
 
-      // 2. Criar nova instância do engine de gamificação
-      const gamificationEngine = new GamificationEngine();
-
-      // 3. Processar todas as tarefas concluídas para recalcular XP
+      // 2. Buscar todas as tarefas concluídas (equivalente a SELECT * FROM tasks WHERE status = 'concluido')
+      console.log('🔍 Buscando tarefas concluídas...');
       const completedTasks = tasks.filter(task => task.statusAtual === 'concluido');
-      
-      let totalXPGained = 0;
-      let totalQPGained = 0;
-      let achievementsUnlocked = 0;
-      let challengesCompleted = 0;
+      console.log(`📋 Encontradas ${completedTasks.length} tarefas concluídas de ${tasks.length} tarefas totais`);
 
-      // Processar cada tarefa concluída
+      // Contadores detalhados
+      let tasksProcessed = 0;
+      let tasksByCategory: Record<string, number> = {};
+      let tasksByComplexity: Record<string, number> = {};
+      let tasksByPriority: Record<string, number> = {};
+
+      console.log('🎯 Processando cada tarefa concluída usando TaskGamificationIntegration...');
+
+      // 3. Processar cada tarefa concluída usando o mesmo padrão do TaskGamificationIntegration
       for (const task of completedTasks) {
-        const result = gamificationEngine.processTaskCompletion(task, tasks);
-        totalXPGained += result.xpGained;
-        totalQPGained += result.qpGained;
-        achievementsUnlocked += result.achievements.length;
-        challengesCompleted += result.challenges.length;
+        console.log(`📝 Processando tarefa: "${task.titulo}" (ID: ${task.id})`);
+        
+        // Usar o mesmo processo que o TaskGamificationIntegration usa
+        processTaskCompletion(task, tasks);
+        
+        tasksProcessed++;
+
+        // Estatísticas por categoria
+        const category = task.categoria || 'sem_categoria';
+        tasksByCategory[category] = (tasksByCategory[category] || 0) + 1;
+
+        // Estatísticas por complexidade
+        const complexity = task.complexidade || 'simples';
+        tasksByComplexity[complexity] = (tasksByComplexity[complexity] || 0) + 1;
+
+        // Estatísticas por prioridade
+        const priority = task.prioridade || 'normal';
+        tasksByPriority[priority] = (tasksByPriority[priority] || 0) + 1;
+
+        console.log(`  ✅ Tarefa processada com sucesso`);
       }
 
-      // 4. Salvar as estatísticas recalculadas
-      const userStats = gamificationEngine.getUserStats();
-      await gamificationRepo.saveUserStats(userStats);
+      console.log('🔄 Atualizando estatísticas de gamificação...');
 
-      // 5. Salvar todos os eventos gerados
-      const events = gamificationEngine.getRecentEvents(1000);
-      for (const event of events) {
-        await gamificationRepo.addEvent(event);
-      }
+      // 4. Atualizar estatísticas usando o mesmo padrão do TaskGamificationIntegration
+      refreshGamificationStats(tasks);
+      console.log('✅ Estatísticas atualizadas com sucesso');
 
-      // 6. Salvar conquistas, power-ups e desafios em tabelas separadas
-      // Primeiro, limpar as tabelas existentes
-      await gamificationDB.achievements.clear();
-      await gamificationDB.powerUps.clear();
-      await gamificationDB.weeklyChallenges.clear();
-      
-      // Adicionar achievements
-      const achievementsWithSync = userStats.achievements.map(achievement => ({
-        ...achievement,
-        syncMetadata: {
-          id: `achievement_${achievement.id}_${Date.now()}`,
-          lastModified: new Date(),
-          isSynced: true,
-          syncVersion: 1
-        }
-      }));
-      await gamificationDB.achievements.bulkAdd(achievementsWithSync);
-      
-      // Adicionar power-ups
-      const powerUpsWithSync = userStats.powerUps.map(powerUp => ({
-        ...powerUp,
-        syncMetadata: {
-          id: `powerup_${powerUp.id}_${Date.now()}`,
-          lastModified: new Date(),
-          isSynced: true,
-          syncVersion: 1
-        }
-      }));
-      await gamificationDB.powerUps.bulkAdd(powerUpsWithSync);
-      
-      // Adicionar challenges
-      const challengesWithSync = userStats.weeklyChallenges.map(challenge => ({
-        ...challenge,
-        syncMetadata: {
-          id: `challenge_${challenge.id}_${Date.now()}`,
-          lastModified: new Date(),
-          isSynced: true,
-          syncVersion: 1
-        }
-      }));
-      await gamificationDB.weeklyChallenges.bulkAdd(challengesWithSync);
+      // 5. Gerar relatório detalhado
+      const categoryBreakdown = Object.entries(tasksByCategory)
+        .map(([cat, count]) => `${cat}: ${count}`)
+        .join(', ');
 
-      setSuccessMessage(
-        `XP Forjado com sucesso! ` +
-        `Ganhou ${totalXPGained} XP e ${totalQPGained} QP. ` +
-        `Desbloqueou ${achievementsUnlocked} conquistas e completou ${challengesCompleted} desafios.`
-      );
+      const complexityBreakdown = Object.entries(tasksByComplexity)
+        .map(([comp, count]) => `${comp}: ${count}`)
+        .join(', ');
+
+      const priorityBreakdown = Object.entries(tasksByPriority)
+        .map(([prio, count]) => `${prio}: ${count}`)
+        .join(', ');
+
+      const successMessage = [
+        '🔥 XP FORJADO COM SUCESSO! 🔥',
+        '',
+        '📊 RESUMO GERAL:',
+        `• Tarefas processadas: ${tasksProcessed}/${completedTasks.length}`,
+        `• Usado padrão TaskGamificationIntegration`,
+        '',
+        '📈 ESTATÍSTICAS POR CATEGORIA:',
+        `• ${categoryBreakdown}`,
+        '',
+        '🎯 ESTATÍSTICAS POR COMPLEXIDADE:',
+        `• ${complexityBreakdown}`,
+        '',
+        '⚡ ESTATÍSTICAS POR PRIORIDADE:',
+        `• ${priorityBreakdown}`,
+        '',
+        '✅ Processo concluído usando o mesmo fluxo do sistema de gamificação!'
+      ].join('\n');
+
+      console.log('🎉 Processo de Forjar XP concluído com sucesso!');
+      console.log(successMessage);
+
+      setSuccessMessage(successMessage);
 
     } catch (error) {
-      console.error('Erro ao forjar XP:', error);
+      console.error('❌ Erro ao forjar XP:', error);
       setErrorMessage('Erro ao forjar XP. Verifique o console para mais detalhes.');
     } finally {
       setIsForgingXP(false);
