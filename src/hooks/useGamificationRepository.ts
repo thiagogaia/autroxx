@@ -3,7 +3,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { gamificationRepository } from '@/lib/gamification-indexeddb-repo';
-import { gamificationMigrationService } from '@/lib/gamification-migration-service';
 import { 
   UserStats, 
   GamificationEvent, 
@@ -16,7 +15,6 @@ export interface UseGamificationRepositoryReturn {
   // Estados
   isLoading: boolean;
   isOnline: boolean;
-  migrationStatus: 'pending' | 'in_progress' | 'completed' | 'error';
   
   // Dados
   userStats: UserStats | null;
@@ -51,10 +49,6 @@ export interface UseGamificationRepositoryReturn {
   updateWeeklyChallenge: (id: string, updates: Partial<WeeklyChallenge>) => Promise<WeeklyChallenge>;
   completeWeeklyChallenge: (id: string) => Promise<WeeklyChallenge>;
   
-  // Métodos de migração
-  migrateFromLocalStorage: () => Promise<void>;
-  checkLocalStorageData: () => Promise<any>;
-  
   // Métodos de sincronização
   syncWithServer: () => Promise<void>;
   getSyncStatus: () => Promise<any>;
@@ -72,7 +66,6 @@ export interface UseGamificationRepositoryReturn {
 export function useGamificationRepository(): UseGamificationRepositoryReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(typeof window !== 'undefined' ? navigator.onLine : true);
-  const [migrationStatus, setMigrationStatus] = useState<'pending' | 'in_progress' | 'completed' | 'error'>('pending');
   
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [events, setEvents] = useState<GamificationEvent[]>([]);
@@ -102,27 +95,11 @@ export function useGamificationRepository(): UseGamificationRepositoryReturn {
       try {
         setIsLoading(true);
         
-        // Verificar migração
-        const localStorageInfo = await gamificationMigrationService.checkLocalStorageData();
-        if (localStorageInfo.hasStats || localStorageInfo.hasEvents) {
-          setMigrationStatus('in_progress');
-          try {
-            await gamificationMigrationService.migrateWithRollback();
-            setMigrationStatus('completed');
-          } catch (error) {
-            console.error('Erro na migração:', error);
-            setMigrationStatus('error');
-          }
-        } else {
-          setMigrationStatus('completed');
-        }
-
         // Carregar dados do IndexedDB
         await refresh();
         
       } catch (error) {
         console.error('Erro ao inicializar dados:', error);
-        setMigrationStatus('error');
       } finally {
         setIsLoading(false);
       }
@@ -346,29 +323,6 @@ export function useGamificationRepository(): UseGamificationRepositoryReturn {
     }
   }, []);
 
-  // Métodos de migração
-  const migrateFromLocalStorage = useCallback(async (): Promise<void> => {
-    try {
-      setMigrationStatus('in_progress');
-      await gamificationMigrationService.migrateWithRollback();
-      setMigrationStatus('completed');
-      await refresh();
-    } catch (error) {
-      console.error('Erro na migração:', error);
-      setMigrationStatus('error');
-      throw error;
-    }
-  }, [refresh]);
-
-  const checkLocalStorageData = useCallback(async () => {
-    try {
-      return await gamificationMigrationService.checkLocalStorageData();
-    } catch (error) {
-      console.error('Erro ao verificar localStorage:', error);
-      throw error;
-    }
-  }, []);
-
   // Métodos de sincronização
   const syncWithServer = useCallback(async (): Promise<void> => {
     try {
@@ -431,7 +385,6 @@ export function useGamificationRepository(): UseGamificationRepositoryReturn {
     // Estados
     isLoading,
     isOnline,
-    migrationStatus,
     
     // Dados
     userStats,
@@ -465,10 +418,6 @@ export function useGamificationRepository(): UseGamificationRepositoryReturn {
     getWeeklyChallenges,
     updateWeeklyChallenge,
     completeWeeklyChallenge,
-    
-    // Métodos de migração
-    migrateFromLocalStorage,
-    checkLocalStorageData,
     
     // Métodos de sincronização
     syncWithServer,

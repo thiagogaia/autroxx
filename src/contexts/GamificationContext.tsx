@@ -12,13 +12,11 @@ import {
 } from '@/types/gamification';
 import { GamificationEngine } from '@/lib/gamification';
 import { gamificationRepository } from '@/lib/gamification-indexeddb-repo';
-import { gamificationMigrationService } from '@/lib/gamification-migration-service';
 
 interface GamificationContextType {
   userStats: UserStats;
   events: GamificationEvent[];
   isLoading: boolean;
-  migrationStatus: 'pending' | 'in_progress' | 'completed' | 'error';
   processTaskCompletion: (task: Task, allTasks: Task[]) => Promise<void>;
   unlockPowerUp: (powerUpId: string) => Promise<boolean>;
   activatePowerUp: (powerUpId: string) => Promise<boolean>;
@@ -26,7 +24,6 @@ interface GamificationContextType {
   dismissEvent: (eventId: number) => Promise<void>;
   getLeaderboard: (type: 'xp' | 'accuracy' | 'speed' | 'quality') => LeaderboardEntry[];
   refreshStats: (tasks: Task[]) => Promise<void>;
-  migrateFromLocalStorage: () => Promise<void>;
 }
 
 const GamificationContext = createContext<GamificationContextType | undefined>(undefined);
@@ -36,7 +33,6 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
   const [userStats, setUserStats] = useState<UserStats>(engine.getUserStats());
   const [events, setEvents] = useState<GamificationEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [migrationStatus, setMigrationStatus] = useState<'pending' | 'in_progress' | 'completed' | 'error'>('pending');
 
   // Carregar dados do IndexedDB na inicialização
   useEffect(() => {
@@ -44,36 +40,7 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
       try {
         setIsLoading(true);
 
-        // 1. Verificar se há dados no localStorage para migrar
-        const localStorageInfo = await gamificationMigrationService.checkLocalStorageData();
-        
-        if (localStorageInfo.hasStats || localStorageInfo.hasEvents) {
-          console.log('Dados encontrados no localStorage, iniciando migração...');
-          setMigrationStatus('in_progress');
-          
-          try {
-            const migrationResult = await gamificationMigrationService.migrateWithRollback();
-            
-            if (migrationResult.success) {
-              console.log('Migração concluída com sucesso:', migrationResult);
-              setMigrationStatus('completed');
-              
-              // Limpar localStorage após migração bem-sucedida
-              await gamificationMigrationService.cleanupLocalStorage();
-            } else {
-              console.error('Erro na migração:', migrationResult.errors);
-              setMigrationStatus('error');
-            }
-          } catch (migrationError) {
-            console.error('Erro durante a migração:', migrationError);
-            setMigrationStatus('error');
-          }
-        } else {
-          console.log('Nenhum dado encontrado no localStorage, carregando do IndexedDB...');
-          setMigrationStatus('completed');
-        }
-
-        // 2. Carregar dados do IndexedDB
+        // Carregar dados do IndexedDB
         const [loadedStats, loadedEvents] = await Promise.all([
           gamificationRepository.getUserStats(),
           gamificationRepository.getRecentEvents(50)
@@ -96,7 +63,6 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
 
       } catch (error) {
         console.error('Erro ao inicializar gamificação:', error);
-        setMigrationStatus('error');
       } finally {
         setIsLoading(false);
       }
@@ -225,54 +191,18 @@ export function GamificationProvider({ children }: { children: ReactNode }) {
     }
   }, [engine]);
 
-  const migrateFromLocalStorage = useCallback(async () => {
-    try {
-      setMigrationStatus('in_progress');
-      const result = await gamificationMigrationService.migrateWithRollback();
-      
-      if (result.success) {
-        setMigrationStatus('completed');
-        await gamificationMigrationService.cleanupLocalStorage();
-        
-        // Recarregar dados após migração
-        const [loadedStats, loadedEvents] = await Promise.all([
-          gamificationRepository.getUserStats(),
-          gamificationRepository.getRecentEvents(50)
-        ]);
-        
-        if (loadedStats) {
-          setUserStats(loadedStats);
-          engine.updateUserStats([]); // Força atualização
-        }
-        
-        if (loadedEvents && loadedEvents.length > 0) {
-          setEvents(loadedEvents);
-          engine.events = loadedEvents;
-          engine.initializeEventId();
-        }
-      } else {
-        setMigrationStatus('error');
-      }
-    } catch (error) {
-      console.error('Erro na migração manual:', error);
-      setMigrationStatus('error');
-    }
-  }, [engine]);
-
   return (
     <GamificationContext.Provider value={{
       userStats,
       events,
       isLoading,
-      migrationStatus,
       processTaskCompletion,
       unlockPowerUp,
       activatePowerUp,
       isPowerUpActive,
       dismissEvent,
       getLeaderboard,
-      refreshStats,
-      migrateFromLocalStorage
+      refreshStats
     }}>
       {children}
     </GamificationContext.Provider>
