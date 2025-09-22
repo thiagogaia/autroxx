@@ -1,9 +1,262 @@
 {
   "tasks": [
     {
-      "id": 28400831406,
+      "id": 28523173237,
+      "titulo": "AATROXX - Sistema de usuarios",
+      "descricao": "",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-22T06:39:33.237Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-22T07:10:13.918Z"
+        }
+      ],
+      "statusAtual": "fazendo",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "impedimentoHistorico": [],
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-22T06:39:33.237Z",
+      "dataInicio": "2025-09-22T07:10:13.918Z",
+      "dataFim": null,
+      "ordem": 0,
+      "tags": [],
+      "is_active": true,
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 240,
+      "complexidade": "complexa",
+      "numeroMudancasPrioridade": 0,
+      "tempoTotalImpedimento": 0,
+      "referenced_task_id": null,
+      "parent_id": null
+    },
+    {
+      "id": 18523124680,
+      "titulo": "AATROXX - Cadastro de tarefa Referenciada",
+      "descricao": "Arvore de tarefas",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-22T06:38:44.680Z"
+        }
+      ],
+      "statusAtual": "a_fazer",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "impedimentoHistorico": [],
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-22T06:38:44.680Z",
+      "dataInicio": null,
+      "dataFim": null,
+      "ordem": 0,
+      "tags": [],
+      "is_active": true,
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 240,
+      "complexidade": "complexa",
+      "numeroMudancasPrioridade": 0,
+      "tempoTotalImpedimento": 0,
+      "referenced_task_id": null,
+      "parent_id": null
+    },
+    {
+      "id": 18521636254,
+      "titulo": "AATROXX - botao de banco de dados para importacao e exportacao de dados",
+      "descricao": "",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-22T06:13:56.254Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-22T06:15:02.141Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-22T06:37:06.562Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "impedimentoHistorico": [],
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-22T06:13:56.254Z",
+      "dataInicio": "2025-09-22T06:15:02.141Z",
+      "dataFim": "2025-09-22T06:37:06.562Z",
+      "ordem": 0,
+      "tags": [],
+      "is_active": true,
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 30,
+      "complexidade": "simples",
+      "numeroMudancasPrioridade": 0,
+      "tempoTotalImpedimento": 0,
+      "referenced_task_id": null,
+      "parent_id": null
+    },
+    {
+      "id": 18519921434,
+      "titulo": "AATROXX - GaiaBan - Organização do projeto",
+      "descricao": "",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-22T05:45:21.434Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-22T05:45:40.399Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-22T06:38:01.607Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "impedimentoHistorico": [],
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-22T05:45:21.434Z",
+      "dataInicio": "2025-09-22T05:45:40.399Z",
+      "dataFim": "2025-09-22T06:38:01.607Z",
+      "ordem": 0,
+      "tags": [],
+      "is_active": true,
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 120,
+      "complexidade": "complexa",
+      "numeroMudancasPrioridade": 0,
+      "tempoTotalImpedimento": 0,
+      "referenced_task_id": null,
+      "parent_id": null
+    },
+    {
+      "id": 18516782193,
+      "titulo": "Gaiaban - implementar Web/Service Worker",
+      "descricao": "📊 Funcionalidades Offline-First Implementadas:\nFuncionalidade\tStatus\tImplementação\nArmazenamento local\t✅\tIndexedDB com persistência\nOperações offline\t✅\tCRUD funciona sem internet\nFila de sincronização\t✅\tOperações enfileiradas\nRetry automático\t✅\tTentativas com backoff\nDetecção online/offline\t✅\tEvent listeners\nStatus visual\t✅\tSyncStatusWidget\nIntegração com CRUD\t❌\tNão conectado ao TaskContext\nConfiguração automática\t❌\tPrecisa de setup manual\n💡 Recomendação:\nPara completar o sistema offline-first:\nIntegrar sincronização ao TaskContextV2\nAdicionar SyncStatusWidget à interface principal\nConfigurar automaticamente o serviço de sincronização\nTestar cenários offline (desconectar internet)\nO sistema tem toda a infraestrutura necessária, mas precisa ser conectado ao fluxo principal da aplicação.",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-21T00:14:37.713Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-21T00:14:57.953Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-22T04:53:52.377Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "baixa",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "impedimentoHistorico": [],
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-21T00:14:37.713Z",
+      "dataInicio": "2025-09-21T00:14:57.953Z",
+      "dataFim": "2025-09-22T04:53:52.377Z",
+      "ordem": 0,
+      "tags": [],
+      "is_active": true,
+      "rsync": false,
+      "id_rsync": null,
+      "categoria": "desenvolvimento",
+      "estimativaTempo": 180,
+      "complexidade": "complexa",
+      "referenced_task_id": null,
+      "parent_id": null
+    },
+    {
+      "id": 28516782194,
+      "titulo": "[BUG] - Gaiaban - funcionalidade de ordenação",
+      "descricao": "",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-20T22:54:14.719Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-20T22:56:04.338Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-22T04:54:31.201Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "normal",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "impedimentoHistorico": [],
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-20T22:54:14.719Z",
+      "dataInicio": "2025-09-20T22:56:04.338Z",
+      "dataFim": "2025-09-22T04:54:31.201Z",
+      "ordem": 1,
+      "tags": [],
+      "is_active": true,
+      "rsync": false,
+      "id_rsync": null,
+      "categoria": "bug",
+      "estimativaTempo": 30,
+      "complexidade": "media",
+      "referenced_task_id": null,
+      "parent_id": null
+    },
+    {
+      "id": 38516782194,
+      "titulo": "Adicionar o comando cursor . e code . no mac",
+      "descricao": "let-env PATH = ($env.PATH | prepend \"/usr/local/bin\")\nlet-env PATH = ($env.PATH | prepend \"/opt/homebrew/bin\")",
+      "statusHistorico": [
+        {
+          "status": "a_fazer",
+          "timestamp": "2025-09-20T23:08:25.426Z"
+        },
+        {
+          "status": "fazendo",
+          "timestamp": "2025-09-20T23:08:50.568Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-20T23:15:55.788Z"
+        }
+      ],
+      "statusAtual": "concluido",
+      "prioridade": "alta",
+      "impedimento": false,
+      "impedimentoMotivo": "",
+      "impedimentoHistorico": [],
+      "dataImpedimento": null,
+      "dataCadastro": "2025-09-20T23:08:25.426Z",
+      "dataInicio": "2025-09-20T23:08:50.568Z",
+      "dataFim": "2025-09-20T23:15:55.788Z",
+      "ordem": 2,
+      "tags": [],
+      "is_active": true,
+      "rsync": false,
+      "id_rsync": null,
+      "categoria": "documentacao",
+      "complexidade": "complexa",
+      "referenced_task_id": null,
+      "parent_id": null
+    },
+    {
+      "id": 58516782195,
       "titulo": "Gaiaban - [Ajuste total da pagina principal]",
-      "descricao": "- [x] Paginação\n- [x] Implementar Filtros\n- [ ] Cadastro de Pausa\n- [ ] Cadastro de tarefa Referenciada\n- [ ] Implementar DeadLine\n- [x] Revisar Metricas Pagina Inicial\n- [ ] Melhorar regras de status => Remover Fazendo => Só pode concluir depois de Fazendo. => pode remover de concluir e remover de fazendo. Deixando tudo no histórico do status.",
+      "descricao": "- [x] Paginação\n- [x] Implementar Filtros\n- [x] Revisar Metricas Pagina Inicial",
       "statusHistorico": [
         {
           "status": "a_fazer",
@@ -12,9 +265,13 @@
         {
           "status": "fazendo",
           "timestamp": "2025-09-20T20:41:08.291Z"
+        },
+        {
+          "status": "concluido",
+          "timestamp": "2025-09-20T22:51:14.423Z"
         }
       ],
-      "statusAtual": "fazendo",
+      "statusAtual": "concluido",
       "prioridade": "baixa",
       "impedimento": false,
       "impedimentoMotivo": "",
@@ -22,14 +279,17 @@
       "dataImpedimento": null,
       "dataCadastro": "2025-09-20T20:40:31.406Z",
       "dataInicio": "2025-09-20T20:41:08.291Z",
-      "dataFim": null,
-      "ordem": 0,
+      "dataFim": "2025-09-20T22:51:14.423Z",
+      "ordem": 4,
       "tags": [],
       "is_active": true,
+      "rsync": false,
+      "id_rsync": null,
       "categoria": "desenvolvimento",
       "estimativaTempo": 120,
       "complexidade": "simples",
-      "referenced_task_id": null
+      "referenced_task_id": null,
+      "parent_id": null
     },
     {
       "id": 28388131726,
