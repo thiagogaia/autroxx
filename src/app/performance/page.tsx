@@ -28,28 +28,13 @@ export default function TaskManagerPage() {
         {/* Navigation */}
         <Navigation />
 
-        <div className="flex justify-between ">
-          {/* Filtros básicos (abas) */}
-          <TaskFilter />
         
-          {/* Filtros avançados */}
-          <AdvancedFilters />
-        </div>
-        
-        {/* Formulário */}
-        <TaskForm />
-        
-        {/* Lista de Tarefas */}
-        <TaskList />
-        
-        {/* Paginação */}
-        <Pagination />
         
         {/* Métricas */}
-        {/* <Metrics /> */}
+        <Metrics />
         
         {/* Insights */}
-        {/* <Insights /> */}
+        <Insights />
         
         {/* Gerenciamento de Dados */}
         {/* <DataManagement /> */}

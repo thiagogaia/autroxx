@@ -20,6 +20,7 @@ export function Navigation() {
 
   const navItems = [
     { href: '/', label: 'Dashboard', icon: Home },
+    { href: '/performance', label: 'Performance', icon: BarChart3 },
     { href: '/reports', label: 'Relatórios', icon: BarChart3 },
     { href: '/essencial', label: 'Essencial', icon: BarChart3 },
     { href: '/gamification', label: 'Forja XP', icon: Trophy }
