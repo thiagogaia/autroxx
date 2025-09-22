@@ -845,7 +845,8 @@ export class GamificationEngine {
   updateUserStats(tasks: Task[]): void {
     const completedTasks = tasks.filter(t => t.statusAtual === 'concluido');
     
-    this.userStats.totalTasksCompleted = completedTasks.length;
+    // ✅ NÃO zerar totalTasksCompleted - manter histórico
+    // this.userStats.totalTasksCompleted = completedTasks.length;
     this.userStats.weeklyStreak = this.calculateStreak(tasks);
     this.userStats.longestStreak = Math.max(this.userStats.longestStreak, this.userStats.weeklyStreak);
     
