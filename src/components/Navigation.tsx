@@ -19,7 +19,7 @@ export function Navigation() {
   const { userStats } = useGamification();
 
   const navItems = [
-    { href: '/', label: 'Dashboard', icon: Home },
+    { href: '/', label: 'Tarefas', icon: Home },
     { href: '/performance', label: 'Performance', icon: BarChart3 },
     { href: '/reports', label: 'Relatórios', icon: BarChart3 },
     { href: '/essencial', label: 'Essencial', icon: BarChart3 },
