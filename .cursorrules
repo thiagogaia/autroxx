@@ -1,7 +1,7 @@
 # Task Manager MVP - Cursor Rules
 
 ## 🎯 Visão Geral do Projeto
-Este é um sistema de gerenciamento de tarefas (Task Manager) desenvolvido em Next.js com foco em:
+Este é um sistema de gerenciamento de tarefas (Task Manager) desenvolvido em Next.js (shadcn ui) com foco em:
 - **Offline-first**: Funciona sem conexão com internet
 - **Gamificação**: Sistema de pontuação, conquistas e níveis
 - **IndexedDB**: Armazenamento local robusto com sincronização posterior
