@@ -52,10 +52,10 @@ export function GamificationDashboard() {
 
   const getLevelColor = (level: string) => {
     const colors = {
-      'novato': 'text-gray-600',
-      'desenvolvedor': 'text-blue-600',
-      'especialista': 'text-purple-600',
-      'mestre': 'text-orange-600',
+      'novato': 'text-gray-200',
+      'desenvolvedor': 'text-blue-300',
+      'especialista': 'text-purple-300',
+      'mestre': 'text-orange-300',
       'lenda': 'text-yellow-600'
     };
     return colors[level as keyof typeof colors] || 'text-gray-600';
