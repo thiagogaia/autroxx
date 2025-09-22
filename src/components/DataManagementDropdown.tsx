@@ -439,11 +439,11 @@ export function DataManagementDropdown() {
 
       {/* Toast notifications */}
       {successMessage && (
-        <div className="fixed top-4 right-4 p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-md shadow-lg z-50">
-          <p className="text-green-800 dark:text-green-200 text-sm">{successMessage}</p>
+        <div className="fixed bottom-4 right-4 p-3 bg-background border border-border rounded-md shadow-lg z-50 max-w-sm">
+          <p className="text-foreground text-sm">{successMessage}</p>
           <button 
             onClick={() => setSuccessMessage('')}
-            className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200 text-xs mt-1"
+            className="text-muted-foreground hover:text-foreground text-xs mt-1"
           >
             ✕ Fechar
           </button>
@@ -451,11 +451,11 @@ export function DataManagementDropdown() {
       )}
       
       {errorMessage && (
-        <div className="fixed top-4 right-4 p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-md shadow-lg z-50">
-          <p className="text-red-800 dark:text-red-200 text-sm whitespace-pre-line">{errorMessage}</p>
+        <div className="fixed bottom-4 right-4 p-3 bg-background border border-border rounded-md shadow-lg z-50 max-w-sm">
+          <p className="text-foreground text-sm whitespace-pre-line">{errorMessage}</p>
           <button 
             onClick={() => setErrorMessage('')}
-            className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 text-xs mt-1"
+            className="text-muted-foreground hover:text-foreground text-xs mt-1"
           >
             ✕ Fechar
           </button>
