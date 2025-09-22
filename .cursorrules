@@ -155,6 +155,8 @@ interface SyncMetadata {
 - ❌ Usar null para campos opcionais (use undefined)
 - ❌ Sobrescrever regras de gamificação existentes
 - ❌ Criar novos tipos sem atualizar este arquivo
+- ❌ Criar toasts customizados (use Sonner)
+- ❌ Usar alert() ou confirm() (use toast + dialogs)
 
 ### SEMPRE FAÇA:
 - ✅ Use `TaskContextV2` como contexto principal
@@ -164,6 +166,8 @@ interface SyncMetadata {
 - ✅ Trate campos opcionais com valores padrão
 - ✅ Implemente retry para operações de sincronização
 - ✅ Mantenha logs para debugging (remova em produção)
+- ✅ Use Sonner para todas as notificações toast
+- ✅ Use toast.success(), toast.error(), toast.info(), toast.warning()
 
 ## 🔧 Padrões de Código
 
@@ -196,6 +200,30 @@ if (!task) {
 }
 ```
 
+### Toast Notifications
+```typescript
+// SEMPRE use Sonner para toast notifications
+import { toast } from 'sonner';
+
+// Para sucesso
+toast.success('Operação realizada com sucesso!');
+
+// Para erro
+toast.error('Erro ao processar operação');
+
+// Para informações
+toast.info('Informação importante');
+
+// Para avisos
+toast.warning('Atenção: ação requerida');
+```
+
+**REGRAS CRÍTICAS:**
+- ✅ **SEMPRE** use `toast` do Sonner (já configurado no projeto)
+- ✅ **NUNCA** crie toasts customizados ou use outras bibliotecas
+- ✅ **NUNCA** use alert() ou confirm() - use toast + dialogs
+- ✅ **SEMPRE** importe `{ toast } from 'sonner'`
+
 ## 📚 Documentação
 - ✅ **SEMPRE** atualize este arquivo quando adicionar novas regras
 - ✅ **SEMPRE** documente novos tipos e interfaces
@@ -210,5 +238,5 @@ if (!task) {
 5. **Manutenibilidade**: Código limpo e bem documentado
 
 ---
-**Última atualização**: 21/09/2025 17:20
-**Versão**: 1.0.0
+**Última atualização**: 21/09/2025 17:45
+**Versão**: 1.1.0

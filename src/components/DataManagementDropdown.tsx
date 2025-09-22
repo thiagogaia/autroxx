@@ -28,6 +28,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
 
 interface ImportedData {
   tasks: unknown[];
@@ -44,8 +45,6 @@ export function DataManagementDropdown() {
   const [forgeXPDialogOpen, setForgeXPDialogOpen] = useState(false);
   const [tasksToImport, setTasksToImport] = useState<Task[]>([]);
   const [importErrors, setImportErrors] = useState<string[]>([]);
-  const [successMessage, setSuccessMessage] = useState<string>('');
-  const [errorMessage, setErrorMessage] = useState<string>('');
   const [isForgingXP, setIsForgingXP] = useState(false);
 
   // Validar estrutura de dados importados
@@ -144,7 +143,7 @@ export function DataManagementDropdown() {
           
           if (!validation.isValid) {
             setImportErrors(validation.errors);
-            setErrorMessage(`Erro na validação:\n${validation.errors.join('\n')}`);
+            toast.error(`Erro na validação:\n${validation.errors.join('\n')}`);
             return;
           }
           
@@ -153,11 +152,11 @@ export function DataManagementDropdown() {
             setImportErrors([]);
             setImportDialogOpen(true);
           } else {
-            setErrorMessage('Formato de arquivo inválido!');
+            toast.error('Formato de arquivo inválido!');
           }
         } catch (error) {
           console.error('Erro ao importar:', error);
-          setErrorMessage('Erro ao processar o arquivo!');
+          toast.error('Erro ao processar o arquivo!');
         }
       };
       
@@ -196,10 +195,10 @@ export function DataManagementDropdown() {
       
       setImportDialogOpen(false);
       setTasksToImport([]);
-      setSuccessMessage('Dados importados com sucesso!');
+      toast.success('Dados importados com sucesso!');
     } catch (error) {
       console.error('Erro ao importar dados:', error);
-      setErrorMessage('Erro ao importar dados. Verifique o formato do arquivo.');
+      toast.error('Erro ao importar dados. Verifique o formato do arquivo.');
     }
   };
 
@@ -212,10 +211,10 @@ export function DataManagementDropdown() {
     try {
       await clearAllData();
       setDoubleConfirmDialogOpen(false);
-      setSuccessMessage('Todos os dados foram excluídos com sucesso!');
+      toast.success('Todos os dados foram excluídos com sucesso!');
     } catch (error) {
       console.error('Erro ao limpar dados:', error);
-      setErrorMessage('Erro ao excluir dados. Tente novamente.');
+      toast.error('Erro ao excluir dados. Tente novamente.');
     }
   };
 
@@ -236,10 +235,10 @@ export function DataManagementDropdown() {
       }
 
       refreshGamificationStats(tasks);
-      setSuccessMessage('XP forjado com sucesso!');
+      toast.success('XP forjado com sucesso!');
     } catch (error) {
       console.error('Erro ao forjar XP:', error);
-      setErrorMessage('Erro ao forjar XP. Verifique o console para mais detalhes.');
+      toast.error('Erro ao forjar XP. Verifique o console para mais detalhes.');
     } finally {
       setIsForgingXP(false);
     }
@@ -301,7 +300,7 @@ export function DataManagementDropdown() {
     });
     
     setSampleDialogOpen(false);
-    setSuccessMessage('Tarefas de exemplo adicionadas com sucesso!');
+    toast.success('Tarefas de exemplo adicionadas com sucesso!');
   };
 
   return (
@@ -436,31 +435,6 @@ export function DataManagementDropdown() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Toast notifications */}
-      {successMessage && (
-        <div className="fixed bottom-4 right-4 p-3 bg-background border border-border rounded-md shadow-lg z-50 max-w-sm">
-          <p className="text-foreground text-sm">{successMessage}</p>
-          <button 
-            onClick={() => setSuccessMessage('')}
-            className="text-muted-foreground hover:text-foreground text-xs mt-1"
-          >
-            ✕ Fechar
-          </button>
-        </div>
-      )}
-      
-      {errorMessage && (
-        <div className="fixed bottom-4 right-4 p-3 bg-background border border-border rounded-md shadow-lg z-50 max-w-sm">
-          <p className="text-foreground text-sm whitespace-pre-line">{errorMessage}</p>
-          <button 
-            onClick={() => setErrorMessage('')}
-            className="text-muted-foreground hover:text-foreground text-xs mt-1"
-          >
-            ✕ Fechar
-          </button>
-        </div>
-      )}
     </>
   );
 }
