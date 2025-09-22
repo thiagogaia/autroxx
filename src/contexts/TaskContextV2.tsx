@@ -421,9 +421,16 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     try {
       const task = state.tasks.find(t => t.id === id);
       if (task) {
+        // Criar nova entrada no histórico de status
+        const newStatusEntry: StatusHistoryEntry = {
+          status: status,
+          timestamp: new Date()
+        };
+        
         const updatedTask = {
           ...task,
           statusAtual: status,
+          statusHistorico: [...task.statusHistorico, newStatusEntry],
           dataInicio: status === 'fazendo' && !task.dataInicio ? new Date() : task.dataInicio,
           dataFim: status === 'concluido' ? new Date() : task.dataFim
         };
@@ -472,10 +479,19 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     try {
       const task = state.tasks.find(t => t.id === id);
       if (task) {
+        // Criar nova entrada no histórico de impedimentos
+        const impedimentoEntry: ImpedimentoHistoryEntry = {
+          id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          impedimento: true,
+          motivo: motivo,
+          timestamp: new Date()
+        };
+        
         const updatedTask = {
           ...task,
           impedimento: true,
           impedimentoMotivo: motivo,
+          impedimentoHistorico: [...task.impedimentoHistorico, impedimentoEntry],
           dataImpedimento: new Date()
         };
         await indexedDBRepository.update(id, updatedTask);
@@ -491,10 +507,19 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     try {
       const task = state.tasks.find(t => t.id === id);
       if (task) {
+        // Criar nova entrada no histórico de impedimentos
+        const impedimentoEntry: ImpedimentoHistoryEntry = {
+          id: `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          impedimento: false,
+          motivo: '',
+          timestamp: new Date()
+        };
+        
         const updatedTask = {
           ...task,
           impedimento: false,
           impedimentoMotivo: '',
+          impedimentoHistorico: [...task.impedimentoHistorico, impedimentoEntry],
           dataImpedimento: null
         };
         await indexedDBRepository.update(id, updatedTask);
