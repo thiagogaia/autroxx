@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download, Upload, Trash2, RefreshCw, Hammer } from 'lucide-react';
 import { migrateTaskData, generateUniqueTaskId } from '@/lib/utils';
 import { deserializeTasks } from '@/lib/storage';
+import { indexedDBRepository } from '@/lib/indexeddb-repo';
 import { useTaskContext } from '@/contexts/TaskContextV2';
 import { useGamificationRepository } from '@/hooks/useGamificationRepository';
 import { useTaskGamificationIntegration } from '@/contexts/TaskGamificationIntegration';
@@ -278,8 +279,8 @@ export function DataManagement() {
 
       // 2. Buscar todas as tarefas concluídas (equivalente a SELECT * FROM tasks WHERE status = 'concluido')
       console.log('🔍 Buscando tarefas concluídas...');
-      const completedTasks = tasks.filter(task => task.statusAtual === 'concluido');
-      console.log(`📋 Encontradas ${completedTasks.length} tarefas concluídas de ${tasks.length} tarefas totais`);
+      const completedTasks = await indexedDBRepository.search({ statusFilter: 'concluido' }, { page: 1, limit: 10000, offset: 0 });
+      console.log(`📋 Encontradas ${completedTasks.data.length} tarefas concluídas`);
 
       // Contadores detalhados
       let tasksProcessed = 0;
@@ -290,7 +291,7 @@ export function DataManagement() {
       console.log('🎯 Processando cada tarefa concluída usando TaskGamificationIntegration...');
 
       // 3. Processar cada tarefa concluída usando o mesmo padrão do TaskGamificationIntegration
-      for (const task of completedTasks) {
+      for (const task of completedTasks.data) {
         console.log(`📝 Processando tarefa: "${task.titulo}" (ID: ${task.id})`);
         
         // Usar o mesmo processo que o TaskGamificationIntegration usa
@@ -336,7 +337,7 @@ export function DataManagement() {
         '🔥 XP FORJADO COM SUCESSO! 🔥',
         '',
         '📊 RESUMO GERAL:',
-        `• Tarefas processadas: ${tasksProcessed}/${completedTasks.length}`,
+        `• Tarefas processadas: ${tasksProcessed}/${completedTasks.data.length}`,
         `• Usado padrão TaskGamificationIntegration`,
         '',
         '📈 ESTATÍSTICAS POR CATEGORIA:',
