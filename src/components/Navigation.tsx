@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useGamification } from '@/contexts/GamificationContext';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { DataManagementDropdown } from '@/components/DataManagementDropdown';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -56,7 +57,10 @@ export function Navigation() {
         </Link>
       ))}
       </div>
-      <ThemeToggle />
+      <div className="flex items-center gap-2">
+        <DataManagementDropdown />
+        <ThemeToggle />
+      </div>
     </nav>
   );
 }
