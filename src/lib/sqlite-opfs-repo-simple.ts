@@ -1,6 +1,7 @@
 // sqlite-opfs-repo-simple.ts — Implementação SQLite OPFS simplificada (fallback)
 
-import { ITaskRepository, Task, Query, Page, ID } from '@/types/domain';
+import { Task, Query, Page, ID } from '@/types/domain';
+import { ITaskRepository } from '@/lib/repository';
 import { TaskStatus, TaskPriority, TaskCategory, TaskComplexity } from '@/types/domain';
 
 /**

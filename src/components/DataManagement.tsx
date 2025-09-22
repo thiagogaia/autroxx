@@ -9,6 +9,7 @@ import { deserializeTasks } from '@/lib/storage';
 import { useTaskContext } from '@/contexts/TaskContextV2';
 import { useGamificationRepository } from '@/hooks/useGamificationRepository';
 import { GamificationEngine } from '@/lib/gamification';
+import { gamificationDB } from '@/lib/gamification-indexeddb-repo';
 import { Task } from '@/types/task';
 import {
   AlertDialog,
@@ -301,20 +302,47 @@ export function DataManagement() {
         await gamificationRepo.addEvent(event);
       }
 
-      // 6. Salvar conquistas atualizadas
-      for (const achievement of userStats.achievements) {
-        await gamificationRepo.updateAchievement(achievement.id, achievement);
-      }
-
-      // 7. Salvar power-ups atualizados
-      for (const powerUp of userStats.powerUps) {
-        await gamificationRepo.updatePowerUp(powerUp.id, powerUp);
-      }
-
-      // 8. Salvar desafios semanais atualizados
-      for (const challenge of userStats.weeklyChallenges) {
-        await gamificationRepo.updateWeeklyChallenge(challenge.id, challenge);
-      }
+      // 6. Salvar conquistas, power-ups e desafios em tabelas separadas
+      // Primeiro, limpar as tabelas existentes
+      await gamificationDB.achievements.clear();
+      await gamificationDB.powerUps.clear();
+      await gamificationDB.weeklyChallenges.clear();
+      
+      // Adicionar achievements
+      const achievementsWithSync = userStats.achievements.map(achievement => ({
+        ...achievement,
+        syncMetadata: {
+          id: `achievement_${achievement.id}_${Date.now()}`,
+          lastModified: new Date(),
+          isSynced: true,
+          syncVersion: 1
+        }
+      }));
+      await gamificationDB.achievements.bulkAdd(achievementsWithSync);
+      
+      // Adicionar power-ups
+      const powerUpsWithSync = userStats.powerUps.map(powerUp => ({
+        ...powerUp,
+        syncMetadata: {
+          id: `powerup_${powerUp.id}_${Date.now()}`,
+          lastModified: new Date(),
+          isSynced: true,
+          syncVersion: 1
+        }
+      }));
+      await gamificationDB.powerUps.bulkAdd(powerUpsWithSync);
+      
+      // Adicionar challenges
+      const challengesWithSync = userStats.weeklyChallenges.map(challenge => ({
+        ...challenge,
+        syncMetadata: {
+          id: `challenge_${challenge.id}_${Date.now()}`,
+          lastModified: new Date(),
+          isSynced: true,
+          syncVersion: 1
+        }
+      }));
+      await gamificationDB.weeklyChallenges.bulkAdd(challengesWithSync);
 
       setSuccessMessage(
         `XP Forjado com sucesso! ` +

@@ -88,7 +88,7 @@ class GamificationDatabase extends Dexie {
 }
 
 // Instância global do banco
-const gamificationDB = new GamificationDatabase();
+export const gamificationDB = new GamificationDatabase();
 
 // Interface do repositório de gamificação
 export interface IGamificationRepository {
