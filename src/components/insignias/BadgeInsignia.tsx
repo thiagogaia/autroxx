@@ -13,6 +13,7 @@ export interface BadgeCardProps {
   onClick?: () => void;
   isUnlocked?: boolean;
   showAnimation?: boolean;
+  size?: 'small' | 'medium' | 'large' | 'xlarge' | number;
 }
 
 const badgeThemes = {
@@ -91,7 +92,8 @@ export function BadgeCard({
   className, 
   onClick, 
   isUnlocked = true,
-  showAnimation = true 
+  showAnimation = true,
+  size = 'medium'
 }: BadgeCardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -101,6 +103,31 @@ export function BadgeCard({
   const [mouseTrailTimeout, setMouseTrailTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const theme = badgeThemes[type];
+
+  // Configuração de tamanhos
+  const getSizeConfig = () => {
+    if (typeof size === 'number') {
+      return {
+        containerSize: size,
+        badgeSize: size * 0.5,
+        pedestalSize: size * 0.6,
+        pedestalHeight: size * 0.15,
+        raySize: size * 0.2,
+        sparkleSize: size * 0.05
+      };
+    }
+    
+    const sizeMap = {
+      small: { containerSize: 200, badgeSize: 100, pedestalSize: 120, pedestalHeight: 30, raySize: 40, sparkleSize: 10 },
+      medium: { containerSize: 320, badgeSize: 160, pedestalSize: 192, pedestalHeight: 48, raySize: 64, sparkleSize: 16 },
+      large: { containerSize: 480, badgeSize: 240, pedestalSize: 288, pedestalHeight: 72, raySize: 96, sparkleSize: 24 },
+      xlarge: { containerSize: 640, badgeSize: 320, pedestalSize: 384, pedestalHeight: 96, raySize: 128, sparkleSize: 32 }
+    };
+    
+    return sizeMap[size];
+  };
+
+  const sizeConfig = getSizeConfig();
 
   // Criar partículas no clique
   const createSparkles = (x: number, y: number, count: number = 8) => {
@@ -247,22 +274,35 @@ export function BadgeCard({
       {/* Container da insignia */}
       <div 
         ref={containerRef}
-        className="relative w-80 h-80 flex flex-col items-center justify-center"
+        className="relative flex flex-col items-center justify-center"
+        style={{
+          width: `${sizeConfig.containerSize}px`,
+          height: `${sizeConfig.containerSize}px`
+        }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={handleClick}
         onMouseMove={handleMouseMove}
       >
         {/* Pedestal */}
-        <div className="absolute w-48 h-12 bg-gradient-to-r from-white/10 via-white/15 to-white/10 rounded-full bottom-20 shadow-lg transition-all duration-300" />
+        <div 
+          className="absolute bg-gradient-to-r from-white/10 via-white/15 to-white/10 rounded-full shadow-lg transition-all duration-300"
+          style={{
+            width: `${sizeConfig.pedestalSize}px`,
+            height: `${sizeConfig.pedestalHeight}px`,
+            bottom: `${sizeConfig.containerSize * 0.25}px`
+          }}
+        />
         
         {/* Anel de dispersão de luz */}
         <div 
           className={cn(
-            "absolute w-56 h-56 rounded-full transition-all duration-300",
+            "absolute rounded-full transition-all duration-300",
             isHovered ? "opacity-70" : "opacity-40"
           )}
           style={{
+            width: `${sizeConfig.containerSize * 0.7}px`,
+            height: `${sizeConfig.containerSize * 0.7}px`,
             background: `conic-gradient(
               ${theme.colors.glow} 0deg,
               ${theme.colors.rays} 60deg,
@@ -283,13 +323,15 @@ export function BadgeCard({
             <div
               key={i}
               className={cn(
-                "absolute w-1 h-16 bg-gradient-to-t from-transparent via-white/60 to-transparent transition-all duration-300",
+                "absolute bg-gradient-to-t from-transparent via-white/60 to-transparent transition-all duration-300",
                 isHovered ? "opacity-100" : "opacity-0"
               )}
               style={{
-                top: i % 2 === 0 ? '60px' : '120px',
-                left: i % 2 === 0 ? '50%' : (i === 1 ? '60px' : 'auto'),
-                right: i === 3 ? '60px' : 'auto',
+                width: '4px',
+                height: `${sizeConfig.raySize}px`,
+                top: i % 2 === 0 ? `${sizeConfig.containerSize * 0.375}px` : `${sizeConfig.containerSize * 0.625}px`,
+                left: i % 2 === 0 ? '50%' : (i === 1 ? `${sizeConfig.containerSize * 0.375}px` : 'auto'),
+                right: i === 3 ? `${sizeConfig.containerSize * 0.375}px` : 'auto',
                 transform: i % 2 === 0 ? 'translateX(-50%)' : `rotate(${i * 90}deg)`,
                 animationDelay: `${i * 0.5}s`,
                 animation: isHovered ? 'rayPulse 2s ease-in-out infinite' : 'none'
@@ -303,11 +345,11 @@ export function BadgeCard({
         
         {/* SVG da insignia */}
         {type === 'discord' ? (
-          <div className="relative w-40 h-40 flex items-center justify-center">
+          <div className="relative flex items-center justify-center" style={{ width: `${sizeConfig.badgeSize}px`, height: `${sizeConfig.badgeSize}px` }}>
             {/* Badge Discord circular */}
             <div 
               className={cn(
-                "relative w-32 h-32 rounded-full transition-all duration-300 flex items-center justify-center",
+                "relative rounded-full transition-all duration-300 flex items-center justify-center",
                 "bg-gradient-to-br from-[#7289da] to-[#5865f2]",
                 "shadow-lg shadow-[#5865f2]/40",
                 isHovered && isUnlocked && "scale-105 -translate-y-1",
@@ -315,6 +357,8 @@ export function BadgeCard({
                 !isUnlocked && "opacity-50 grayscale"
               )}
               style={{
+                width: `${sizeConfig.badgeSize * 0.8}px`,
+                height: `${sizeConfig.badgeSize * 0.8}px`,
                 boxShadow: isHovered ? 
                   '0 12px 32px rgba(88, 101, 242, 0.5), 0 6px 16px rgba(88, 101, 242, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)' :
                   '0 8px 24px rgba(88, 101, 242, 0.4), 0 4px 12px rgba(88, 101, 242, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
@@ -335,7 +379,8 @@ export function BadgeCard({
               
               {/* SVG do escudo Discord */}
               <svg 
-                className="w-16 h-16 transition-all duration-300 drop-shadow-lg"
+                className="transition-all duration-300 drop-shadow-lg"
+                style={{ width: `${sizeConfig.badgeSize * 0.4}px`, height: `${sizeConfig.badgeSize * 0.4}px` }}
                 viewBox="0 0 100 100"
                 xmlns="http://www.w3.org/2000/svg"
               >
@@ -467,11 +512,12 @@ export function BadgeCard({
           <svg 
             ref={svgRef}
             className={cn(
-              "w-40 h-40 transition-all duration-300 drop-shadow-lg",
+              "transition-all duration-300 drop-shadow-lg",
               isHovered && isUnlocked && "scale-105 rotate-1",
               isClicked && "animate-diamondPulse",
               !isUnlocked && "opacity-50 grayscale"
             )}
+            style={{ width: `${sizeConfig.badgeSize}px`, height: `${sizeConfig.badgeSize}px` }}
             viewBox="0 0 200 200"
             xmlns="http://www.w3.org/2000/svg"
           >

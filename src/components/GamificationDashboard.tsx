@@ -361,6 +361,7 @@ export function GamificationDashboard() {
                               <BadgeCard
                                 type="legendary"
                                 title=""
+                                size={281}
                                 description=""
                                 isUnlocked={true}
                                 showAnimation={true}
