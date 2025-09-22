@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import './medieval-insignia.css';
+import styles from './medieval-insignia.module.css';
 
 interface MedievalInsigniaProps {
   className?: string;
   medievalType?: 'knight' | 'wizard' | 'archer' | 'paladin';
   showText?: boolean;
   text?: string;
+  size?: 'small' | 'medium' | 'large' | 'xlarge' | number;
 }
 
 const medievalTypes = {
@@ -57,7 +58,8 @@ export default function MedievalInsignia({
   className = '', 
   medievalType = 'knight',
   showText = true,
-  text
+  text,
+  size = 'medium'
 }: MedievalInsigniaProps) {
   const nftContainerRef = useRef<HTMLDivElement>(null);
   const shieldContainerRef = useRef<HTMLDivElement>(null);
@@ -66,6 +68,30 @@ export default function MedievalInsignia({
 
   const selectedType = medievalTypes[currentType];
   const displayText = text || selectedType.text;
+
+  // Configuração de tamanhos
+  const getSizeConfig = () => {
+    if (typeof size === 'number') {
+      return {
+        containerSize: size,
+        shieldSize: size * 0.3,
+        crystalSize: size * 0.03,
+        runeSize: Math.max(8, size * 0.04),
+        fontSize: Math.max(10, size * 0.045)
+      };
+    }
+    
+    const sizeMap = {
+      small: { containerSize: 200, shieldSize: 60, crystalSize: 6, runeSize: 8, fontSize: 10 },
+      medium: { containerSize: 400, shieldSize: 120, crystalSize: 12, runeSize: 16, fontSize: 18 },
+      large: { containerSize: 600, shieldSize: 180, crystalSize: 18, runeSize: 24, fontSize: 24 },
+      xlarge: { containerSize: 800, shieldSize: 240, crystalSize: 24, runeSize: 32, fontSize: 32 }
+    };
+    
+    return sizeMap[size];
+  };
+
+  const sizeConfig = getSizeConfig();
 
   // Efeito de ativação
   const handleActivation = () => {
@@ -172,37 +198,44 @@ export default function MedievalInsignia({
     }
   };
 
-  // Atualiza cores quando o tipo muda
+  // Atualiza cores e tamanhos quando o tipo ou tamanho muda
   useEffect(() => {
     if (nftContainerRef.current) {
       const colors = selectedType.colors;
       
-      // Atualiza CSS custom properties
+      // Atualiza CSS custom properties para cores
       nftContainerRef.current.style.setProperty('--medieval-primary', colors.primary);
       nftContainerRef.current.style.setProperty('--medieval-secondary', colors.secondary);
       nftContainerRef.current.style.setProperty('--medieval-accent', colors.accent);
       nftContainerRef.current.style.setProperty('--medieval-glow', colors.glow);
+      
+      // Atualiza CSS custom properties para tamanhos
+      nftContainerRef.current.style.setProperty('--medieval-container-size', `${sizeConfig.containerSize}px`);
+      nftContainerRef.current.style.setProperty('--medieval-shield-size', `${sizeConfig.shieldSize}px`);
+      nftContainerRef.current.style.setProperty('--medieval-crystal-size', `${sizeConfig.crystalSize}px`);
+      nftContainerRef.current.style.setProperty('--medieval-rune-size', `${sizeConfig.runeSize}px`);
+      nftContainerRef.current.style.setProperty('--medieval-font-size', `${sizeConfig.fontSize}px`);
     }
-  }, [currentType]);
+  }, [currentType, sizeConfig]);
 
   return (
-    <div className="medieval-wrapper">
+    <div className={styles.medievalWrapper}>
       <div 
         ref={nftContainerRef}
-        className={`nft-container ${className}`}
+        className={`${styles.nftContainer} ${className}`}
         onClick={handleActivation}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
-        <div className="web3-badge">WEB3</div>
-        <div className="interactive-glow"></div>
         
-        <div className="outer-ring"></div>
-        <div className="middle-ring"></div>
+        <div className={styles.interactiveGlow}></div>
         
-        <div className="inner-circle">
-          <div ref={shieldContainerRef} className="shield-container">
-            <svg ref={shieldSvgRef} className="shield-svg" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+        <div className={styles.outerRing}></div>
+        <div className={styles.middleRing}></div>
+        
+        <div className={styles.innerCircle}>
+          <div ref={shieldContainerRef} className={styles.shieldContainer}>
+            <svg ref={shieldSvgRef} className={styles.shieldSvg} viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" style={{stopColor:'#1e3c72', stopOpacity:1}} />
@@ -330,21 +363,18 @@ export default function MedievalInsignia({
           </div>
         </div>
         
-        <div className="decorative-elements">
-          <div className="crystal"></div>
-          <div className="crystal"></div>
-          <div className="crystal"></div>
-          <div className="crystal"></div>
-          <div className="rune">ᚱ</div>
-          <div className="rune">ᚦ</div>
-          <div className="rune">ᚨ</div>
-          <div className="rune">ᚺ</div>
+        <div className={styles.decorativeElements}>
+          <div className={styles.crystal}></div>
+          <div className={styles.crystal}></div>
+          <div className={styles.crystal}></div>
+          <div className={styles.crystal}></div>
+          <div className={styles.rune}>ᚱ</div>
+          <div className={styles.rune}>ᚦ</div>
+          <div className={styles.rune}>ᚨ</div>
+          <div className={styles.rune}>ᚺ</div>
         </div>
         
-        <div className="nft-info">
-          <div className="nft-title">{displayText}</div>
-          <div className="nft-description">{selectedType.subtitle}</div>
-        </div>
+        
       </div>
     </div>
   );

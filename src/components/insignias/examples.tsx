@@ -268,6 +268,91 @@ export function NFTMinimalExample() {
   );
 }
 
+// Exemplos de diferentes tamanhos NFT
+export function NFTSizeExamples() {
+  return (
+    <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
+      {/* Tamanho pequeno */}
+      <div>
+        <h3>Small (200px)</h3>
+        <NFTInsignia 
+          nftType="tech"
+          size="small"
+          showText={true}
+        />
+      </div>
+      
+      {/* Tamanho médio */}
+      <div>
+        <h3>Medium (400px)</h3>
+        <NFTInsignia 
+          nftType="cyber"
+          size="medium"
+          showText={true}
+        />
+      </div>
+      
+      {/* Tamanho grande */}
+      <div>
+        <h3>Large (600px)</h3>
+        <NFTInsignia 
+          nftType="neural"
+          size="large"
+          showText={true}
+        />
+      </div>
+      
+      {/* Tamanho extra grande */}
+      <div>
+        <h3>XLarge (800px)</h3>
+        <NFTInsignia 
+          nftType="quantum"
+          size="xlarge"
+          showText={true}
+        />
+      </div>
+      
+      {/* Tamanho customizado */}
+      <div>
+        <h3>Custom (300px)</h3>
+        <NFTInsignia 
+          nftType="tech"
+          size={300}
+          showText={true}
+        />
+      </div>
+    </div>
+  );
+}
+
+// Exemplo de NFT com tamanho responsivo
+export function NFTResponsiveExample() {
+  return (
+    <div style={{ 
+      display: 'grid', 
+      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+      gap: '20px',
+      padding: '20px'
+    }}>
+      <NFTInsignia 
+        nftType="tech"
+        size="small"
+        showText={true}
+      />
+      <NFTInsignia 
+        nftType="cyber"
+        size="medium"
+        showText={true}
+      />
+      <NFTInsignia 
+        nftType="neural"
+        size="large"
+        showText={true}
+      />
+    </div>
+  );
+}
+
 // Exemplo de uso dos componentes Medieval
 
 import { MedievalBackGround, MedievalInsignia } from '@/components/insignias';
@@ -303,5 +388,90 @@ export function MedievalMinimalExample() {
         showText={false}
       />
     </MedievalBackGround>
+  );
+}
+
+// Exemplos de diferentes tamanhos Medieval
+export function MedievalSizeExamples() {
+  return (
+    <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
+      {/* Tamanho pequeno */}
+      <div>
+        <h3>Small (200px)</h3>
+        <MedievalInsignia 
+          medievalType="knight"
+          size="small"
+          showText={true}
+        />
+      </div>
+      
+      {/* Tamanho médio */}
+      <div>
+        <h3>Medium (400px)</h3>
+        <MedievalInsignia 
+          medievalType="wizard"
+          size="medium"
+          showText={true}
+        />
+      </div>
+      
+      {/* Tamanho grande */}
+      <div>
+        <h3>Large (600px)</h3>
+        <MedievalInsignia 
+          medievalType="archer"
+          size="large"
+          showText={true}
+        />
+      </div>
+      
+      {/* Tamanho extra grande */}
+      <div>
+        <h3>XLarge (800px)</h3>
+        <MedievalInsignia 
+          medievalType="paladin"
+          size="xlarge"
+          showText={true}
+        />
+      </div>
+      
+      {/* Tamanho customizado */}
+      <div>
+        <h3>Custom (300px)</h3>
+        <MedievalInsignia 
+          medievalType="knight"
+          size={300}
+          showText={true}
+        />
+      </div>
+    </div>
+  );
+}
+
+// Exemplo de Medieval com tamanho responsivo
+export function MedievalResponsiveExample() {
+  return (
+    <div style={{ 
+      display: 'grid', 
+      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+      gap: '20px',
+      padding: '20px'
+    }}>
+      <MedievalInsignia 
+        medievalType="knight"
+        size="small"
+        showText={true}
+      />
+      <MedievalInsignia 
+        medievalType="wizard"
+        size="medium"
+        showText={true}
+      />
+      <MedievalInsignia 
+        medievalType="archer"
+        size="large"
+        showText={true}
+      />
+    </div>
   );
 }

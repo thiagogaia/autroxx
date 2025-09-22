@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import './nft-insignia.css';
+import styles from './nft-insignia.module.css';
 
 interface NFTInsigniaProps {
   className?: string;
   nftType?: 'tech' | 'cyber' | 'neural' | 'quantum';
   showText?: boolean;
   text?: string;
+  size?: 'small' | 'medium' | 'large' | 'xlarge' | number;
 }
 
 const nftTypes = {
@@ -57,13 +58,37 @@ export default function NFTInsignia({
   className = '', 
   nftType = 'tech',
   showText = true,
-  text
+  text,
+  size = 'medium'
 }: NFTInsigniaProps) {
   const nftContainerRef = useRef<HTMLDivElement>(null);
   const [currentType, setCurrentType] = useState(nftType);
 
   const selectedType = nftTypes[currentType];
   const displayText = text || selectedType.text;
+
+  // Configuração de tamanhos
+  const getSizeConfig = () => {
+    if (typeof size === 'number') {
+      return {
+        containerSize: size,
+        logoSize: size * 0.5,
+        nodeSize: size * 0.025,
+        fontSize: Math.max(8, size * 0.03)
+      };
+    }
+    
+    const sizeMap = {
+      small: { containerSize: 200, logoSize: 100, nodeSize: 5, fontSize: 8 },
+      medium: { containerSize: 400, logoSize: 200, nodeSize: 10, fontSize: 12 },
+      large: { containerSize: 600, logoSize: 300, nodeSize: 15, fontSize: 16 },
+      xlarge: { containerSize: 800, logoSize: 400, nodeSize: 20, fontSize: 20 }
+    };
+    
+    return sizeMap[size];
+  };
+
+  const sizeConfig = getSizeConfig();
 
   // Efeito de mint
   const handleMintEffect = () => {
@@ -100,83 +125,89 @@ export default function NFTInsignia({
     }
   };
 
-  // Atualiza cores quando o tipo muda
+  // Atualiza cores e tamanhos quando o tipo ou tamanho muda
   useEffect(() => {
     if (nftContainerRef.current) {
       const colors = selectedType.colors;
       
-      // Atualiza CSS custom properties
+      // Atualiza CSS custom properties para cores
       nftContainerRef.current.style.setProperty('--nft-primary', colors.primary);
       nftContainerRef.current.style.setProperty('--nft-secondary', colors.secondary);
       nftContainerRef.current.style.setProperty('--nft-accent', colors.accent);
       nftContainerRef.current.style.setProperty('--nft-glow', colors.glow);
+      
+      // Atualiza CSS custom properties para tamanhos
+      nftContainerRef.current.style.setProperty('--nft-container-size', `${sizeConfig.containerSize}px`);
+      nftContainerRef.current.style.setProperty('--nft-logo-size', `${sizeConfig.logoSize}px`);
+      nftContainerRef.current.style.setProperty('--nft-node-size', `${sizeConfig.nodeSize}px`);
+      nftContainerRef.current.style.setProperty('--nft-font-size', `${sizeConfig.fontSize}px`);
     }
-  }, [currentType]);
+  }, [currentType, sizeConfig]);
 
   return (
-    <div className="nft-wrapper">
+    <div className={styles.nftWrapper}>
       <div 
         ref={nftContainerRef}
-        className={`nft-container ${className}`}
+        className={`${styles.nftContainer} ${className}`}
         onClick={handleMintEffect}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
-        <div className="grid-background"></div>
-        <div className="blockchain-elements"></div>
+        <div className={styles.gridBackground}></div>
+        <div className={styles.blockchainElements}></div>
         
-        <div className="central-logo">
-          <div className="neural-network">
-            <div className="node"></div>
-            <div className="node"></div>
-            <div className="node"></div>
-            <div className="node"></div>
-            <div className="node"></div>
-            <div className="node node-center"></div>
-            <div className="connection"></div>
-            <div className="connection"></div>
-            <div className="connection"></div>
-            <div className="connection connection-diagonal-1"></div>
-            <div className="connection connection-diagonal-2"></div>
-            <div className="connection connection-diagonal-3"></div>
-            <div className="connection connection-diagonal-4"></div>
-            <div className="ai-core">
-              <div className="ai-pulse"></div>
-              <div className="ai-ring"></div>
+        <div className={styles.centralLogo}>
+          <div className={styles.neuralNetwork}>
+            <div className={styles.node}></div>
+            <div className={styles.node}></div>
+            <div className={styles.node}></div>
+            <div className={styles.node}></div>
+            <div className={styles.node}></div>
+            <div className={`${styles.node} ${styles.nodeCenter}`}></div>
+            <div className={styles.connection}></div>
+            <div className={styles.connection}></div>
+            <div className={styles.connection}></div>
+            <div className={`${styles.connection} ${styles.connectionDiagonal1}`}></div>
+            <div className={`${styles.connection} ${styles.connectionDiagonal2}`}></div>
+            <div className={`${styles.connection} ${styles.connectionDiagonal3}`}></div>
+            <div className={`${styles.connection} ${styles.connectionDiagonal4}`}></div>
+            <div className={styles.aiCore}>
+              <div className={styles.aiPulse}></div>
+              <div className={styles.aiRing}></div>
             </div>
           </div>
         </div>
 
-        <div className="corner-elements corner-tl"></div>
-        <div className="corner-elements corner-tr"></div>
-        <div className="corner-elements corner-bl"></div>
-        <div className="corner-elements corner-br"></div>
+        <div className={`${styles.cornerElements} ${styles.cornerTl}`}></div>
+        <div className={`${styles.cornerElements} ${styles.cornerTr}`}></div>
+        <div className={`${styles.cornerElements} ${styles.cornerBl}`}></div>
+        <div className={`${styles.cornerElements} ${styles.cornerBr}`}></div>
 
-        <div className="data-particles particle-1"></div>
-        <div className="data-particles particle-2"></div>
-        <div className="data-particles particle-3"></div>
-        <div className="data-particles particle-4"></div>
-        <div className="data-particles particle-5"></div>
-        <div className="data-particles particle-6"></div>
+        <div className={`${styles.dataParticles} ${styles.particle1}`}></div>
+        <div className={`${styles.dataParticles} ${styles.particle2}`}></div>
+        <div className={`${styles.dataParticles} ${styles.particle3}`}></div>
+        <div className={`${styles.dataParticles} ${styles.particle4}`}></div>
+        <div className={`${styles.dataParticles} ${styles.particle5}`}></div>
+        <div className={`${styles.dataParticles} ${styles.particle6}`}></div>
 
-        <div className="ai-data-streams">
-          <div className="data-stream stream-1"></div>
-          <div className="data-stream stream-2"></div>
-          <div className="data-stream stream-3"></div>
+        <div className={styles.aiDataStreams}>
+          <div className={`${styles.dataStream} ${styles.stream1}`}></div>
+          <div className={`${styles.dataStream} ${styles.stream2}`}></div>
+          <div className={`${styles.dataStream} ${styles.stream3}`}></div>
         </div>
 
-        <div className="tech-text">
+        <div className={styles.techText}>
           NEURAL NETWORK<br />
           AUTHENTICATED
         </div>
 
-        <div className="hologram-effect"></div>
+        <div className={styles.hologramEffect}></div>
       </div>
 
       {showText && (
-        <div className="info-panel">
-          <div className="title">{displayText}</div>
-          <div className="subtitle">{selectedType.subtitle}</div>
+        <div className={styles.infoPanel}>
+          <div className={styles.title}>{displayText}</div>
+          <div className={styles.subtitle}>{selectedType.subtitle}</div>
         </div>
       )}
     </div>

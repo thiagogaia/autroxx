@@ -24,7 +24,8 @@ import {
   ZapIcon
 } from 'lucide-react';
 import { useState } from 'react';
-import { DiscordInsignia, FireInsignia, HydroInsignia, SpaceInsignia, ThunderInsignia, TrophyInsignia } from './insignias';
+import { DiscordInsignia, FireInsignia, HydroInsignia, MedievalInsignia, NFTInsignia, SpaceInsignia, ThunderInsignia, TrophyInsignia } from './insignias';
+import { BadgeCard } from './insignias/BadgeInsignia';
 
 export function GamificationDashboard() {
   const { 
@@ -350,23 +351,22 @@ export function GamificationDashboard() {
                                 showTyping={false}
                               />
                             ) : achievement.id === 'perfectionist' ? (
-                              <DiscordInsignia
-                                badgeType="partner"
-                                showText={false}
-                                text="Partner"
-                                showTyping={false}
-                              />
+                              <MedievalInsignia size={300} />
                             ) : achievement.id === 'organizer' ? (
                               <HydroInsignia
                                 waterType="hydro"
                                 showText={false}
                               />
                             ) : achievement.id === 'efficiency_master' ? (
-                              <DiscordInsignia
-                                badgeType="partner"
-                                showText={false}
-                                text="Developer"
-                                showTyping={false}
+                              <BadgeCard
+                                type="legendary"
+                                title=""
+                                description=""
+                                isUnlocked={true}
+                                showAnimation={true}
+                                onClick={() => {
+                                  console.log(`Você é Hacker!`);
+                                }}
                               />
                             ) : achievement.id === 'quick_draw' ? (
                               <DiscordInsignia
@@ -376,12 +376,7 @@ export function GamificationDashboard() {
                                 showTyping={false}
                               />
                             ) : achievement.id === 'bug_hunter' ? (
-                              <DiscordInsignia
-                                badgeType="developer"
-                                showText={false}
-                                text="Developer"
-                                showTyping={false}
-                              />
+                              <NFTInsignia nftType="tech" />
                             ) : achievement.id === 'documentation_guru' ? (
                               <DiscordInsignia
                                 badgeType="developer"

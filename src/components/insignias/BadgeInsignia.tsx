@@ -570,22 +570,7 @@ export function BadgeCard({
         </svg>
         )}
         
-        {/* Texto da insignia */}
-        <div className={cn(
-          "absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center transition-all duration-300",
-          isUnlocked ? "text-white" : "text-gray-500",
-          isHovered && isUnlocked && "transform -translate-x-1/2 -translate-y-1"
-        )}>
-          <div className={cn(
-            "font-bold text-sm tracking-wider",
-            isUnlocked && "text-shadow-lg"
-          )}>
-            {isUnlocked ? theme.name : title}
-          </div>
-          <div className="text-xs text-gray-400 mt-1">
-            {isUnlocked ? theme.description : description}
-          </div>
-        </div>
+        
       </div>
     </div>
   );
