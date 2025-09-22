@@ -29,6 +29,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
+import { indexedDBRepository } from '@/lib/indexeddb-repo';
 
 interface ImportedData {
   tasks: unknown[];
@@ -226,9 +227,19 @@ export function DataManagementDropdown() {
     try {
       setIsForgingXP(true);
       setForgeXPDialogOpen(false);
+      console.log('🔥 Iniciando processo de Forjar XP...');
 
+      // 1. Limpar todos os dados de gamificação existentes
+      console.log('📊 Limpando dados de gamificação existentes...');
       await gamificationRepo.clearAllData();
+      console.log('✅ Dados de gamificação limpos com sucesso');
+
+      // 2. Buscar todas as tarefas concluídas (equivalente a SELECT * FROM tasks WHERE status = 'concluido')
+      console.log('🔍 Buscando tarefas concluídas...');
+      // const completedTasks = await indexedDBRepository.search({ statusFilter: 'concluido' }, { page: 1, limit: 10000, offset: 0 });
       const completedTasks = tasks.filter(task => task.statusAtual === 'concluido');
+
+      // console.log(`📋 Encontradas ${completedTasks.data.length} tarefas concluídas`);
 
       for (const task of completedTasks) {
         processTaskCompletion(task, tasks);
