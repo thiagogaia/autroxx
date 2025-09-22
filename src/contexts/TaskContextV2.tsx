@@ -107,16 +107,14 @@ function taskReducer(state: TaskState, action: TaskAction): TaskState {
         ordem: 0,
         tags: [],
         is_active: true,
-        categoria: 'sem_categoria',
+        categoria: undefined,
         estimativaTempo: undefined,
-        complexidade: 'media',
+        complexidade: undefined,
         numeroMudancasPrioridade: 0,
         tempoTotalImpedimento: 0,
         foiRetrabalho: false,
         referenced_task_id: null,
-        parent_id: null,
-        rsync: false,
-        id_rsync: null
+        parent_id: null
       };
       
       const updatedTasks = state.tasks.map(task => ({
@@ -380,16 +378,14 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         ordem: 0,
         tags: [],
         is_active: true,
-        categoria: 'sem_categoria',
+        categoria: undefined,
         estimativaTempo: undefined,
-        complexidade: 'media',
+        complexidade: undefined,
         numeroMudancasPrioridade: 0,
         tempoTotalImpedimento: 0,
         foiRetrabalho: false,
         referenced_task_id: null,
-        parent_id: null,
-        rsync: false,
-        id_rsync: null
+        parent_id: null
       };
       
       // Salvar no IndexedDB

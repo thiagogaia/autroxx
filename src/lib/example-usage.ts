@@ -196,8 +196,6 @@ async function demonstrateCRUD() {
     referenced_task_id: null,
     parent_id: null,
     is_active: true,
-    rsync: false,
-    id_rsync: null,
     statusHistorico: [{ status: 'a_fazer', timestamp: new Date() }]
   };
   

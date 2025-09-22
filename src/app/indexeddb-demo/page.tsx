@@ -186,9 +186,7 @@ export default function IndexedDBDemo() {
       categoria: 'desenvolvimento',
       estimativaTempo: 60,
       complexidade: 'simples',
-      is_active: true,
-      rsync: false,
-      id_rsync: null
+      is_active: true
     };
 
     try {

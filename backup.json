@@ -26,8 +26,6 @@
       "ordem": 0,
       "tags": [],
       "is_active": true,
-      "rsync": false,
-      "id_rsync": null,
       "categoria": "desenvolvimento",
       "estimativaTempo": 120,
       "complexidade": "simples",

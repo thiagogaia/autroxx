@@ -218,8 +218,6 @@ export function DataManagement() {
           ordem: task.ordem || 0,
           // Novos campos com valores padrão
           is_active: task.is_active !== undefined ? task.is_active : true,
-          rsync: task.rsync !== undefined ? task.rsync : false,
-          id_rsync: task.id_rsync || null,
           referenced_task_id: task.referenced_task_id || null,
           parent_id: task.parent_id || null
         });
@@ -379,8 +377,6 @@ export function DataManagement() {
         categoria: 'desenvolvimento',
         complexidade: 'media',
         is_active: true,
-        rsync: false,
-        id_rsync: null,
         referenced_task_id: null,
         parent_id: null
       },
@@ -406,8 +402,6 @@ export function DataManagement() {
         categoria: 'design',
         complexidade: 'simples',
         is_active: true,
-        rsync: false,
-        id_rsync: null,
         referenced_task_id: null,
         parent_id: null
       },
@@ -434,8 +428,6 @@ export function DataManagement() {
         categoria: 'devops',
         complexidade: 'media',
         is_active: true,
-        rsync: false,
-        id_rsync: null,
         referenced_task_id: null,
         parent_id: null
       },
@@ -458,8 +450,6 @@ export function DataManagement() {
         categoria: 'feature',
         complexidade: 'complexa',
         is_active: true,
-        rsync: false,
-        id_rsync: null,
         referenced_task_id: null,
         parent_id: null
       },
@@ -482,8 +472,6 @@ export function DataManagement() {
         categoria: 'devops',
         complexidade: 'media',
         is_active: true,
-        rsync: false,
-        id_rsync: null,
         referenced_task_id: null,
         parent_id: null
       }

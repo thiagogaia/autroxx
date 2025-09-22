@@ -51,8 +51,6 @@ function generateTestData(count: number): TestData {
       referenced_task_id: Math.random() > 0.9 ? `ref_${i}` : null,
       parent_id: Math.random() > 0.95 ? `parent_${i}` : null,
       is_active: true,
-      rsync: false,
-      id_rsync: null,
       statusHistorico: [{
         status: 'a_fazer',
         timestamp: new Date(now.getTime() - Math.random() * 86400000 * 30)

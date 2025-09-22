@@ -46,8 +46,6 @@ export interface Task {
   referenced_task_id?: string | null;
   parent_id?: string | null;
   is_active?: boolean;
-  rsync?: boolean;
-  id_rsync?: number | null;
 }
 
 // Tipos para ordenação

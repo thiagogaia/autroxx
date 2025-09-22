@@ -41,8 +41,6 @@ export interface Task {
   referenced_task_id?: string | null; // Referência cruzada (bugs, retrabalhos, dependências)
   parent_id?: string | null; // Árvore de tarefas (para feature futura)
   is_active?: boolean; // Visível na listagem? -> não
-  rsync?: boolean; // Visível na listagem? -> não
-  id_rsync?: number | null; // Visível na listagem? -> não
 }
 
 export interface StatusConfig {

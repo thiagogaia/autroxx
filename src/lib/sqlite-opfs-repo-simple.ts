@@ -537,8 +537,7 @@ export class SQLiteOPFSTaskRepository implements ITaskRepository {
       'foiRetrabalho': 'foi_retrabalho',
       'referenced_task_id': 'referenced_task_id',
       'parent_id': 'parent_id',
-      'is_active': 'is_active',
-      'id_rsync': 'id_rsync'
+      'is_active': 'is_active'
     };
     
     return mapping[field] || field;
@@ -570,9 +569,7 @@ export class SQLiteOPFSTaskRepository implements ITaskRepository {
       foi_retrabalho: task.foiRetrabalho || false,
       referenced_task_id: task.referenced_task_id || null,
       parent_id: task.parent_id || null,
-      is_active: task.is_active !== false,
-      rsync: task.rsync || false,
-      id_rsync: task.id_rsync || null
+      is_active: task.is_active !== false
     };
   }
 
@@ -607,8 +604,6 @@ export class SQLiteOPFSTaskRepository implements ITaskRepository {
       referenced_task_id: row.referenced_task_id,
       parent_id: row.parent_id,
       is_active: Boolean(row.is_active),
-      rsync: Boolean(row.rsync),
-      id_rsync: row.id_rsync,
       statusHistorico: statusHistory,
       impedimentoHistorico: impedimentHistory
     };

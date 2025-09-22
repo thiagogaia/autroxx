@@ -51,8 +51,8 @@ export class SqliteTaskRepository implements ITaskRepository {
         impedimento_motivo, data_impedimento, data_cadastro, data_inicio, 
         data_fim, ordem, tags, categoria, estimativa_tempo, complexidade,
         numero_mudancas_prioridade, tempo_total_impedimento, foi_retrabalho,
-        referenced_task_id, parent_id, is_active, rsync, id_rsync
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        referenced_task_id, parent_id, is_active
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
     const params = [
@@ -77,9 +77,7 @@ export class SqliteTaskRepository implements ITaskRepository {
       entity.foiRetrabalho ? 1 : 0,
       entity.referenced_task_id || null,
       entity.parent_id || null,
-      entity.is_active ? 1 : 0,
-      entity.rsync ? 1 : 0,
-      entity.id_rsync || null
+      entity.is_active ? 1 : 0
     ];
     
     this.db.run(sql, ...params);
@@ -310,9 +308,7 @@ export class SqliteTaskRepository implements ITaskRepository {
       'tempoTotalImpedimento': 'tempo_total_impedimento',
       'foiRetrabalho': 'foi_retrabalho',
       'referenced_task_id': 'referenced_task_id',
-      'parent_id': 'parent_id',
-      'is_active': 'is_active',
-      'id_rsync': 'id_rsync'
+      'parent_id': 'parent_id'
     };
     
     return mapping[field] || field;
@@ -345,8 +341,6 @@ export class SqliteTaskRepository implements ITaskRepository {
       referenced_task_id: row.referenced_task_id as string | null,
       parent_id: row.parent_id as string | null,
       is_active: Boolean(row.is_active),
-      rsync: Boolean(row.rsync),
-      id_rsync: row.id_rsync as number | null,
       // Campos que precisam ser reconstruídos
       statusHistorico: [], // TODO: Implementar tabela separada
       impedimentoHistorico: [] // TODO: Implementar tabela separada
