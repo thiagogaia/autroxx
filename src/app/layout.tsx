@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: 'Task Manager MVP',
+  title: ':::AATROXX:::',
   description: 'Sistema de gerenciamento de tarefas desenvolvido com Next.js e shadcn/ui',
 }
 
