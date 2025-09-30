@@ -459,7 +459,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     }
   }, [state.tasks]);
 
-  const addTask = (titulo: string, prioridade: TaskPriority = 'normal') => {
+  const addTask = async (titulo: string, prioridade: TaskPriority = 'normal') => {
     dispatch({ type: 'ADD_TASK', payload: { titulo, prioridade } });
   };
 
@@ -511,6 +511,10 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'REORDER_TASKS', payload: { taskIds } });
   };
 
+  const clearAllData = async () => {
+    dispatch({ type: 'LOAD_TASKS', payload: { tasks: [] } });
+  };
+
   return (
     <TaskContext.Provider value={{
       tasks: state.tasks,
@@ -519,6 +523,9 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       paginatedTasks,
       totalTasks: filteredTasks.length,
       advancedFilters: state.advancedFilters,
+      isCreatingTask: false,
+      isLoadingTasks: false,
+      isSearching: false,
       addTask,
       addTaskFull,
       updateTaskStatus,
@@ -531,7 +538,8 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       setFilter,
       setAdvancedFilters,
       setPagination,
-      resetFilters
+      resetFilters,
+      clearAllData
     }}>
       {children}
     </TaskContext.Provider>

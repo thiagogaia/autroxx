@@ -2,7 +2,7 @@
 
 import { LocalStorageTaskRepository } from '@/lib/localstorage-repo';
 import { SqliteTaskRepository } from '@/lib/sqlite-repo';
-import { Task, Query, createAndSpec } from '@/types/domain';
+import { Task, Query, createAndSpec, Spec } from '@/types/domain';
 import { taskFiltersToSpec, taskFiltersToPageRequest } from '@/lib/query-utils';
 
 /**
@@ -152,7 +152,7 @@ function demonstrateFilterMigration() {
   };
   
   // Converter para Specification/Query Object
-  const spec = taskFiltersToSpec(oldFilters);
+  const spec = taskFiltersToSpec(oldFilters) as unknown as Spec<Task>;
   const pageRequest = taskFiltersToPageRequest(oldFilters);
   
   console.log('Specification:', JSON.stringify(spec, null, 2));

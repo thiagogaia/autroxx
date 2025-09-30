@@ -19,7 +19,16 @@ import {
   ArrowUpDown,
   Timer,
   Users,
-  FileText
+  FileText,
+  Code,
+  TestTube,
+  Server,
+  Headphones,
+  ShoppingCart,
+  Scale,
+  Palette,
+  MessageSquare,
+  HelpCircle
 } from 'lucide-react';
 
 export function Insights() {
@@ -133,33 +142,57 @@ export function Insights() {
 
   const getCategoryIcon = (category: TaskCategory) => {
     const icons = {
-      desenvolvimento: <Zap className="h-4 w-4" />,
-      reuniao: <Users className="h-4 w-4" />,
+      feature: <Target className="h-4 w-4" />,
+      desenvolvimento: <Code className="h-4 w-4" />,
+      qa: <TestTube className="h-4 w-4" />,
+      devops: <Server className="h-4 w-4" />,
       bug: <AlertTriangle className="h-4 w-4" />,
+      atendimento: <Headphones className="h-4 w-4" />,
+      comercial: <ShoppingCart className="h-4 w-4" />,
+      juridico: <Scale className="h-4 w-4" />,
+      design: <Palette className="h-4 w-4" />,
       documentacao: <FileText className="h-4 w-4" />,
-      sem_categoria: <Activity className="h-4 w-4" />
+      reuniao: <Users className="h-4 w-4" />,
+      sem_categoria: <Activity className="h-4 w-4" />,
+      outro: <HelpCircle className="h-4 w-4" />
     };
     return icons[category];
   };
 
   const getCategoryColor = (category: TaskCategory) => {
     const colors = {
+      feature: 'text-indigo-600',
       desenvolvimento: 'text-green-600',
-      reuniao: 'text-blue-600',
+      qa: 'text-cyan-600',
+      devops: 'text-orange-600',
       bug: 'text-red-600',
+      atendimento: 'text-teal-600',
+      comercial: 'text-yellow-600',
+      juridico: 'text-slate-600',
+      design: 'text-pink-600',
       documentacao: 'text-purple-600',
-      sem_categoria: 'text-gray-600'
+      reuniao: 'text-blue-600',
+      sem_categoria: 'text-gray-600',
+      outro: 'text-gray-500'
     };
     return colors[category];
   };
 
   const getCategoryLabel = (category: TaskCategory) => {
     const labels = {
+      feature: 'Feature',
       desenvolvimento: 'Desenvolvimento',
-      reuniao: 'Reunião',
+      qa: 'QA',
+      devops: 'DevOps',
       bug: 'Bug',
+      atendimento: 'Atendimento',
+      comercial: 'Comercial',
+      juridico: 'Jurídico',
+      design: 'Design',
       documentacao: 'Documentação',
-      sem_categoria: 'Sem Categoria'
+      reuniao: 'Reunião',
+      sem_categoria: 'Sem Categoria',
+      outro: 'Outro',
     };
     return labels[category];
   };
@@ -296,13 +329,13 @@ export function Insights() {
               <div className="space-y-3">
                 {Object.entries(
                   insights.estimateAnalysis.reduce((acc, item) => {
-                    const category = item.category || 'sem_categoria';
+                    const category = item?.category || 'sem_categoria';
                     if (!acc[category]) {
                       acc[category] = { total: 0, count: 0, accuracies: [] };
                     }
-                    acc[category].total += item.actual;
+                    acc[category].total += item?.actual || 0;
                     acc[category].count += 1;
-                    acc[category].accuracies.push(item.accuracy);
+                    acc[category].accuracies.push(item?.accuracy || 0);
                     return acc;
                   }, {} as Record<TaskCategory, { total: number; count: number; accuracies: number[] }>)
                 ).map(([category, data]) => {
@@ -374,12 +407,12 @@ export function Insights() {
               <div className="space-y-3">
                 {Object.entries(
                   insights.estimateAnalysis.reduce((acc, item) => {
-                    if (!item.category || !item.task.complexidade) return acc;
+                    if (!item?.category || !item?.task.complexidade) return acc;
                     const key = `${item.category}-${item.task.complexidade}`;
                     if (!acc[key]) {
                       acc[key] = { times: [], category: item.category, complexity: item.task.complexidade };
                     }
-                    acc[key].times.push(item.actual);
+                    acc[key].times.push(item?.actual);
                     return acc;
                   }, {} as Record<string, { times: number[]; category: TaskCategory; complexity: TaskComplexity }>)
                 ).map(([key, data]) => {

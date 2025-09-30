@@ -310,10 +310,10 @@ export function TaskProvider({ children }: { children: ReactNode }) {
         dispatch({ type: 'SET_LOADING_TASKS', payload: { isLoading: true } });
         
         // Buscar tarefas com filtros e paginação atuais
-        const result = await indexedDBRepository.search(state.advancedFilters, state.pagination);
+        const result = await indexedDBRepository.searchLegacy(state.advancedFilters, state.pagination);
         
         // Buscar total de tarefas que correspondem aos filtros
-        const totalCount = await indexedDBRepository.count(state.advancedFilters);
+        const totalCount = await indexedDBRepository.countLegacy(state.advancedFilters);
         
         dispatch({ type: 'LOAD_TASKS', payload: { tasks: result.data, totalTasks: totalCount } });
         
@@ -334,8 +334,8 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       try {
         dispatch({ type: 'SET_LOADING_TASKS', payload: { isLoading: true } });
         
-        const result = await indexedDBRepository.search(state.advancedFilters, state.pagination);
-        const totalCount = await indexedDBRepository.count(state.advancedFilters);
+        const result = await indexedDBRepository.searchLegacy(state.advancedFilters, state.pagination);
+        const totalCount = await indexedDBRepository.countLegacy(state.advancedFilters);
         dispatch({ type: 'LOAD_TASKS', payload: { tasks: result.data, totalTasks: totalCount } });
       } catch (error) {
         console.error('Error reloading tasks:', error);
@@ -392,8 +392,8 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       await indexedDBRepository.create(newTask);
       
       // Recarregar a listagem de tarefas para mostrar a nova tarefa
-      const result = await indexedDBRepository.search(state.advancedFilters, state.pagination);
-      const totalCount = await indexedDBRepository.count(state.advancedFilters);
+      const result = await indexedDBRepository.searchLegacy(state.advancedFilters, state.pagination);
+      const totalCount = await indexedDBRepository.countLegacy(state.advancedFilters);
       dispatch({ type: 'LOAD_TASKS', payload: { tasks: result.data, totalTasks: totalCount } });
       
     } catch (error) {

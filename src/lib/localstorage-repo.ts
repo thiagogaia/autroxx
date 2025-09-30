@@ -1,10 +1,10 @@
 // localstorage-repo.ts — Implementação em LocalStorage usando Specification/Query Object
 
-import { ITaskRepository, Task, Query, Page, ID } from '@/types/domain';
+import { Repository, Task, Query, Page, ID } from '@/types/domain';
 import { matches, paginate, sortArray } from '@/lib/query-utils';
 import { STORAGE_KEYS, serializeTasks, deserializeTasks } from '@/lib/storage';
 
-export class LocalStorageTaskRepository implements ITaskRepository {
+export class LocalStorageTaskRepository implements Repository<Task> {
   private readonly key = STORAGE_KEYS.TASKS;
 
   /**

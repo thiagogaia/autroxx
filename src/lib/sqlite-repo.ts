@@ -1,13 +1,13 @@
 // sqlite-repo.ts — Implementação "SQLite" simulada usando Specification/Query Object
 
-import { ITaskRepository, Task, Query, Page, ID } from '@/types/domain';
+import { Repository, Task, Query, Page, ID, TaskStatus, TaskPriority, TaskCategory, TaskComplexity } from '@/types/domain';
 
 /**
  * Implementação simulada de SQLite Repository
  * Esta implementação demonstra como converter Specification/Query Object para SQL
  * Em produção, você usaria better-sqlite3, sql.js, knex, ou similar
  */
-export class SqliteTaskRepository implements ITaskRepository {
+export class SqliteTaskRepository implements Repository<Task> {
   constructor(private db: { 
     all: (sql: string, ...params: unknown[]) => unknown[]; 
     get: (sql: string, ...params: unknown[]) => unknown; 
@@ -18,7 +18,7 @@ export class SqliteTaskRepository implements ITaskRepository {
    * Busca uma tarefa por ID
    */
   async get(id: ID): Promise<Task | null> {
-    const row = this.db.get("SELECT * FROM tasks WHERE id = ?", id);
+    const row = this.db.get("SELECT * FROM tasks WHERE id = ?", id) as Record<string, unknown> | null;
     return row ? this.mapRowToTask(row) : null;
   }
 
@@ -27,10 +27,10 @@ export class SqliteTaskRepository implements ITaskRepository {
    */
   async search(query?: Query<Task>): Promise<Page<Task>> {
     const { sql, params } = this.buildSQL(query);
-    const countSql = this.buildCountSQL(query);
+    const { sql: countSql, params: countParams } = this.buildCountSQL(query);
     
     const items = (this.db.all(sql, ...params) as Record<string, unknown>[]).map((row: Record<string, unknown>) => this.mapRowToTask(row));
-    const totalResult = this.db.get(countSql, ...params) as { count: number } | null;
+    const totalResult = this.db.get(countSql, ...countParams) as { count: number } | null;
     const total = totalResult?.count || 0;
     
     return { 
@@ -133,7 +133,7 @@ export class SqliteTaskRepository implements ITaskRepository {
    */
   async count(query?: Query<Task>): Promise<number> {
     const { sql, params } = this.buildCountSQL(query);
-    const result = this.db.get(sql, ...params);
+    const result = this.db.get(sql, ...params) as { count: number } | null;
     return result?.count || 0;
   }
 
@@ -208,15 +208,15 @@ export class SqliteTaskRepository implements ITaskRepository {
   /**
    * Constrói cláusula WHERE baseada na Specification
    */
-  private buildWhereClause(spec?: Record<string, unknown>): { sql: string; params: unknown[] } {
-    if (!spec || !spec.where || spec.where.length === 0) {
+  private buildWhereClause(spec?: any): { sql: string; params: unknown[] } {
+    if (!spec || !spec.where || !Array.isArray(spec.where) || spec.where.length === 0) {
       return { sql: '', params: [] };
     }
     
     const conditions: string[] = [];
     const params: unknown[] = [];
     
-    (spec.where as Record<string, unknown>[]).forEach((rule: Record<string, unknown>) => {
+    spec.where.forEach((rule: any) => {
       const dbField = this.mapFieldToDbColumn(rule.field as keyof Task);
       const condition = this.buildCondition(dbField, rule.op as string, rule.value);
       conditions.push(condition.sql);

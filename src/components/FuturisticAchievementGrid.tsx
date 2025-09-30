@@ -1,7 +1,7 @@
 'use client';
 
 import { Achievement } from '@/types/gamification';
-import { SVGInsignia } from './SVGInsignia';
+// import { SVGInsignia } from './SVGInsignia';
 import { AchievementListItem } from './AchievementListItem';
 import { AchievementStats } from './AchievementStats';
 import { useState } from 'react';
@@ -108,10 +108,11 @@ export function FuturisticAchievementGrid({ achievements }: FuturisticAchievemen
       )}>
         {filteredAchievements.map((achievement) => (
           viewMode === 'grid' ? (
-            <SVGInsignia
-              key={achievement.id}
-              achievement={achievement}
-            />
+            // <SVGInsignia
+            //   key={achievement.id}
+            //   achievement={achievement}
+            // />
+            <span style={{ fontSize: '227px' }}>{achievement.icon}</span>
           ) : (
             <AchievementListItem
               key={achievement.id}

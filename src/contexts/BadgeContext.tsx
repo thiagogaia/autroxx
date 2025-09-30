@@ -312,18 +312,32 @@ export function BadgeProvider({ children }: { children: ReactNode }) {
         const qpReward = badge.rewards.find(reward => reward.type === 'qp');
         return total + (qpReward?.value || 0);
       }, 0),
-    favoriteBadgeType: badges
-      .filter(badge => badge.isUnlocked)
-      .reduce((acc, badge) => {
-        acc[badge.type] = (acc[badge.type] || 0) + 1;
-        return acc;
-      }, {} as Record<BadgeType, number>) as BadgeType,
-    mostCommonRarity: badges
-      .filter(badge => badge.isUnlocked)
-      .reduce((acc, badge) => {
-        acc[badge.rarity] = (acc[badge.rarity] || 0) + 1;
-        return acc;
-      }, {} as Record<BadgeRarity, number>) as BadgeRarity,
+    favoriteBadgeType: (() => {
+      const typeCounts = badges
+        .filter(badge => badge.isUnlocked)
+        .reduce((acc, badge) => {
+          acc[badge.type] = (acc[badge.type] || 0) + 1;
+          return acc;
+        }, {} as Record<BadgeType, number>);
+      
+      return Object.entries(typeCounts).reduce((max, [type, count]) => 
+        count > (typeCounts[max] || 0) ? type as BadgeType : max, 
+        'elite' as BadgeType
+      );
+    })(),
+    mostCommonRarity: (() => {
+      const rarityCounts = badges
+        .filter(badge => badge.isUnlocked)
+        .reduce((acc, badge) => {
+          acc[badge.rarity] = (acc[badge.rarity] || 0) + 1;
+          return acc;
+        }, {} as Record<BadgeRarity, number>);
+      
+      return Object.entries(rarityCounts).reduce((max, [rarity, count]) => 
+        count > (rarityCounts[max] || 0) ? rarity as BadgeRarity : max, 
+        'common' as BadgeRarity
+      );
+    })(),
     averageUnlockTime: 0, // TODO: Implementar cálculo baseado em datas
     badgesByMonth: {}, // TODO: Implementar agrupamento por mês
     recentUnlocks: badges
@@ -343,7 +357,7 @@ export function BadgeProvider({ children }: { children: ReactNode }) {
       badge.unlockConditions.forEach(condition => {
         switch (condition.type) {
           case 'task_completed':
-            const completedTasks = allTasks.filter(t => t.status === 'completed').length;
+            const completedTasks = allTasks.filter(t => t.statusAtual === 'concluido').length;
             updatedBadge.progress = Math.min(completedTasks, badge.maxProgress);
             condition.currentValue = completedTasks;
             progressUpdated = true;

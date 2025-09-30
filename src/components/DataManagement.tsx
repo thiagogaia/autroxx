@@ -279,7 +279,7 @@ export function DataManagement() {
 
       // 2. Buscar todas as tarefas concluídas (equivalente a SELECT * FROM tasks WHERE status = 'concluido')
       console.log('🔍 Buscando tarefas concluídas...');
-      const completedTasks = await indexedDBRepository.search({ statusFilter: 'concluido' }, { page: 1, limit: 10000, offset: 0 });
+      const completedTasks = await indexedDBRepository.searchLegacy({ statusFilter: 'concluido' }, { page: 1, limit: 10000, offset: 0 });
       console.log(`📋 Encontradas ${completedTasks.data.length} tarefas concluídas`);
 
       // Contadores detalhados

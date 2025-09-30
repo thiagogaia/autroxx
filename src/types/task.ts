@@ -80,7 +80,7 @@ export interface PaginationResult<T> {
 // Tipos para filtros avançados (preparado para migração SQL)
 export interface TaskFilters {
   // Filtros básicos (abas existentes)
-  statusFilter: FilterType;
+  statusFilter?: FilterType;
   
   // Filtros avançados
   titleSearch?: string;

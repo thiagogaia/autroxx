@@ -31,8 +31,8 @@ export function GamificationMigrationDemo() {
     userStats, 
     events, 
     isLoading, 
-    migrationStatus, 
-    migrateFromLocalStorage 
+    // migrationStatus, 
+    // migrateFromLocalStorage 
   } = useGamification();
   
   const [migrationStats, setMigrationStats] = useState<MigrationStats | null>(null);
@@ -67,7 +67,7 @@ export function GamificationMigrationDemo() {
 
   const handleManualMigration = async () => {
     try {
-      await migrateFromLocalStorage();
+      // await migrateFromLocalStorage();
       await loadStats(); // Recarregar estatísticas após migração
     } catch (error) {
       console.error('Erro na migração manual:', error);
@@ -124,15 +124,15 @@ export function GamificationMigrationDemo() {
           {/* Status da Migração */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              {getStatusIcon(migrationStatus)}
+              {/* {getStatusIcon(migrationStatus)} */}
               <span className="font-medium">Status da Migração:</span>
             </div>
-            <Badge className={getStatusColor(migrationStatus)}>
-              {migrationStatus === 'pending' && 'Pendente'}
-              {migrationStatus === 'in_progress' && 'Em Progresso'}
-              {migrationStatus === 'completed' && 'Concluída'}
-              {migrationStatus === 'error' && 'Erro'}
-            </Badge>
+            {/* <Badge className={getStatusColor(migrationStatus)}> */}
+              {/* {migrationStatus === 'pending' && 'Pendente'} */}
+              {/* {migrationStatus === 'in_progress' && 'Em Progresso'} */}
+              {/* {migrationStatus === 'completed' && 'Concluída'} */}
+              {/* {migrationStatus === 'error' && 'Erro'} */}
+            {/* </Badge> */}
           </div>
 
           {/* Loading State */}
@@ -147,7 +147,7 @@ export function GamificationMigrationDemo() {
 
           {/* Botões de Ação */}
           <div className="flex gap-2">
-            <Button 
+            {/* <Button 
               onClick={handleManualMigration}
               disabled={isLoading || migrationStatus === 'in_progress'}
               variant="outline"
@@ -163,7 +163,7 @@ export function GamificationMigrationDemo() {
                   Migrar Manualmente
                 </>
               )}
-            </Button>
+            </Button> */}
             
             <Button 
               onClick={loadStats}

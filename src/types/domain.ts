@@ -161,3 +161,12 @@ export interface TaskContextType {
   setPagination: (params: Partial<PaginationParams>) => void;
   resetFilters: () => void;
 }
+
+// Helper functions para criar especificações
+export function createAndSpec<T>(...specs: Spec<T>[]): Spec<T> {
+  return { and: specs };
+}
+
+export function createOrSpec<T>(...specs: Spec<T>[]): Spec<T> {
+  return { or: specs };
+}

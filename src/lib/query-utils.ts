@@ -25,10 +25,26 @@ function compare(a: unknown, op: FilterOp, b: unknown): boolean {
   switch (op) {
     case "eq": return a === b;
     case "neq": return a !== b;
-    case "gt": return a > b;
-    case "lt": return a < b;
-    case "gte": return a >= b;
-    case "lte": return a <= b;
+    case "gt": 
+      if (typeof a === 'number' && typeof b === 'number') return a > b;
+      if (typeof a === 'string' && typeof b === 'string') return a > b;
+      if (a instanceof Date && b instanceof Date) return a > b;
+      return false;
+    case "lt": 
+      if (typeof a === 'number' && typeof b === 'number') return a < b;
+      if (typeof a === 'string' && typeof b === 'string') return a < b;
+      if (a instanceof Date && b instanceof Date) return a < b;
+      return false;
+    case "gte": 
+      if (typeof a === 'number' && typeof b === 'number') return a >= b;
+      if (typeof a === 'string' && typeof b === 'string') return a >= b;
+      if (a instanceof Date && b instanceof Date) return a >= b;
+      return false;
+    case "lte": 
+      if (typeof a === 'number' && typeof b === 'number') return a <= b;
+      if (typeof a === 'string' && typeof b === 'string') return a <= b;
+      if (a instanceof Date && b instanceof Date) return a <= b;
+      return false;
     case "contains": 
       if (typeof a === "string") {
         return a.toLowerCase().includes(String(b).toLowerCase());
@@ -41,7 +57,17 @@ function compare(a: unknown, op: FilterOp, b: unknown): boolean {
       return Array.isArray(b) ? b.includes(a) : false;
     case "between":
       if (!Array.isArray(b) || b.length !== 2) return false;
-      return a >= b[0] && a <= b[1];
+      const [start, end] = b;
+      if (typeof a === 'number' && typeof start === 'number' && typeof end === 'number') {
+        return a >= start && a <= end;
+      }
+      if (typeof a === 'string' && typeof start === 'string' && typeof end === 'string') {
+        return a >= start && a <= end;
+      }
+      if (a instanceof Date && start instanceof Date && end instanceof Date) {
+        return a >= start && a <= end;
+      }
+      return false;
     case "is_null":
       return a === null || a === undefined;
     case "is_not_null":
@@ -121,52 +147,57 @@ export function taskFiltersToSpec(filters: Record<string, unknown>): Spec<Record
   }
   
   // Filtro por título
-  if (filters.titleSearch) {
+  if (filters.titleSearch && typeof filters.titleSearch === 'string') {
     spec.where.push({ field: 'titulo', op: 'contains', value: filters.titleSearch });
   }
   
   // Filtro por data
-  if (filters.dateRange?.start || filters.dateRange?.end) {
-    if (filters.dateRange.start && filters.dateRange.end) {
+  const dateRange = filters.dateRange as { start?: Date | null; end?: Date | null } | undefined;
+  if (dateRange?.start || dateRange?.end) {
+    if (dateRange.start && dateRange.end) {
       spec.where.push({ 
         field: 'dataCadastro', 
         op: 'between', 
-        value: [filters.dateRange.start, filters.dateRange.end] 
+        value: [dateRange.start, dateRange.end] 
       });
-    } else if (filters.dateRange.start) {
-      spec.where.push({ field: 'dataCadastro', op: 'gte', value: filters.dateRange.start });
-    } else if (filters.dateRange.end) {
-      spec.where.push({ field: 'dataCadastro', op: 'lte', value: filters.dateRange.end });
+    } else if (dateRange.start) {
+      spec.where.push({ field: 'dataCadastro', op: 'gte', value: dateRange.start });
+    } else if (dateRange.end) {
+      spec.where.push({ field: 'dataCadastro', op: 'lte', value: dateRange.end });
     }
   }
   
   // Filtro por prioridade
-  if (filters.priorityFilter && filters.priorityFilter.length > 0) {
-    spec.where.push({ field: 'prioridade', op: 'in', value: filters.priorityFilter });
+  const priorityFilter = filters.priorityFilter as string[] | undefined;
+  if (priorityFilter && Array.isArray(priorityFilter) && priorityFilter.length > 0) {
+    spec.where.push({ field: 'prioridade', op: 'in', value: priorityFilter });
   }
   
   // Filtro por categoria
-  if (filters.categoryFilter && filters.categoryFilter.length > 0) {
-    spec.where.push({ field: 'categoria', op: 'in', value: filters.categoryFilter });
+  const categoryFilter = filters.categoryFilter as string[] | undefined;
+  if (categoryFilter && Array.isArray(categoryFilter) && categoryFilter.length > 0) {
+    spec.where.push({ field: 'categoria', op: 'in', value: categoryFilter });
   }
   
   // Filtro por tags
-  if (filters.tagsFilter && filters.tagsFilter.length > 0) {
+  const tagsFilter = filters.tagsFilter as string[] | undefined;
+  if (tagsFilter && Array.isArray(tagsFilter) && tagsFilter.length > 0) {
     // Para tags, precisamos de uma lógica especial pois é um array
     spec.and = spec.and || [];
-    filters.tagsFilter.forEach((tag: string) => {
+    tagsFilter.forEach((tag: string) => {
       spec.and!.push({ where: [{ field: 'tags', op: 'contains', value: tag }] });
     });
   }
   
   // Filtro por impedimento
-  if (filters.impedimentFilter !== null) {
+  if (filters.impedimentFilter !== null && filters.impedimentFilter !== undefined) {
     spec.where.push({ field: 'impedimento', op: 'eq', value: filters.impedimentFilter });
   }
   
   // Filtro por complexidade
-  if (filters.complexityFilter && filters.complexityFilter.length > 0) {
-    spec.where.push({ field: 'complexidade', op: 'in', value: filters.complexityFilter });
+  const complexityFilter = filters.complexityFilter as string[] | undefined;
+  if (complexityFilter && Array.isArray(complexityFilter) && complexityFilter.length > 0) {
+    spec.where.push({ field: 'complexidade', op: 'in', value: complexityFilter });
   }
   
   return spec;
@@ -176,11 +207,11 @@ export function taskFiltersToSpec(filters: Record<string, unknown>): Spec<Record
  * Converte TaskFilters para PageRequest (compatibilidade com sistema atual)
  */
 export function taskFiltersToPageRequest(filters: Record<string, unknown>): PageRequest {
-  const sort = [];
+  const sort: { field: string; dir: SortDir }[] = [];
   
-  if (filters.sortBy) {
+  if (filters.sortBy && typeof filters.sortBy === 'string') {
     sort.push({
-      field: filters.sortBy as keyof Record<string, unknown>,
+      field: filters.sortBy,
       dir: (filters.sortOrder || 'desc') as SortDir
     });
   }
@@ -188,7 +219,7 @@ export function taskFiltersToPageRequest(filters: Record<string, unknown>): Page
   return {
     page: 1,
     size: 10,
-    sort: sort.length > 0 ? sort : undefined
+    sort: sort.length > 0 ? sort as any : undefined
   };
 }
 

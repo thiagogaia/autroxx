@@ -37,7 +37,7 @@ export class RepositoryFactory {
       const { IndexedDBTaskRepository } = await import('./indexeddb-repo');
       this.instance = new IndexedDBTaskRepository();
     }
-    return this.instance;
+    return this.instance!;
   }
   
   static setTaskRepository(repository: ITaskRepository): void {

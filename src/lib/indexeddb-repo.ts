@@ -4,6 +4,7 @@
 import Dexie, { Table } from 'dexie';
 import { Task, TaskStatus, TaskPriority, TaskCategory, TaskComplexity, PaginationParams, PaginationResult, TaskFilters } from '@/types/task';
 import { ID } from '@/types/domain';
+import { ITaskRepository } from './repository';
 
 // Interface para sincronização
 interface SyncMetadata {
@@ -55,7 +56,7 @@ class TaskDatabase extends Dexie {
 // Instância global do banco
 const db = new TaskDatabase();
 
-export class IndexedDBTaskRepository {
+export class IndexedDBTaskRepository implements ITaskRepository {
   private isOnline: boolean = typeof window !== 'undefined' ? navigator.onLine : true;
   private syncInProgress: boolean = false;
 
@@ -78,6 +79,15 @@ export class IndexedDBTaskRepository {
     window.addEventListener('offline', () => {
       this.isOnline = false;
     });
+  }
+
+  async save(entity: Task): Promise<Task> {
+    // Se já tem ID, é uma atualização
+    if (entity.id) {
+      return this.update(entity.id, entity);
+    }
+    // Se não tem ID, é uma criação
+    return this.create(entity);
   }
 
   // Métodos básicos CRUD
@@ -103,6 +113,10 @@ export class IndexedDBTaskRepository {
     return taskWithSync;
   }
 
+  async get(id: ID): Promise<Task | null> {
+    return this.getById(Number(id));
+  }
+
   async getById(id: number): Promise<Task | null> {
     const task = await db.tasks.get(id);
     return task ? this.removeSyncMetadata(task) : null;
@@ -126,7 +140,15 @@ export class IndexedDBTaskRepository {
       }
     };
 
-    await db.tasks.update(id, updatedTask);
+    await db.tasks.update(id, {
+      ...updates,
+      syncMetadata: {
+        ...existingTask.syncMetadata,
+        lastModified: now,
+        isSynced: this.isOnline,
+        syncVersion: existingTask.syncMetadata.syncVersion + 1
+      }
+    });
 
     if (!this.isOnline) {
       await this.addToSyncQueue('update', { id, ...updates });
@@ -149,7 +171,22 @@ export class IndexedDBTaskRepository {
   }
 
   // Queries paginadas e filtradas
-  async search(filters: TaskFilters = {}, pagination: PaginationParams = { page: 1, limit: 10, offset: 0 }): Promise<PaginationResult<Task>> {
+  async search(query?: { spec?: any; page?: any }): Promise<{ items: Task[]; total: number; page: number; size: number }> {
+    // Por enquanto, retornar todas as tarefas
+    // TODO: Implementar filtros usando Specification/Query Object
+    const allTasks = await db.tasks.toArray();
+    const tasks = allTasks.map(task => this.removeSyncMetadata(task));
+    
+    return {
+      items: tasks,
+      total: tasks.length,
+      page: 1,
+      size: tasks.length
+    };
+  }
+
+  // Método legado para compatibilidade
+  async searchLegacy(filters: TaskFilters = { statusFilter: 'tudo' }, pagination: PaginationParams = { page: 1, limit: 10, offset: 0 }): Promise<PaginationResult<Task>> {
     // Buscar todos os dados primeiro
     let data = await db.tasks.toArray();
 
@@ -226,14 +263,14 @@ export class IndexedDBTaskRepository {
     // Filtro por categoria usando índice
     if (filters.categoryFilter && filters.categoryFilter.length > 0) {
       query = query.filter(task => 
-        task.categoria && filters.categoryFilter!.includes(task.categoria)
+        Boolean(task.categoria && filters.categoryFilter!.includes(task.categoria))
       );
     }
 
     // Filtro por tags
     if (filters.tagsFilter && filters.tagsFilter.length > 0) {
       query = query.filter(task => 
-        task.tags && task.tags.some(tag => filters.tagsFilter!.includes(tag))
+        Boolean(task.tags && task.tags.some(tag => filters.tagsFilter!.includes(tag)))
       );
     }
 
@@ -247,34 +284,12 @@ export class IndexedDBTaskRepository {
     // Filtro por complexidade
     if (filters.complexityFilter && filters.complexityFilter.length > 0) {
       query = query.filter(task => 
-        task.complexidade && filters.complexityFilter!.includes(task.complexidade)
+        Boolean(task.complexidade && filters.complexityFilter!.includes(task.complexidade))
       );
     }
 
-    // Ordenação
-    if (filters.sortBy) {
-      switch (filters.sortBy) {
-        case 'titulo':
-          query = query.sortBy('titulo');
-          break;
-        case 'prioridade':
-          query = query.sortBy('prioridade');
-          break;
-        case 'dataCadastro':
-          query = query.sortBy('dataCadastro');
-          break;
-        case 'dataInicio':
-          query = query.sortBy('dataInicio');
-          break;
-        case 'dataFim':
-          query = query.sortBy('dataFim');
-          break;
-      }
-
-      // Para ordem decrescente, vamos ordenar os resultados após buscar
-      // O Dexie não tem método reverse() direto
-    }
-
+    // Ordenação - Dexie não suporta ordenação direta em Collection
+    // A ordenação será aplicada após buscar os dados
     return query;
   }
 
@@ -442,14 +457,20 @@ export class IndexedDBTaskRepository {
 
   async findWithImpediments(): Promise<Task[]> {
     const tasks = await db.tasks
-      .where('impedimento')
-      .equals(true)
+      .filter(task => task.impedimento === true)
       .toArray();
     
     return tasks.map(task => this.removeSyncMetadata(task));
   }
 
-  async count(filters: TaskFilters = {}): Promise<number> {
+  async count(query?: { spec?: any }): Promise<number> {
+    // Por enquanto, retornar contagem total
+    // TODO: Implementar contagem usando Specification/Query Object
+    return await db.tasks.count();
+  }
+
+  // Método legado para compatibilidade
+  async countLegacy(filters: TaskFilters = { statusFilter: 'tudo' }): Promise<number> {
     const allTasks = await db.tasks.toArray();
     const filteredTasks = this.applyFiltersToArray(allTasks, filters);
     return filteredTasks.length;

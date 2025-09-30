@@ -13,6 +13,8 @@ interface SQLiteDB {
     get: () => unknown;
     all: () => unknown[];
     finalize: () => void;
+    bind: (index: number, value: unknown) => void;
+    reset: () => void;
   };
   close: () => void;
 }
@@ -40,9 +42,11 @@ export class SQLiteOPFSTaskRepository implements ITaskRepository {
 
     try {
       // Importar wa-sqlite dinamicamente
+      // @ts-ignore - wa-sqlite não tem tipos TypeScript
       const { default: SQLiteESMFactory } = await import('wa-sqlite/dist/wa-sqlite-async.mjs');
       
       // Configurar OPFS
+      // @ts-ignore - wa-sqlite não tem tipos TypeScript
       const OPFS = await import('wa-sqlite/dist/wa-sqlite-opfs-async.mjs');
       
       // Criar instância do SQLite
@@ -102,7 +106,9 @@ export class SQLiteOPFSTaskRepository implements ITaskRepository {
                   }
                   return rows;
                 },
-                finalize: () => sqlite3.finalize(stmt)
+                finalize: () => sqlite3.finalize(stmt),
+                bind: (index: number, value: unknown) => sqlite3.bind(stmt, index, value),
+                reset: () => sqlite3.reset(stmt)
               };
             },
             close: () => sqlite3.close(db)
@@ -260,10 +266,13 @@ export class SQLiteOPFSTaskRepository implements ITaskRepository {
     if (!this.db) throw new Error('Database not initialized');
 
     const { sql, params } = this.buildSQL(query);
-    const countSql = this.buildCountSQL(query);
+    const { sql: countSql, params: countParams } = this.buildCountSQL(query);
     
     // Buscar total de registros
     const countStmt = this.db.prepare(countSql);
+    for (let i = 0; i < countParams.length; i++) {
+      countStmt.bind(i + 1, countParams[i]);
+    }
     let total = 0;
     if (countStmt.step()) {
       const countRow = countStmt.get() as Record<string, unknown>;
@@ -273,6 +282,9 @@ export class SQLiteOPFSTaskRepository implements ITaskRepository {
 
     // Buscar dados paginados
     const stmt = this.db.prepare(sql);
+    for (let i = 0; i < params.length; i++) {
+      stmt.bind(i + 1, params[i]);
+    }
     const rows: unknown[] = [];
     while (stmt.step()) {
       rows.push(stmt.get());

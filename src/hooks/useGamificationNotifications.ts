@@ -13,7 +13,7 @@ export function useGamificationNotifications() {
     if (isInitialLoadRef.current) {
       events.forEach(event => {
         if (!event.dismissed) {
-          processedEventsRef.current.add(event.id);
+          processedEventsRef.current.add(event.id.toString());
         }
       });
       isInitialLoadRef.current = false;
@@ -23,21 +23,21 @@ export function useGamificationNotifications() {
     // Para carregamentos subsequentes, processar apenas eventos novos
     const newEvents = events.filter(e => 
       !e.dismissed && 
-      !processedEventsRef.current.has(e.id)
+      !processedEventsRef.current.has(e.id.toString())
     );
     
     if (newEvents.length > 0) {
       // Marcar eventos como processados
       newEvents.forEach(event => {
-        processedEventsRef.current.add(event.id);
+        processedEventsRef.current.add(event.id.toString());
       });
       
       // Exibir notificações usando Sonner
       newEvents.forEach(event => {
         const { title, description, icon, value } = getNotificationContent(event);
         
-        toast.success(description, {
-          title,
+        toast.success(title, {
+          description,
           icon,
           duration: 4000,
           action: {

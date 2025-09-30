@@ -131,10 +131,12 @@ export default function DiscordInsignia({
       const statuses = document.querySelectorAll('.status-dot');
       statuses.forEach(dot => {
         if (Math.random() > 0.7) {
+          if (dot instanceof HTMLElement) {
           dot.style.transform = 'scale(1.3)';
-          setTimeout(() => {
-            dot.style.transform = 'scale(1)';
-          }, 300);
+            setTimeout(() => {
+              dot.style.transform = 'scale(1)';
+            }, 300);
+          }
         }
       });
     };

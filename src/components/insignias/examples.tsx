@@ -232,116 +232,116 @@ export function FireMinimalExample() {
 
 // Exemplo de uso dos componentes BadgeCard
 
-import { BadgeCard } from '@/components/insignias';
+// import { BadgeCard } from '@/components/insignias';
 
 // Uso básico BadgeCard
-export function BasicBadgeCardExample() {
-  return (
-    <BadgeCard 
-      type="elite"
-      title="DIAMOND ELITE"
-      description="Elite Cristalino"
-    />
-  );
-}
+// export function BasicBadgeCardExample() {
+//   return (
+//     <BadgeCard 
+//       type="elite"
+//       title="DIAMOND ELITE"
+//       description="Elite Cristalino"
+//     />
+//   );
+// }
 
 // Uso com propriedades customizadas BadgeCard
-export function CustomBadgeCardExample() {
-  return (
-    <BadgeCard 
-      type="royal"
-      title="CUSTOM ROYAL"
-      description="Coroa Real Customizada"
-      size="large"
-      onClick={() => console.log('Badge clicked!')}
-    />
-  );
-}
+// export function CustomBadgeCardExample() {
+//   return (
+//     <BadgeCard 
+//       type="royal"
+//       title="CUSTOM ROYAL"
+//       description="Coroa Real Customizada"
+//       size="large"
+//       onClick={() => console.log('Badge clicked!')}
+//     />
+//   );
+// }
 
 // Exemplos de diferentes tamanhos BadgeCard
-export function BadgeCardSizeExamples() {
-  return (
-    <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
-      {/* Tamanho pequeno */}
-      <div>
-        <h3>Small (200px)</h3>
-        <BadgeCard 
-          type="elite"
-          title="DIAMOND ELITE"
-          size="small"
-        />
-      </div>
+// export function BadgeCardSizeExamples() {
+//   return (
+//     <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
+//       {/* Tamanho pequeno */}
+//       <div>
+//         <h3>Small (200px)</h3>
+//         <BadgeCard 
+//           type="elite"
+//           title="DIAMOND ELITE"
+//           size="small"
+//         />
+//       </div>
       
-      {/* Tamanho médio */}
-      <div>
-        <h3>Medium (320px)</h3>
-        <BadgeCard 
-          type="royal"
-          title="ROYAL CROWN"
-          size="medium"
-        />
-      </div>
+//       {/* Tamanho médio */}
+//       <div>
+//         <h3>Medium (320px)</h3>
+//         <BadgeCard 
+//           type="royal"
+//           title="ROYAL CROWN"
+//           size="medium"
+//         />
+//       </div>
       
-      {/* Tamanho grande */}
-      <div>
-        <h3>Large (480px)</h3>
-        <BadgeCard 
-          type="mystic"
-          title="MYSTIC CRYSTAL"
-          size="large"
-        />
-      </div>
+//       {/* Tamanho grande */}
+//       <div>
+//         <h3>Large (480px)</h3>
+//         <BadgeCard 
+//           type="mystic"
+//           title="MYSTIC CRYSTAL"
+//           size="large"
+//         />
+//       </div>
       
-      {/* Tamanho extra grande */}
-      <div>
-        <h3>XLarge (640px)</h3>
-        <BadgeCard 
-          type="cosmic"
-          title="COSMIC STONE"
-          size="xlarge"
-        />
-      </div>
+//       {/* Tamanho extra grande */}
+//       <div>
+//         <h3>XLarge (640px)</h3>
+//         <BadgeCard 
+//           type="cosmic"
+//           title="COSMIC STONE"
+//           size="xlarge"
+//         />
+//       </div>
       
-      {/* Tamanho customizado */}
-      <div>
-        <h3>Custom (300px)</h3>
-        <BadgeCard 
-          type="legendary"
-          title="LEGENDARY CORE"
-          size={300}
-        />
-      </div>
-    </div>
-  );
-}
+//       {/* Tamanho customizado */}
+//       <div>
+//         <h3>Custom (300px)</h3>
+//         <BadgeCard 
+//           type="legendary"
+//           title="LEGENDARY CORE"
+//           size={300}
+//         />
+//       </div>
+//     </div>
+//   );
+// }
 
 // Exemplo de BadgeCard com tamanho responsivo
-export function BadgeCardResponsiveExample() {
-  return (
-    <div style={{ 
-      display: 'grid', 
-      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-      gap: '20px',
-      padding: '20px'
-    }}>
-      <BadgeCard 
-        type="elite"
-        title="DIAMOND ELITE"
-        size="small"
-      />
-      <BadgeCard 
-        type="royal"
-        title="ROYAL CROWN"
-        size="medium"
-      />
-      <BadgeCard 
-        type="mystic"
-        title="MYSTIC CRYSTAL"
-        size="large"
-      />
-    </div>
-  );
-}
+// export function BadgeCardResponsiveExample() {
+//   return (
+//     <div style={{ 
+//       display: 'grid', 
+//       gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+//       gap: '20px',
+//       padding: '20px'
+//     }}>
+//       <BadgeCard 
+//         type="elite"
+//         title="DIAMOND ELITE"
+//         size="small"
+//       />
+//       <BadgeCard 
+//         type="royal"
+//         title="ROYAL CROWN"
+//         size="medium"
+//       />
+//       <BadgeCard 
+//         type="mystic"
+//         title="MYSTIC CRYSTAL"
+//         size="large"
+//       />
+//     </div>
+//   );
+// }
 
 // Exemplo de uso dos componentes NFT
 

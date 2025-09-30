@@ -5,7 +5,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { TaskProvider } from '@/contexts/TaskContext';
-import { TaskProviderIndexedDB } from '@/contexts/TaskContextIndexedDB';
+import { TaskProvider as TaskProviderIndexedDB } from '@/contexts/TaskContextV2';
 import { TaskContextType } from '@/types/task';
 import { useIsClient } from '@/hooks/useIsClient';
 
