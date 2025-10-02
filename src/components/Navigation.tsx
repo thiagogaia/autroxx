@@ -8,7 +8,8 @@ import {
   Home, 
   BarChart3, 
   Trophy, 
-  Sparkles
+  Sparkles,
+  Spade
 } from 'lucide-react';
 import { useGamification } from '@/contexts/GamificationContext';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -23,7 +24,8 @@ export function Navigation() {
     { href: '/performance', label: 'Performance', icon: BarChart3 },
     { href: '/reports', label: 'Relatórios', icon: BarChart3 },
     { href: '/essencial', label: 'Essencial', icon: BarChart3 },
-    { href: '/gamification', label: 'Forja XP', icon: Trophy }
+    { href: '/gamification', label: 'Forja XP', icon: Trophy },
+    { href: '/mementomori', label: 'Memento Mori', icon: Spade }
   ];
 
   const isActive = (href: string) => {
