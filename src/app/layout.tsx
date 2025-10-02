@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: ':::AATROXX:::',
-  description: 'Sistema de gerenciamento de tarefas desenvolvido com Next.js e shadcn/ui',
+  description: 'O primeiro SAAS de gerenciamento de tarefas que transforma sua produtividade em uma épica jornada RPG.',
 }
 
 export default function RootLayout({
