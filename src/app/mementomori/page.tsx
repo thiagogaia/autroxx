@@ -643,7 +643,7 @@ const MementoMoriPage = () => {
                             <p className="text-sm text-slate-600">{milestoneInWeek.date}</p>
                           </div>
                         </div>
-                        <div className="bg-slate-50 p-3 rounded-lg">
+                        <div className="p-3 rounded-lg">
                           <div className="text-sm space-y-1">
                             <div><strong>Idade:</strong> {calculateAgeAtDate(milestoneInWeek.date)} anos</div>
                             <div><strong>Semana:</strong> {weekIndex + 1} de {Math.floor(getLifeExpectancy() * 52)}</div>
@@ -657,7 +657,7 @@ const MementoMoriPage = () => {
                           <h4 className="font-semibold text-lg">Ano {year + 1}</h4>
                           <p className="text-sm text-slate-600">Semana {week + 1}</p>
                         </div>
-                        <div className="bg-slate-50 p-3 rounded-lg">
+                        <div className="p-3 rounded-lg">
                           <div className="text-sm space-y-1">
                             <div><strong>Semana total:</strong> {weekIndex + 1}</div>
                             <div><strong>Idade aproximada:</strong> {year + 1} anos</div>
@@ -818,6 +818,18 @@ const MementoMoriPage = () => {
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <Navigation />
+
+        <div className="flex justify-between ">
+          <div className="mb-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList>
+                <TabsTrigger value="grid">Vida em Semanas</TabsTrigger>
+                <TabsTrigger value="stats">Estatísticas</TabsTrigger>
+                <TabsTrigger value="milestones">Marcos</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        </div>
         {/* <div className="text-center space-y-2 py-8">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Sua Vida em Semanas
@@ -829,12 +841,6 @@ const MementoMoriPage = () => {
         </div> */}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 max-w-2xl mx-auto">
-            <TabsTrigger value="grid">Grade Visual</TabsTrigger>
-            <TabsTrigger value="stats">Estatísticas</TabsTrigger>
-            <TabsTrigger value="milestones">Marcos</TabsTrigger>
-            
-          </TabsList>
 
           <TabsContent value="grid" className="space-y-6">
             <Card>
@@ -904,7 +910,7 @@ const MementoMoriPage = () => {
                             </p>
                           </div>
 
-                          <Alert className="bg-blue-50 border-blue-200">
+                          <Alert className="">
                             <AlertDescription>
                               <div className="space-y-1">
                                 <div>Idade atual: <strong>{currentAge.toFixed(1)} anos</strong></div>
@@ -1064,8 +1070,8 @@ const MementoMoriPage = () => {
                             {FAMOUS_DEATHS.map((death: FamousDeathData, idx: number) => (
                               <div
                                 key={idx}
-                                className={`text-sm p-2 hover:bg-slate-100 rounded cursor-pointer transition ${
-                                  selectedFamousDeath?.who === death.who ? 'bg-red-100 border border-red-300' : ''
+                                className={`text-sm p-2 rounded cursor-pointer transition ${
+                                  selectedFamousDeath?.who === death.who ? 'border' : ''
                                 }`}
                                 onMouseEnter={() => setHoveredAge(death.age)}
                                 onMouseLeave={() => setHoveredAge(null)}
@@ -1138,7 +1144,7 @@ const MementoMoriPage = () => {
                       <div className="print-controls">
                         <Button 
                           onClick={() => window.print()}
-                          className="bg-black text-white hover:bg-gray-800"
+                          className=""
                         >
                           <Printer className="w-4 h-4 mr-2" /> Imprimir Quadro
                         </Button>
@@ -1159,7 +1165,7 @@ const MementoMoriPage = () => {
 
           <TabsContent value="stats">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="bg-gradient-to-br from-blue-50 to-blue-100">
+              <Card className="bg-gradient-to-br from-blue-300 to-blue-200">
                 <CardHeader>
                   <CardTitle className="text-blue-700">⏱️ Tempo Vivido</CardTitle>
                 </CardHeader>
@@ -1172,7 +1178,7 @@ const MementoMoriPage = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-green-50 to-green-100">
+              <Card className="bg-gradient-to-br from-green-300 to-green-200">
                 <CardHeader>
                   <CardTitle className="text-green-700">🎯 Tempo Restante</CardTitle>
                 </CardHeader>
@@ -1185,7 +1191,7 @@ const MementoMoriPage = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-purple-50 to-purple-100">
+              <Card className="bg-gradient-to-br from-purple-200 to-purple-100">
                 <CardHeader>
                   <CardTitle className="text-purple-700">📊 Progresso</CardTitle>
                 </CardHeader>
@@ -1203,7 +1209,7 @@ const MementoMoriPage = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-orange-50 to-orange-100">
+              <Card className="bg-gradient-to-br from-orange-300 to-orange-200">
                 <CardHeader>
                   <CardTitle className="text-orange-700">💼 Carreira</CardTitle>
                 </CardHeader>
@@ -1218,7 +1224,7 @@ const MementoMoriPage = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-cyan-50 to-cyan-100">
+              <Card className="bg-gradient-to-br from-cyan-500 to-cyan-200">
                 <CardHeader>
                   <CardTitle className="text-cyan-700">🏖️ Aposentadoria</CardTitle>
                 </CardHeader>
@@ -1233,7 +1239,7 @@ const MementoMoriPage = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-pink-50 to-pink-100">
+              <Card className="bg-gradient-to-br from-pink-400 to-pink-200">
                 <CardHeader>
                   <CardTitle className="text-pink-700">🌟 Total</CardTitle>
                 </CardHeader>
@@ -1317,7 +1323,7 @@ const MementoMoriPage = () => {
                     {milestones.map((milestone: Milestone) => (
                       <div
                         key={milestone.id}
-                        className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition"
+                        className="flex items-center justify-between p-3 bg-slate-700 rounded-lg hover:bg-slate-800 transition"
                       >
                         <div className="flex items-center gap-3">
                           <div 
