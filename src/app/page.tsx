@@ -28,12 +28,19 @@ export default function TaskManagerPage() {
         {/* Navigation */}
         <Navigation />
 
-        <div className="flex justify-between ">
-          {/* Filtros básicos (abas) */}
-          <TaskFilter />
-        
-          {/* Filtros avançados */}
-          <AdvancedFilters />
+        <div className="space-y-4 md:space-y-0">
+          {/* Filtros - Stack em mobile, lado a lado em desktop */}
+          <div className="flex flex-col md:flex-row md:justify-between gap-4">
+            {/* Filtros básicos (abas) - Apenas desktop */}
+            <div className="hidden md:flex md:flex-1">
+              <TaskFilter />
+            </div>
+          
+            {/* Filtros avançados */}
+            <div className="md:flex-1 md:max-w-md">
+              <AdvancedFilters />
+            </div>
+          </div>
         </div>
         
         {/* Formulário */}

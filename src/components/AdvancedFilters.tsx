@@ -110,9 +110,9 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
 
   return (
     <div className={className}>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         {/* Campo de busca rápida */}
-        <div className="relative flex-1 max-w-md">
+        <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Buscar por título..."
@@ -130,9 +130,10 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
         {/* Botão de filtros avançados */}
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="relative">
-              <Filter className="h-4 w-4 mr-2" />
-              Filtros
+            <Button variant="outline" className="relative shrink-0 w-full sm:w-auto">
+              <Filter className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Filtros</span>
+              <span className="sm:hidden">Filtros ({activeFiltersCount})</span>
               {activeFiltersCount > 0 && (
                 <Badge variant="secondary" className="ml-2 h-5 w-5 rounded-full p-0 text-xs">
                   {activeFiltersCount}
@@ -140,7 +141,7 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-96 p-0" align="end">
+          <PopoverContent className="w-[90vw] max-w-[28rem] p-0" align="end">
             <Card>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -159,7 +160,7 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
                 {/* Filtro por data */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Data de Cadastro</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button variant="outline" className="justify-start text-left font-normal">
@@ -295,7 +296,7 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
                 {/* Ordenação */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Ordenar por</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <Select
                       value={advancedFilters.sortBy || 'dataCadastro'}
                       onValueChange={(value) => handleFilterChange('sortBy', value)}
@@ -327,11 +328,11 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
                 </div>
 
                 {/* Botões de ação */}
-                <div className="flex justify-end gap-2 pt-2 border-t">
-                  <Button variant="outline" size="sm" onClick={() => setIsOpen(false)}>
+                <div className="flex flex-col sm:flex-row sm:justify-end gap-2 pt-2 border-t">
+                  <Button variant="outline" size="sm" onClick={() => setIsOpen(false)} className="w-full sm:w-auto">
                     Fechar
                   </Button>
-                  <Button size="sm" onClick={() => setIsOpen(false)}>
+                  <Button size="sm" onClick={() => setIsOpen(false)} className="w-full sm:w-auto">
                     Aplicar Filtros
                   </Button>
                 </div>
