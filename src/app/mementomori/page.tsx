@@ -846,7 +846,7 @@ const MementoMoriPage = () => {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Seu Grid de Vida</CardTitle>
+                  <CardTitle>Vida em Semanas</CardTitle>
                   <div className="flex items-center gap-2">
                     <Popover>
                       <PopoverTrigger asChild>
