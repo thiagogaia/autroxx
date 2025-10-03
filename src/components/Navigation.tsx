@@ -90,7 +90,7 @@ export function Navigation() {
           </SheetTrigger>
           <SheetContent side="left" className="w-80">
             <SheetHeader>
-              <SheetTitle>AATROXX</SheetTitle>
+              <SheetTitle>:::AATROXX:::</SheetTitle>
             </SheetHeader>
             <div className="flex flex-col gap-6">
               {renderNavItems('flex flex-col gap-2')}
