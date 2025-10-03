@@ -76,16 +76,16 @@ export function Pagination({ className }: PaginationProps) {
   const endItem = Math.min(currentPage * pagination.limit, totalTasks);
 
   return (
-    <div className={`flex items-center justify-between ${className}`}>
+    <div className={`flex items-center flex-col md:flex-row gap-2 md:gap-0 justify-between ${className}`}>
       {/* Informações da paginação */}
       <div className="flex items-center gap-4 text-sm text-muted-foreground">
-        <span>
+        <span className="hidden md:block">
           Mostrando {startItem} a {endItem} de {totalTasks} tarefas
         </span>
         
         {/* Seletor de itens por página */}
         <div className="flex items-center gap-2">
-          <span>Itens por página:</span>
+          {/* <span>Itens por página:</span> */}
           <Select value={pagination.limit.toString()} onValueChange={handleLimitChange}>
             <SelectTrigger className="w-20">
               <SelectValue />
