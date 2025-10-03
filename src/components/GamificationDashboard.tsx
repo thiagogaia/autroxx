@@ -181,7 +181,7 @@ export function GamificationDashboard() {
           { id: 'overview', label: 'Visão Geral', icon: TrendingUp },
           { id: 'achievements', label: 'Conquistas', icon: Trophy },
           { id: 'challenges', label: 'Desafios', icon: Target },
-          { id: 'leaderboard', label: 'Ranking', icon: Crown }
+          // { id: 'leaderboard', label: 'Ranking', icon: Crown }
         ].map(({ id, label, icon: Icon }) => (
           <Button
             key={id}
