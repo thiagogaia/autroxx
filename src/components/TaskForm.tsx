@@ -22,7 +22,7 @@ export function TaskForm() {
 
       await addTask(novaTarefa.trim(), prioridade);
       setNovaTarefa('');
-      setPrioridadeNovaTarefa('normal');
+      // setPrioridadeNovaTarefa('normal');
     }
   };
 
