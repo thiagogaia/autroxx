@@ -1,10 +1,10 @@
 'use client';
 
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { useTaskContext } from '@/contexts/TaskContextV2';
+import { RepositoryFactory } from '@/lib/repository';
 import { Task, TaskCategory, TaskComplexity } from '@/types/task';
 import { formatMinutesToString } from '@/lib/time-converter';
 import { 
@@ -32,13 +32,39 @@ import {
 } from 'lucide-react';
 
 export function Insights() {
-  const { tasks } = useTaskContext();
+  const [tasks, setTasks] = React.useState<Task[]>([]);
+  const [completedTasksRepo, setCompletedTasksRepo] = React.useState<Task[]>([]);
+  const [impedimentTasksRepo, setImpedimentTasksRepo] = React.useState<Task[]>([]);
+
+  // Carregar tarefas diretamente do repositório (bounded context Adapter)
+  React.useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const repo = await RepositoryFactory.getTaskRepository();
+        const [result, completed, impediments] = await Promise.all([
+          repo.search(),
+          repo.findByStatus('concluido'),
+          repo.findWithImpediments()
+        ]);
+        if (!cancelled) {
+          setTasks(result.items);
+          setCompletedTasksRepo(completed);
+          setImpedimentTasksRepo(impediments);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar tarefas (Insights) do repositório:', error);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const insights = useMemo(() => {
-    const completedTasks = tasks.filter(task => task.statusAtual === 'concluido');
+    // Usar conjuntos direcionados vindos do repository
+    const completedTasks = completedTasksRepo;
     const tasksWithTime = completedTasks.filter(task => task.dataInicio && task.dataFim);
     const tasksWithCategory = tasks.filter(task => task.categoria);
-    const tasksWithEstimate = tasks.filter(task => task.estimativaTempo);
+    const tasksWithEstimate = completedTasksRepo.filter(task => task.estimativaTempo);
 
     // Tempo gasto por categoria
     const timeByCategory = tasksWithTime.reduce((acc, task) => {
@@ -96,19 +122,17 @@ export function Insights() {
     }, { total: 0, tasksWithChanges: 0, highRisk: 0 });
 
     // Análise de impedimentos
-    const impedimentAnalysis = tasks.reduce((acc, task) => {
-      if (task.impedimento) {
-        acc.totalImpediments += 1;
-        const impedimentTime = task.tempoTotalImpedimento || 0;
-        acc.totalImpedimentTime += impedimentTime;
-        
-        if (task.categoria) {
-          if (!acc.byCategory[task.categoria]) {
-            acc.byCategory[task.categoria] = { count: 0, time: 0 };
-          }
-          acc.byCategory[task.categoria].count += 1;
-          acc.byCategory[task.categoria].time += impedimentTime;
+    const impedimentAnalysis = impedimentTasksRepo.reduce((acc, task) => {
+      acc.totalImpediments += 1;
+      const impedimentTime = task.tempoTotalImpedimento || 0;
+      acc.totalImpedimentTime += impedimentTime;
+      
+      if (task.categoria) {
+        if (!acc.byCategory[task.categoria]) {
+          acc.byCategory[task.categoria] = { count: 0, time: 0 };
         }
+        acc.byCategory[task.categoria].count += 1;
+        acc.byCategory[task.categoria].time += impedimentTime;
       }
       return acc;
     }, { 
@@ -138,7 +162,7 @@ export function Insights() {
       completedTasks: completedTasks.length,
       tasksWithCategory: tasksWithCategory.length
     };
-  }, [tasks]);
+  }, [tasks, completedTasksRepo, impedimentTasksRepo]);
 
   const getCategoryIcon = (category: TaskCategory) => {
     const icons = {
