@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { useTaskContext } from '@/contexts/TaskContextV2';
+import { RepositoryFactory } from '@/lib/repository';
+import { Task } from '@/types/task';
 import { formatMinutesToString } from '@/lib/time-converter';
 import { 
   CheckCircle, 
@@ -18,7 +19,25 @@ import {
 import { Navigation } from '@/components/Navigation';
 
 export default function Reports2Page() {
-  const { tasks } = useTaskContext();
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  // Carregar tarefas diretamente do repositório (bounded context Adapter)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const repo = await RepositoryFactory.getTaskRepository();
+        const result = await repo.search();
+        if (!cancelled) {
+          setTasks(result.items);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar tarefas (Essencial) do repositório:', error);
+        if (!cancelled) setTasks([]);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // Calcular métricas essenciais
   const metrics = useMemo(() => {
