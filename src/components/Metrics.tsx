@@ -2,7 +2,10 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import React from 'react';
 import { useTaskContext } from '@/contexts/TaskContextV2';
+import { RepositoryFactory } from '@/lib/repository';
+import { Task } from '@/types/task';
 import { 
   CheckCircle, 
   Clock, 
@@ -16,11 +19,54 @@ import {
 
 export function Metrics() {
   const { tasks } = useTaskContext();
+  const [tarefasConcluidas, setTarefasConcluidas] = React.useState<Task[]>([]);
+  const [tarefasEmAndamento, setTarefasEmAndamento] = React.useState<Task[]>([]);
+  const [impedimentosCount, setImpedimentosCount] = React.useState<number>(0);
+  const [taxaImpedimento, setTaxaImpedimento] = React.useState<number>(0);
+  const [prioridades, setPrioridades] = React.useState<Record<string, number>>({});
+  const [totalCount, setTotalCount] = React.useState<number>(0);
+
+  // Buscar tarefas concluídas diretamente do repositório (bounded context Adapter)
+  React.useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const repo = await RepositoryFactory.getTaskRepository();
+        const [concluidas, emAndamento, comImpedimento, total, baixa, normal, media, alta] = await Promise.all([
+          repo.findByStatus('concluido'),
+          repo.findByStatus('fazendo'),
+          repo.findWithImpediments(),
+          repo.count(),
+          repo.findByPriority('baixa'),
+          repo.findByPriority('normal'),
+          repo.findByPriority('media'),
+          repo.findByPriority('alta')
+        ]);
+
+        const withDates = concluidas.filter(t => t.dataFim && t.dataInicio);
+
+        if (!cancelled) {
+          setTarefasConcluidas(withDates);
+          setTarefasEmAndamento(emAndamento);
+          setImpedimentosCount(comImpedimento.length);
+          setTaxaImpedimento(total > 0 ? Math.round((comImpedimento.length / total) * 100) : 0);
+          setTotalCount(total);
+          setPrioridades({
+            baixa: baixa.length,
+            normal: normal.length,
+            media: media.length,
+            alta: alta.length
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao carregar tarefas concluídas do repositório:', error);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // Calcular métricas úteis
-  const tarefasConcluidas = tasks.filter(t => t.statusAtual === 'concluido' && t.dataFim && t.dataInicio);
-  const tarefasEmAndamento = tasks.filter(t => t.statusAtual === 'fazendo');
-  const tarefasComImpedimento = tasks.filter(t => t.impedimento);
+  const tarefasComImpedimento = impedimentosCount;
   
   // Tempo médio de conclusão
   const tempoMedio = tarefasConcluidas.length > 0 ? 
@@ -39,14 +85,10 @@ export function Metrics() {
   });
   
   // Taxa de impedimentos
-  const taxaImpedimento = tasks.length > 0 ? 
-    Math.round((tarefasComImpedimento.length / tasks.length) * 100) : 0;
+  // taxaImpedimento vem do repositório (com base no total em storage)
   
   // Distribuição de prioridades
-  const prioridades = tasks.reduce((acc, t) => {
-    acc[t.prioridade] = (acc[t.prioridade] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  // prioridades vem do repositório
 
   const metricas = [
     {
@@ -105,7 +147,7 @@ export function Metrics() {
     },
     {
       title: "Total tarefas",
-      value: tasks.length,
+      value: totalCount,
       icon: BarChart3,
       iconColor: "text-gray-600 dark:text-gray-400",
       bgColor: "bg-gray-50 dark:bg-gray-950/20",
@@ -114,7 +156,7 @@ export function Metrics() {
     },
     {
       title: "Taxa conclusão",
-      value: `${tasks.length > 0 ? Math.round((tarefasConcluidas.length / tasks.length) * 100) : 0}%`,
+      value: `${totalCount > 0 ? Math.round((tarefasConcluidas.length / totalCount) * 100) : 0}%`,
       icon: Target,
       iconColor: "text-emerald-600 dark:text-emerald-400",
       bgColor: "bg-emerald-50 dark:bg-emerald-950/20",
