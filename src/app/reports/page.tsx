@@ -1,17 +1,17 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useTaskContext } from '@/contexts/TaskContextV2';
+import { RepositoryFactory } from '@/lib/repository';
 import { formatMinutesToString } from '@/lib/time-converter';
 import { hasStatusInHistory } from '@/lib/utils';
 import { Task } from '@/types/task';
-import { TAREFAS_EXEMPLO } from '@/lib/mock-data';
+// import { TAREFAS_EXEMPLO } from '@/lib/mock-data';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -69,33 +69,41 @@ const PRIORITY_COLORS = {
 
 export default function ReportsPage() {
   const [periodFilter, setPeriodFilter] = useState<PeriodFilter>('all');
-  const { tasks } = useTaskContext();
-  
-  // Usar dados mock se não houver tarefas reais (para demonstração)
-  const tasksToUse = useMemo(() => {
-    if (tasks && tasks.length > 0) {
-      return tasks;
-    }
-    // Fallback para dados mock se não houver tarefas reais
-    try {
-      return TAREFAS_EXEMPLO || [];
-    } catch (error) {
-      console.warn('Erro ao carregar dados mock:', error);
-      return [];
-    }
-  }, [tasks]);
+  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
 
-  // Filtrar dados por período
-  const filteredTasks = useMemo(() => {
-    if (periodFilter === 'all') return tasksToUse;
-    
-    const daysMap = { '7d': 7, '30d': 30, '90d': 90 };
-    const cutoffDate = subDays(new Date(), daysMap[periodFilter]);
-    
-    return tasksToUse.filter((task: Task) => 
-      new Date(task.dataCadastro) >= cutoffDate
-    );
-  }, [tasksToUse, periodFilter]);
+  // Carregar tarefas do repositório conforme o filtro de período
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const repo = await RepositoryFactory.getTaskRepository();
+
+        // Construir filtro por período
+        if (periodFilter === 'all') {
+          const result = await repo.search();
+          if (!cancelled) setFilteredTasks(result.items);
+        } else {
+          const daysMap: Record<Exclude<PeriodFilter, 'all'>, number> = { '7d': 7, '30d': 30, '90d': 90 };
+          const cutoffDate = subDays(new Date(), daysMap[periodFilter]);
+          const now = new Date();
+          const result = await repo.search({
+            spec: {
+              where: [
+                { field: 'dataCadastro', op: 'between', value: [cutoffDate, now] }
+              ]
+            }
+          } as any);
+          if (!cancelled) setFilteredTasks(result.items);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar tarefas (Reports) do repositório:', error);
+        if (!cancelled) setFilteredTasks([]);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [periodFilter]);
+  
+  // filteredTasks já vem do repositório considerando o período
 
   // Métricas principais
   const metrics = useMemo(() => {
